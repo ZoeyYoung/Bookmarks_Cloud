@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <!-- saved from url=(0014)about:internet -->
+    <title>{{ escape(handler.settings['title'])}}</title>
+    <meta name="keywords" content="{{ escape(handler.settings['keywords']) }}">
+    <meta name="description" content="{{ escape(handler.settings['desc']) }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{static_url('css/bootstrap-flatly.min.css')}}" rel="stylesheet" media="screen">
+    <link href="{{static_url('css/font-awesome.min.css')}}" rel="stylesheet" media="screen">
+    <!-- font-awesome如果需要IE7支持要添加额外的CSS -->
+    <link href="{{static_url('css/pygments.css')}}" rel="stylesheet" media="screen">
+    <link href="{{static_url('css/style.css') }}" rel="stylesheet" />
+    <link href="{{static_url('css/bootstrap-responsive.min.css')}}" rel="stylesheet" media="screen">
+    <script src="{{static_url('js/prefixfree.min.js')}}"></script>
+</head>
+
+<body id="top" data-spy="scroll" data-target=".subnav" data-offset="80">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner clearfix">
+            <div class="container-fluid">
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"></button>
+                <div class="nav-collapse collapse">
+                    <ul class="nav">
+                        <li class="active"><a href="/"><i class="icon-cloud"></i> {{escape(handler.settings['title'])}}</a>
+                        </li>
+                        <li><a href="#1" data-toggle="tab"><i class="icon-list"></i> 列表({{count}})</a>
+                        </li>
+                        <li id="waterfallTab"><a href="#2" data-toggle="tab"><i class="icon-th"></i> 瀑布流</a>
+                        </li>
+                        <li><a href="#3" data-toggle="tab"><i class="icon-tags"></i> 标签</a>
+                        </li>
+                        <li id="randomBookmarksBtn"><a href="#4" data-toggle="tab"><i class="icon-random"></i> 随机</a>
+                        </li>
+                    </ul>
+                    <ul class="nav pull-right">
+                        {% if not handler.get_current_user() is None %}
+                        <li><a id="showLinkFormBtn" href="#">+</a></li>
+                        <li><a href="/auth/logout">登出</a></li>
+                        <li><img src="{{handler.avatar()}}" class="img-circle" /></li>
+                        {% else %}
+                        <li><a href="/auth/login">登录</a></li>
+                        {% end %}
+                    </ul>
+                    <form class="navbar-search pull-right" action="/search" method="post" name="search">
+                        {% module xsrf_form_html() %}
+                        <input type="search" id="keywords" name="keywords" class="input-medium search-query" placeholder="搜索: 标题 网址 标签" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row-fluid show-grid">
+            <div class="span12">
+                {% block header %} {% if not handler.get_current_user() is None %}
+                <form id="linkForm" class="form-horizontal" action="#">
+                    {% module xsrf_form_html() %}
+                    <div class="control-group">
+                        <!-- <label class="control-label" for="url">url</label> -->
+                        <div class="controls input-prepend input-append">
+                            <span class="add-on"><i class="icon-bookmark"></i>
+                            </span>
+                            <input type="url" name="url" id="url" class="input-xxlarge" placeholder="网址" autofocus required/>
+                            <button class="btn btn-info" type="button" id="getLinkInfoBtn" data-loading-text="载入中...">获取信息</button>
+                        </div>
+                    </div>
+                    <div id="linkInfoInputs">
+                        <div class="control-group">
+                            <label class="control-label" for="title" >标题</label>
+                            <div class="controls">
+                                <input type="text" name="title" id="title" placeholder="the title of the web" class=" span10" required disabled>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="description">摘要</label>
+                            <div class="controls">
+                                <textarea name="description" id="description" rows="2" placeholder="the description of the web" class="span10" disabled></textarea>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="tags">标签</label>
+                            <div class="controls">
+                                <input type="text" name="tags" id="tags" class="tagsinput span10" placeholder="tags,seprate,with,','" required/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="note">笔记</label>
+                            <div class="controls">
+                                <textarea class="span10" id="note" rows="5" placeholder="some note"></textarea>
+                                <span class="help-block">使用Markdown语法</span>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="addLinkBtn" class="btn btn-primary">提交</button>
+                            <button type="button" id="cancelAddLinkBtn" class="btn">取消</button>
+                        </div>
+                    </div>
+                </form>
+                {% end %} {% end %} {% block content %}{% end %}
+            </div>
+        </div>
+    </div>
+    <article id="article" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="article-title" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="article-title"></h3>
+      </div>
+      <div id="article-content" class="modal-body">
+      </div>
+    </article>
+    <footer id="footer">
+    </footer>
+    <script src="{{static_url('js/jquery-1.10.2.min.js')}}"></script>
+    <script src="{{static_url('js/bootstrap.min.js')}}"></script>
+    <script src="{{static_url('js/jquery.placeholder.js')}}"></script>
+    <script src="{{static_url('js/handlebars.js')}}"></script>
+    <script src="{{static_url('js/waterfall.min.js')}}"></script>
+    <script src="{{static_url('js/script.js')}}"></script>
+</body>
+</html>

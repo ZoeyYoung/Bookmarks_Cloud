@@ -1,0 +1,24 @@
+<div class="link-item" data-name="{{link['title']}}">
+    <div class="link-favicon">
+        <a target="_blank" class="link-title" title="{{link['url']}}" href="{{link['url']}}"><img src="{{link['favicon']}}" onError="this.src='http://ico.ylsnuha.com/{{link['url']}}?defaulticon={{handler.avatar()}}';" alt="{{link['title']}}"/></a>
+    </div>
+    <div class="link-content">
+        <a target="_blank" class="link-title" title="{{link['url']}}" href="{{link['url']}}">{{link['title']}}</a>
+        <time><i class="icon-time"></i> {{locale.format_date(link['post_time'], -480, relative=False)}}</time>
+        <div class="icons pull-right">
+            <a title="{{link['url']}}" class="link-refresh-btn"><i class="icon-refresh"></i></a>
+            <a title="{{link['url']}}" class="link-read-btn"><i class="icon-file-text"></i></a>
+            <a title="{{link['url']}}" class="link-edit-btn" href="#top"><i class="icon-edit"></i></a>
+            <a title="{{link['url']}}" class="link-del-btn"><i class="icon-trash"></i></a>
+        </div>
+        <blockquote><p>{{link['description']}}</p></blockquote>
+        {{link['note_html']}}
+        {% if len(link['tags']) > 0 %}
+        <ul class="inline tags">
+            {% for tag in link['tags'] %}
+                <li class="label label-important"><a style="color:white;" href="/tag/1/{{tag}}"><i class="icon-tag icon-white"></i> {{tag}}</a></li>
+            {% end %}
+        </ul>
+        {% end %}
+    </div>
+</div>

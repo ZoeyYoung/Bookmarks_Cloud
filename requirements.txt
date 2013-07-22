@@ -1,0 +1,6 @@
+tornado>=3
+pymongo
+markdown
+pygments
+chardet
+cssselect
