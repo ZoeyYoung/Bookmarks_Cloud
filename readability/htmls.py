@@ -1,23 +1,39 @@
-from .cleaners import normalize_spaces, clean_attributes
-from .encoding import get_encoding
-from lxml.html import tostring
 import logging
-import lxml.html
 import re
 
-logging.getLogger().setLevel(logging.DEBUG)
+from lxml.html import document_fromstring
+from lxml.html import HTMLParser
+from lxml.html import tostring
+from lxml.html import soupparser
 
-utf8_parser = lxml.html.HTMLParser(encoding='utf-8')
+from .cleaners import clean_attributes
+from .cleaners import normalize_spaces
+from .encoding import decode_html
+
+logging.getLogger().setLevel(logging.DEBUG)
+utf8_parser = HTMLParser(encoding='utf-8')
+
+
+LOG = logging.getLogger()
 
 
 def build_doc(page):
-    if isinstance(page, str):
-        page_unicode = page
-    else:
-        enc = get_encoding(page)
-        page_unicode = page.decode(enc, 'replace')
-    doc = lxml.html.document_fromstring(
-        page_unicode.encode('utf-8', 'replace'), parser=utf8_parser)
+    """解析HTML
+    @para page: 爬取的页面
+    @return <class 'lxml.html.HtmlElement'> 类型对象
+    """
+    # Requires that the `page` not be None
+    if page is None:
+        LOG.error("Page content is None, can't build_doc")
+        return ''
+    doc = document_fromstring(decode_html(page))
+    try:
+        tostring(doc, encoding='unicode')
+    except UnicodeDecodeError:
+        """Using soupparser as a fallback
+        """
+        print("Using soupparser as a fallback")
+        doc = soupparser.fromstring(decode_html(page))
     return doc
 
 
@@ -48,27 +64,28 @@ def norm_title(title):
 
 
 def get_title(doc):
-    title = doc.find('.//title')
-    if title is None or len(title.text) == 0:
-        return '[no-title]'
+    title_node = doc.find('.//title')
 
-    return norm_title(title.text)
+    if title_node is None:
+        return '[no-title]'
+    title = title_node.text
+    return norm_title(title)
 
 
 def get_description(doc):
-    description = doc.xpath("//meta[translate(@name, 'ABCDEFGHJIKLMNOPQRSTUVWXYZ', 'abcdefghjiklmnopqrstuvwxyz')='description']")
-    if len(description) <= 0:
-        return '[no-description]'
+    description_node = doc.xpath("//meta[translate(@name, 'ABCDEFGHJIKLMNOPQRSTUVWXYZ', 'abcdefghjiklmnopqrstuvwxyz')='description']")
 
-    return description[0].attrib["content"]
+    if len(description_node) <= 0:
+        return '[no-description]'
+    return description_node[0].attrib["content"]
 
 
 def get_keywords(doc):
-    keywords = doc.xpath("//meta[translate(@name, 'ABCDEFGHJIKLMNOPQRSTUVWXYZ', 'abcdefghjiklmnopqrstuvwxyz')='keywords']")
-    if len(keywords) <= 0:
+    keywords_node = doc.xpath("//meta[translate(@name, 'ABCDEFGHJIKLMNOPQRSTUVWXYZ', 'abcdefghjiklmnopqrstuvwxyz')='keywords']")
+    if len(keywords_node) <= 0:
         return ''
 
-    return keywords[0].attrib["content"]
+    return keywords_node[0].attrib["content"]
 
 
 def add_match(collection, text, orig):
@@ -79,11 +96,12 @@ def add_match(collection, text, orig):
 
 
 def shorten_title(doc):
-    title = doc.find('.//title')
-    if title is None or title.text is None or len(title.text) == 0:
+    title_node = doc.find('.//title')
+    if title_node is None:
         return ''
 
-    title = orig = norm_title(title.text)
+    title = title_node.text
+    title = orig = norm_title(title)
 
     candidates = set()
 
@@ -129,13 +147,13 @@ def shorten_title(doc):
 
 def get_body(doc):
     [elem.drop_tree() for elem in doc.xpath('.//script | .//link | .//style')]
-    # raw_html = str(tostring(doc.body or doc))
-    raw_html = tostring(doc.body or doc)
+    raw_html = str(tostring(doc.body or doc))
     cleaned = clean_attributes(raw_html)
     try:
-        # BeautifulSoup(cleaned) #FIXME do we really need to try loading it?
+        #BeautifulSoup(cleaned) #FIXME do we really need to try loading it?
         return cleaned
     except Exception:  # FIXME find the equivalent lxml error
-        logging.error("cleansing broke html content: %s\n---------\n%s" %
-                      (raw_html, cleaned))
+        logging.error("cleansing broke html content: %s\n---------\n%s" % (
+            raw_html,
+            cleaned))
         return raw_html

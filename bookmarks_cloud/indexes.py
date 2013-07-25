@@ -14,3 +14,4 @@ def ensure_indexes(sync_db, drop=False):
     sync_db.links.ensure_index([("note", ASCENDING)])
     sync_db.links.ensure_index([("url", ASCENDING)])
     sync_db.links.ensure_index([("tags", ASCENDING)])
+    sync_db.links.ensure_index([("random", ASCENDING)])

@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # db = motor.MotorClient().open_sync().links
     # db = pymongo.Connection().links
     # cache.startup(db)
-
+    print(options.ensure_indexes)
     if options.rebuild_indexes or options.ensure_indexes:
         indexes.ensure_indexes(
             config.config['db'],

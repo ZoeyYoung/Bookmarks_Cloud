@@ -1,37 +1,51 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# strip out a set of nuisance html attributes that can mess up rendering in RSS feeds
+# strip out a set of nuisance html attributes that can mess up rendering in
+# RSS feeds
 import re
 from lxml.html.clean import Cleaner
 
-bad_attrs = ['width', 'height', 'style', '[-a-z]*color', 'background[-a-z]*', 'on*']
+bad_attrs = ['width', 'height', 'style', '[-a-z]*color',
+             'background[-a-z]*', 'on*']
 single_quoted = "'[^']+'"
 double_quoted = '"[^"]+"'
 non_space = '[^ "\'>]+'
+cstr = ("<"  # open
+        "([^>]+) "  # prefix
+        "(?:%s) *" % ('|'.join(bad_attrs),) +  # undesirable attributes
+        '= *(?:%s|%s|%s)' % (non_space, single_quoted, double_quoted) +  # value
+        "([^>]*)" +  # postfix
+        ">")
 htmlstrip = re.compile("<"  # open
-    "([^>]+) "  # prefix
-    "(?:%s) *" % ('|'.join(bad_attrs),) +  # undesirable attributes
-    '= *(?:%s|%s|%s)' % (non_space, single_quoted, double_quoted) +  # value
-    "([^>]*)"  # postfix
-    ">"        # end
-, re.I)
+                       "([^>]+) "  # prefix
+                       "(?:%s) *" % ('|'.join(bad_attrs),) +  # undesirable attributes
+                       '= *(?:%s|%s|%s)' % (non_space, single_quoted, double_quoted) +  # value
+                       "([^>]*)"  # postfix
+                       ">",       # end
+                       re.I)
 
 
 def clean_attributes(html):
+    """移除HTML标签中无用的属性, 即上面的bad_attrs
+    例如: <div id="main" class="content" style="font-size:18px;">content</div>
+    变成: <div id="main" class="content">content</div>
+    """
     while htmlstrip.search(html):
-        html = htmlstrip.sub('<\\1\\2>', html)
+        html = htmlstrip.sub(r'<\1\2>', html)
     return html
 
 
 def normalize_spaces(s):
+    """replace any sequence of whitespace characters with a single space
+    将多个空格变成一个空格
+    """
     if not s:
         return ''
-    """replace any sequence of whitespace
-    characters with a single space"""
     return ' '.join(s.split())
 
+
 html_cleaner = Cleaner(scripts=True, javascript=True, comments=True,
-                  style=True, links=True, meta=False, add_nofollow=False,
-                  page_structure=False, processing_instructions=True, embedded=False,
-                  frames=False, forms=False, annoying_tags=False, remove_tags=None,
-                  remove_unknown_tags=False, safe_attrs_only=False)
+                       style=True, links=True, meta=False, add_nofollow=True,
+                       page_structure=False, processing_instructions=True,
+                       embedded=False, frames=False, forms=False,
+                       annoying_tags=False, remove_tags=None,
+                       kill_tags=['footer', 'nav'],
+                       remove_unknown_tags=False, safe_attrs_only=False)

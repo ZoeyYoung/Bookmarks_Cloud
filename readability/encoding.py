@@ -1,20 +1,40 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+import logging
 import re
 import chardet
+from bs4 import UnicodeDammit
+
+LOG = logging.getLogger()
+
 
 BROTHER_ENCODINGS = [
     ('GB2312', 'GBK', 'GB18030'),
 ]
 
 
-def get_encoding(page):
+def decode_html(html_string):
+    """使用BS4的UnicodeDammit来检测网页编码, 并返回unicode文档, 不能保证正确率100%, 因此加上备选方案
+    """
+    dammit = UnicodeDammit(html_string, ['GB2312', 'GBK', 'GB18030'], smart_quotes_to="html", is_html=True)
+    doc = dammit.unicode_markup
+    # print("dammit —— ", dammit.original_encoding)
+    if dammit.original_encoding == 'ISO-8859-2':
+        enc = get_encoding(html_string)
+        # print("chardet —— ", enc)
+        doc = html_string.decode(enc, 'replace')
+    elif not dammit.unicode_markup:
+        raise UnicodeDecodeError("Failed to detect encoding, tried [%s]", ', '.join(dammit.triedEncodings))
+    return doc
 
+
+def get_encoding(page):
+    """测试编码的备选方案
+    """
     def is_enc(enc):
         try:
             diff = text.decode(enc, 'ignore').encode(enc)
             sizes = len(diff), len(text)
-            if abs(len(text) - len(diff)) < max(sizes) * 0.01:  # 99% of utf-8
+            # 99% of utf-8
+            if abs(len(text) - len(diff)) < max(sizes) * 0.01:
                 return True
         except UnicodeDecodeError:
             return False
@@ -50,8 +70,4 @@ def get_encoding(page):
     else:
         return enc
 
-    raise DetectionFailed('raw result from chardet: %s' % res)
-
-
-class DetectionFailed(Exception):
-    pass
+    raise UnicodeDecodeError("Failed to detect encoding, tried [%s]", 'raw result from chardet: %s' % res)

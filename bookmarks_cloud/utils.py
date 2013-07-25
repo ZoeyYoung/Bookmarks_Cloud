@@ -24,20 +24,32 @@ def get_html(url):
     # request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1485.0 Safari/537.36')
     # html_doc = urllib2.urlopen(request, timeout=10)
     http_client = httpclient.HTTPClient()
-    request = httpclient.HTTPRequest(url)
-    response = http_client.fetch(request)
+    try:
+        request = httpclient.HTTPRequest(url)
+        response = http_client.fetch(request)
+    except httpclient.HTTPError as e:
+        print("Error:", e)
+        response = None
     http_client.close()
+    if not response:
+        return None
     return response.body
 
 
-def get_bookmark_info(url):
-    html = get_html(url)
-    print(get_html.cache_info())
-    title = Document(html).short_title()
-    article = Document(html).summary()
-    description = Document(html).description()
-    keywords = Document(html).keywords()
-
+def get_bookmark_info(url, html=None):
+    if html is '':
+        html = get_html(url)
+        print(get_html.cache_info())
+    if not html:
+        return None
+    doc = Document(html, url=url, debug=True, multipage=False)
+    summary_obj = doc.summary_with_metadata(enclose_with_html_tag=True)
+    title = summary_obj.short_title
+    # print(summary_obj.title)
+    # print(summary_obj.short_title)
+    article = summary_obj.html  # .decode('utf-8', 'replace')
+    description = summary_obj.description
+    keywords = summary_obj.keywords
     return dict(title=title, favicon="", article=article, description=description, tags=keywords)
 
 

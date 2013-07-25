@@ -17,6 +17,7 @@ handlers = [
     (r'/link/del', LinkDelHandler),
     (r'/tag/([0-9]+)/(.*)', TagLinksHandler),
     (r'/tags_cloud', TagsCloudHandler),
+    (r'/randomlink', RandomLinkHandler),
     (r'/random', RandomLinksHandler),
     (r'/search', SearchHandler)
 ]

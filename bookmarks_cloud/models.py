@@ -9,6 +9,9 @@ import markdown
 page_size = config['page_size']
 
 
+# Bookmark = namedtuple('Bookmark', ['_id', 'article', 'description', 'favicon', 'note', 'note_html', 'post_time', 'tags', 'title', 'url'])
+
+
 class Page(object):
 
     def __init__(self, total, cur):
@@ -37,6 +40,15 @@ class Link(object):
         return tags['result']
 
     @staticmethod
+    def get_random_one():
+        random.seed(a=None, version=2)
+        r = random.random()
+        link = links_db.find_one({"random": {"$gt": r}})
+        if not link:
+            link = links_db.find_one({"random": {"$lte": r}})
+        return link
+
+    @staticmethod
     def get_count():
         return links_db.count()
 
@@ -54,11 +66,16 @@ class Link(object):
     # TODO(Zoey) 这样搜索会比较慢, 需改进
     @staticmethod
     def get_by_keywords(keywords):
+        t_keywords = r".*" + keywords + r".*"
         keywords = keywords.split(' ')
         regex_keywords = r".*"
         for key in keywords:
             regex_keywords += key + r".*"
         regex_list = []
+        regex_list.append({'title': {'$regex': t_keywords, '$options': '-i'}})
+        regex_list.append({'description': {'$regex': t_keywords, '$options': '-i'}})
+        regex_list.append({'tags': {'$regex': t_keywords, '$options': '-i'}})
+        regex_list.append({'note': {'$regex': t_keywords, '$options': '-i'}})
         regex_list.append({'title': {'$regex': regex_keywords, '$options': '-i'}})
         regex_list.append({'url': {'$regex': regex_keywords, '$options': '-i'}})
         regex_list.append({'description': {'$regex': regex_keywords, '$options': '-i'}})
@@ -76,12 +93,9 @@ class Link(object):
         return links_db.find().skip((page-1)*page_size).limit(page_size).sort([("post_time", -1)])
 
     @staticmethod
-    def get_info(url):
-        link = links_db.find_one({'$or': [
-            {"url": url},
-            {"url": cgi.escape(url)}
-        ]})
-        info = get_bookmark_info(url)
+    def get_info(url, html=''):
+        link = Link.get_by_url(url)
+        info = get_bookmark_info(url, html)
         if info:
             if link:
                 info['note'] = link['note']
@@ -98,10 +112,7 @@ class Link(object):
 
     @staticmethod
     def insert_or_update(new_link):
-        link = links_db.find_one({'$or': [
-            {"url": new_link['url']},
-            {"url": cgi.escape(new_link['url'])}
-        ]})
+        link = Link.get_by_url(new_link['url'])
         # 更新信息
         # print(info['article'].encode('utf-8'))
         # 如果书签已存在, 则更新信息
@@ -116,10 +127,11 @@ class Link(object):
             links_db.save(link)
             return link
         else:
-            info = Link.get_info(new_link['url'])
-            new_link['title'] = info['title']
-            new_link['description'] = info['description']
-            new_link['article'] = info['article']
+            info = Link.get_info(new_link['url'], new_link['html'])
+            if info:
+                new_link['title'] = info['title']
+                new_link['description'] = info['description']
+                new_link['article'] = info['article']
             new_link['note_html'] = markdown.markdown(new_link['note'], extensions=['codehilite(linenums=True)'])
             links_db.insert(new_link)
             return new_link
@@ -127,11 +139,11 @@ class Link(object):
     @staticmethod
     def refresh(link):
         info = Link.get_info(link['url'])
-        # 如果书签已存在, 则更新信息
-        link['title'] = info['title']
-        link['article'] = info['article']
-        link['description'] = info['description']
-        links_db.save(link)
+        if info:
+            link['title'] = info['title']
+            link['article'] = info['article']
+            link['description'] = info['description']
+            links_db.save(link)
         return link
 
     @staticmethod
@@ -143,7 +155,9 @@ class Link(object):
 
     @staticmethod
     def get_random_links():
+        random.seed(a=None, version=2)
         r = random.random()
+        print(r)
         links = links_db.find({"random": {"$gt": r}}).limit(page_size)
         if not links:
             links = links_db.find({"random": {"$lte": r}}).limit(page_size)

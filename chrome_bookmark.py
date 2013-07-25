@@ -14,11 +14,16 @@ from configs.config import config
 from handlers.link import Link
 import time
 import os.path
+# 数据库名
 links_db = config['db'].links
+# 书签路径
 input_filename = os.path.abspath('.') + "/Bookmarks"
 print(input_filename)
 
+
 def loop_entrys(bookmarks, tags):
+    """遍历所有书签
+    """
     link_tags = ','.join(copy.deepcopy(tags))
     for entry in bookmarks:
         if entry['type'] == 'folder':
@@ -47,7 +52,9 @@ def loop_entrys(bookmarks, tags):
                 links_db.save(link)
     tags.pop()
 
+
 def add_links():
+    """从Chrome书签导入"""
     try:
         input_file = codecs.open(input_filename, encoding='utf-8')
         bookmark_data = json.load(input_file)
@@ -59,5 +66,6 @@ def add_links():
                 print("not has children")
     except IOError:
         print('file not exist')
+
 
 add_links()

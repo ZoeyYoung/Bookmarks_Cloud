@@ -17,27 +17,31 @@ class LinkModule(tornado.web.UIModule):
         try:
             return self.render_string('modules/link.html', link=link)
         except KeyError:
-            print('KeyError ->', link['url'])
+            print('KeyError ->', link)
 
 
 class IndexHandler(BaseHandler):
+
     @tornado.web.authenticated
     def get(self, page=1):
         links = Link.get_page(page)
         page = Page(Link.get_count(), page)
         tags = Link.get_tags()
         tags_cloud = get_tags_cloud(tags)
-        self.render('index.html', tags_cloud=tags_cloud, links=links, count=Link.get_count(), page=page)
+        self.render('index.html', tags_cloud=tags_cloud,
+                    links=links, count=Link.get_count(), page=page)
 
 
 class LinkHandler(BaseHandler):
+
     @tornado.web.authenticated
     def get(self, page):
         tags = Link.get_tags()
         links = Link.get_page(int(page))
         page = Page(Link.get_count(), int(page))
         tags_cloud = get_tags_cloud(tags)
-        self.render('index.html', tags_cloud=tags_cloud, links=links, count=Link.get_count(), page=page)
+        self.render('index.html', tags_cloud=tags_cloud,
+                    links=links, count=Link.get_count(), page=page)
 
 
 class AjaxLinkHandler(BaseHandler):
@@ -100,8 +104,10 @@ class LinkRefreshHandler(BaseHandler):
         if link:
             link = Link.refresh(link)
             link = Link.insert_or_update(link)
-            link_module = tornado.escape.to_basestring(self.render_string('modules/link.html', link=link))
-            self.write(json.dumps({'success': 'true', 'link_module': link_module}))
+            link_module = tornado.escape.to_basestring(
+                self.render_string('modules/link.html', link=link))
+            self.write(
+                json.dumps({'success': 'true', 'link_module': link_module, 'title': link['title'], 'article': link['article']}))
         else:
             self.write(json.dumps({'success': 'false'}))
 
@@ -136,11 +142,13 @@ class LinkAddHandler(BaseHandler):
             tags=format_tags(self.get_argument('tags')),
             note=note,
             post_time=post_time,
-            random=random.random()
+            random=random.random(),
+            html=self.get_argument('html')
         )
         link = Link.insert_or_update(link)
-        link_module = tornado.escape.to_basestring(self.render_string('modules/link.html', link=link))
-        self.write(json.dumps({'success': 'true', 'link_module': link_module}))
+        link_module = tornado.escape.to_basestring(
+            self.render_string('modules/link.html', link=link))
+        self.write(json.dumps({'success': 'true', 'link_module': link_module, 'article': link['article']}))
 
 
 class LinkDelHandler(BaseHandler):
@@ -159,8 +167,7 @@ class TagLinksHandler(BaseHandler):
         tags_cloud = get_tags_cloud(tags)
         links = Link.get_by_tag(tag, int(page))
         page = Page(links.count(), int(page))
-        self.render('tags_links.html', tags_cloud=tags_cloud, links=links,
-                    count=Link.get_count(), page=page, cur_tag=tag, tag_count=links.count())
+        self.render('tags_links.html', tags_cloud=tags_cloud, links=links, count=Link.get_count(), page=page, cur_tag=tag, tag_count=links.count())
 
 
 class TagsCloudHandler(BaseHandler):
@@ -177,14 +184,29 @@ class RandomLinksHandler(BaseHandler):
         tags = Link.get_tags()
         tags_cloud = get_tags_cloud(tags)
         links = Link.get_random_links()
-        self.render('random_links.html', tags_cloud=tags_cloud, links=links, count=Link.get_count())
+        self.render('random_links.html', tags_cloud=tags_cloud,
+                    links=links, count=Link.get_count())
+
+
+class RandomLinkHandler(BaseHandler):
+
+    def get(self):
+        link = Link.get_random_one()
+        self.write(json.dumps({
+            'success': 'true',
+            'url': link['url'],
+            'title': link['title'],
+            'article': link['article']
+        }))
 
 
 class SearchHandler(BaseHandler):
-
-    def post(self):
+    """搜索书签
+    """
+    def get(self):
         tags = Link.get_tags()
         tags_cloud = get_tags_cloud(tags)
         keywords = self.get_argument('keywords')
         result = Link.get_by_keywords(keywords)
-        return self.render('search_result.html', keywords=keywords, tags_cloud=tags_cloud, links=result, count=result.count())
+        count = result.count()
+        self.render('search_result.html', keywords=keywords, tags_cloud=tags_cloud, links=result, count=count)

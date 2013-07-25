@@ -1,3 +1,1 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-from .readability import Document
+VERSION = '0.2.5'
