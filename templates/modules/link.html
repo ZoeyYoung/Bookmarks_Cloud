@@ -12,7 +12,7 @@
             <a title="{{link['url']}}" class="link-del-btn"><i class="icon-trash"></i></a>
         </div>
         <blockquote><p>{{link['description']}}</p></blockquote>
-        {{link['note_html']}}
+        <div class="link-note">{{link['note_html']}}</div>
         {% if len(link['tags']) > 0 %}
         <ul class="inline tags">
             {% for tag in link['tags'] %}

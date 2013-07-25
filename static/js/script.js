@@ -1,22 +1,54 @@
 (function($) {
+    $(document).ready(function(){
+        $(".article-edit-panel").mCustomScrollbar({
+            scrollButtons:{
+                enable:true
+            },
+            advanced:{
+                updateOnBrowserResize: true,
+                updateOnContentResize: true
+            }
+        });
+        $(".bookmarks-panel").mCustomScrollbar({
+            scrollButtons:{
+                enable:true
+            },
+            advanced:{
+                updateOnBrowserResize: true,
+                updateOnContentResize: true
+            }
+        });
+        jQuery.getJSON('/randomlink', function(response) {
+            if (response.success === 'true') {
+                showArticle(response.url, response.title, response.article);
+            } else {
+                alert('数据库返回错误');
+            }
+        });
+    });
     // Placeholders for input/textarea
     $("input, textarea").placeholder();
 
+    // 瀑布流 http://wlog.cn/waterfall/index-zh.html
     $(document).on('click', '#waterfallTab', function() {
         $('#waterflowContainer').waterfall({
             itemCls: 'link-item',
             prefix: 'link',
-            dataType: 'html',
-            colWidth: 330,
-            gutterWidth: 5,
-            gutterHeight: 15,
-            isAnimated: true,
-            checkImagesLoaded: false,
             fitWidth: true,
-            maxCol: 3,
+            gutterWidth: 0,
+            gutterHeight: 15,
+            bufferPixel: -50,
+            align: 'center',
+            colWidth: 300,
+            minCol: 1,
+            isAnimated: true,
+            resizable: true,
+            isFadeIn: true,
+            checkImagesLoaded: false,
             path: function(page) {
                 return '/link?page=' + page;
-            }
+            },
+            dataType: 'html'
         });
     });
 
@@ -49,9 +81,11 @@
         //$('#isreaded').prop('checked', false),
         $('#linkForm').hide(),
         $('#linkInfoInputs').hide();
+        $('#article').show();
     }
 
     function initAddLinkForm(url, response) {
+        $('#article').hide();
         $('#url').prop('disabled', true);
         $('#url').val(url);
         $("#title").val(response.title);
@@ -69,6 +103,10 @@
     }
     $(document).on('click', '#showLinkFormBtn', function() {
         $('#linkForm').toggle();
+        $('#article').toggle();
+    });
+    $(document).on('click', '#searchBtn', function() {
+        $('#searchForm').toggle();
     });
     // do get link infomation
     $(document).on('click', '#getLinkInfoBtn', function() {
@@ -85,19 +123,23 @@
         });
     });
     $(document).on('click', '#addLinkBtn', function() {
+        var url = $('#url').val();
+        var title = $('#title').val();
         jQuery.postJSON('/link/add', {
-            url: $('#url').val(),
+            url: url,
             favicon: '',
-            title: $('#title').val(),
+            title: title,
             description: $('#description').val(),
             tags: $('#tags').val(),
-            note: $('#note').val()
+            note: $('#note').val(),
+            html: ''
         }, function(response) {
             if(response.success === 'true') {
             // count = parseInt($('#linksCount').text()) + 1;
             // $('#linksCount').text(count);
             // $('#linkList').prepend(generateLinkHtml(response));
                 $('#linkList').prepend(response.link_module);
+                showArticle(url, title, response.article);
                 resetAddLinkForm();
             } else {
               alert('数据库返回错误');
@@ -109,6 +151,7 @@
         resetAddLinkForm();
         if (last_editor !== null) {
             last_editor.show();
+            last_editor = null;
         }
     });
     // 刷新书签信息
@@ -123,6 +166,7 @@
         }, function(response) {
             if (response.success === 'true') {
                 that.replaceWith(response.link_module);
+                showArticle(url, response.title, response.article);
                 // $icon.removeClass(animateClass);
             } else {
                 $icon.removeClass(animateClass);
@@ -171,12 +215,24 @@
             url: url
         }, function(response) {
             if (response.success === 'true') {
-                $('#article-title').html(response.title + ' <a target="_blank" href="' + url + '">查看原网页</a>');
-                $('#article-content').html(response.article);
-                $('#article').modal();
+                showArticle(url, response.title, response.article);
             } else {
                 alert('数据库返回错误');
             }
         });
     });
+
+    function showArticle(url, title, article) {
+        $('#article-title').html(title);
+        $('#article-content').html('<p><a target="_blank" href="' + url + '">查看原网页</a></p>' + article);
+        if (last_editor !== null) {
+            last_editor.show();
+            last_editor = null;
+        }
+        $('#article').show();
+        $(".article-edit-panel").mCustomScrollbar("update");
+        $(".article-edit-panel").mCustomScrollbar("scrollTo","top",{scrollInertia:200
+        }); //scroll to top
+        $('#linkForm').hide();
+    }
 })(jQuery);

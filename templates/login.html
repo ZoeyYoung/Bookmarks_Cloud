@@ -1,26 +1,52 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="well span6">
-<form action="/auth/login" method="post" class="form-horizontal">
-    {% module xsrf_form_html() %}
-    <fieldset>
-        <legend>Log In</legend>
-        <div class="control-group">
-            <label class="control-label" for="email">Email</label>
-            <div class="controls">
-                <input type="text" class="input-xlarge" id="email" name="email">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!-- saved from url=(0014)about:internet -->
+    <title>{{ escape(handler.settings['title'])}}</title>
+    <meta name="keywords" content="{{ escape(handler.settings['keywords']) }}">
+    <meta name="description" content="{{ escape(handler.settings['desc']) }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{static_url('css/bootstrap-journal.min.css')}}" rel="stylesheet" media="screen">
+    <link href="{{static_url('css/font-awesome.min.css')}}" rel="stylesheet" media="screen">
+    <!-- font-awesome如果需要IE7支持要添加额外的CSS -->
+    <link href="{{static_url('css/style.css') }}" rel="stylesheet" />
+    <link href="{{static_url('css/bootstrap-responsive.min.css')}}" rel="stylesheet" media="screen">
+    <script src="{{static_url('js/prefixfree.min.js')}}"></script>
+</head>
+
+<body id="top" data-spy="scroll" data-target=".subnav" data-offset="80">
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12">
+                <form action="/auth/login" method="post" class="form-horizontal well">
+                    {% module xsrf_form_html() %}
+                    <fieldset>
+                        <legend>Log In</legend>
+                        <div class="control-group">
+                            <div class="controls">
+                                <input type="text" class="input-xlarge" id="email" name="email" placeholder="Email">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="controls">
+                                <input type="password" class="input-xlarge" id="password" name="password" placeholder="Password">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Log In</button>
+                        </div>
+                    </fieldset>
+                </form>
             </div>
         </div>
-        <div class="control-group">
-            <label class="control-label" for="password">Password</label>
-            <div class="controls">
-                <input type="password" class="input-xlarge" id="password" name="password">
-            </div>
-        </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Log In</button>
-        </div>
-    </fieldset>
-</form>
-</div>
-{% end %}
+    </div>
+
+    <footer id="footer">
+    </footer>
+    <script src="{{static_url('js/jquery-1.10.2.min.js')}}"></script>
+    <script src="{{static_url('js/bootstrap.min.js')}}"></script>
+    <script src="{{static_url('js/jquery.placeholder.js')}}"></script>
+    <script src="{{static_url('js/script.js')}}"></script>
+</body>
+</html>

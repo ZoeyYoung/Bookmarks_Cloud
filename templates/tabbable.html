@@ -10,7 +10,7 @@
         </div>
         <div class="tab-pane" id="3">
             {% block tags_pane %}
-            <div id="tagCloud" class="well">
+            <div id="tagCloud" class="well" style="margin: 0 0 0 20px;">
             {% for tag in tags_cloud %}
                 <a style="font-size:{{tag['font_size']}}pt" href="/tag/1/{{tag['tag']['_id']}}">{{tag['tag']['_id']}}({{tag['tag']['count']}})</a>
             {% end %}

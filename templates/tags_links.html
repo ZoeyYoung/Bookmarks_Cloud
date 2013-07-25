@@ -1,6 +1,6 @@
 {% extends 'tabbable.html' %}
 {% block links_pane %}
-    <h3>{{cur_tag}} ({{tag_count}} links):</h3>
+    <h3>{{cur_tag}} ({{tag_count}} 个书签):</h3>
     <ul id="linkList">
     {% for link in links %}
         {% module Link(link) %}
