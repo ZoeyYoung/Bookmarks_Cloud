@@ -20,7 +20,7 @@
         });
         jQuery.getJSON('/randomlink', function(response) {
             if (response.success === 'true') {
-                showArticle(response.url, response.title, response.article);
+                showArticle(response.url, response.title, response.article, false);
             } else {
                 alert('数据库返回错误');
             }
@@ -139,7 +139,7 @@
             // $('#linksCount').text(count);
             // $('#linkList').prepend(generateLinkHtml(response));
                 $('#linkList').prepend(response.link_module);
-                showArticle(url, title, response.article);
+                showArticle(url, title, response.article, false);
                 resetAddLinkForm();
             } else {
               alert('数据库返回错误');
@@ -166,7 +166,7 @@
         }, function(response) {
             if (response.success === 'true') {
                 that.replaceWith(response.link_module);
-                showArticle(url, response.title, response.article);
+                showArticle(url, response.title, response.article, false);
                 // $icon.removeClass(animateClass);
             } else {
                 $icon.removeClass(animateClass);
@@ -215,17 +215,17 @@
             url: url
         }, function(response) {
             if (response.success === 'true') {
-                showArticle(url, response.title, response.article);
+                showArticle(url, response.title, response.article, false);
             } else {
                 alert('数据库返回错误');
             }
         });
     });
 
-    function showArticle(url, title, article) {
+    function showArticle(url, title, article, show_last_editor) {
         $('#article-title').html(title);
         $('#article-content').html('<p><a target="_blank" href="' + url + '">查看原网页</a></p>' + article);
-        if (last_editor !== null) {
+        if (show_last_editor && last_editor !== null) {
             last_editor.show();
             last_editor = null;
         }
