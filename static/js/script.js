@@ -1,56 +1,20 @@
 (function($) {
-    $(document).ready(function(){
-        $(".article-edit-panel").mCustomScrollbar({
-            scrollButtons:{
-                enable:true
-            },
-            advanced:{
-                updateOnBrowserResize: true,
-                updateOnContentResize: true
-            }
-        });
-        $(".bookmarks-panel").mCustomScrollbar({
-            scrollButtons:{
-                enable:true
-            },
-            advanced:{
-                updateOnBrowserResize: true,
-                updateOnContentResize: true
-            }
-        });
-        jQuery.getJSON('/randomlink', function(response) {
-            if (response.success === 'true') {
-                showArticle(response.url, response.title, response.article, false);
-            } else {
-                alert('数据库返回错误');
-            }
-        });
+    $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height()-50).customScrollbar({hScroll: false, updateOnWindowResize: true});
+    $(window).resize(function() {
+        $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height()-50);
+    });
+    $('.link-item').hover(
+        function(){ $('.link-note', this).stop(true, true).slideToggle(); }
+    );
+    jQuery.getJSON('/randomlink', function(response) {
+        if (response.success === 'true') {
+            showArticle(response.url, response.title, response.article);
+        } else {
+            alert('数据库返回错误');
+        }
     });
     // Placeholders for input/textarea
     $("input, textarea").placeholder();
-
-    // 瀑布流 http://wlog.cn/waterfall/index-zh.html
-    $(document).on('click', '#waterfallTab', function() {
-        $('#waterflowContainer').waterfall({
-            itemCls: 'link-item',
-            prefix: 'link',
-            fitWidth: true,
-            gutterWidth: 0,
-            gutterHeight: 15,
-            bufferPixel: -50,
-            align: 'center',
-            colWidth: 300,
-            minCol: 1,
-            isAnimated: true,
-            resizable: true,
-            isFadeIn: true,
-            checkImagesLoaded: false,
-            path: function(page) {
-                return '/link?page=' + page;
-            },
-            dataType: 'html'
-        });
-    });
 
     function getCookie(name) {
         var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
@@ -81,17 +45,22 @@
         //$('#isreaded').prop('checked', false),
         $('#linkForm').hide(),
         $('#linkInfoInputs').hide();
-        $('#article').show();
+        $('#bookmarks-panel').show();
     }
 
     function initAddLinkForm(url, response) {
-        $('#article').hide();
+        $('#bookmarks-panel').hide();
         $('#url').prop('disabled', true);
         $('#url').val(url);
         $("#title").val(response.title);
         $('#description').val(response.description);
-        $('#tags').val(response.tags);
-        $('#note').val(response.note);
+        tags_t = $('#tags').val();
+        tags = (tags_t === '') ? response.tags : response.tags + ','+ tags_t;
+        $('#tags').val(tags);
+        note_t = $('#note').val();
+        note = (note_t === '') ? response.note : response.note + '\n' + note_t;
+        $('#note').val(note);
+        showArticle(url, response.title, response.article);
         // if (response.is_star == 1) {
         //     $('#isstar').prop('checked', true);
         // }
@@ -103,10 +72,11 @@
     }
     $(document).on('click', '#showLinkFormBtn', function() {
         $('#linkForm').toggle();
-        $('#article').toggle();
+        $('#bookmarks-panel').toggle();
     });
     $(document).on('click', '#searchBtn', function() {
         $('#searchForm').toggle();
+        $('#keywords').focus();
     });
     // do get link infomation
     $(document).on('click', '#getLinkInfoBtn', function() {
@@ -139,7 +109,7 @@
             // $('#linksCount').text(count);
             // $('#linkList').prepend(generateLinkHtml(response));
                 $('#linkList').prepend(response.link_module);
-                showArticle(url, title, response.article, false);
+                showArticle(url, title, response.article);
                 resetAddLinkForm();
             } else {
               alert('数据库返回错误');
@@ -156,28 +126,26 @@
     });
     // 刷新书签信息
     $(document).on('click', '.link-refresh-btn', function() {
-        var url = $(this).attr('title');
-        var that = $(this).parent().parent().parent();
-        var $icon = $(this).find(".icon-refresh" ),
-            animateClass = "icon-spin";
-        $icon.addClass(animateClass);
+        var link_item = $(this).closest('.link-item');
+        var url = link_item.find('.link-title').attr('href');
+        var animateClass = "icon-spin";
+        $(this).addClass(animateClass);
         jQuery.getJSON('/link/refresh', {
             url: url
         }, function(response) {
             if (response.success === 'true') {
                 that.replaceWith(response.link_module);
-                showArticle(url, response.title, response.article, false);
-                // $icon.removeClass(animateClass);
+                showArticle(url, response.title, response.article);
             } else {
-                $icon.removeClass(animateClass);
+                $(this).removeClass(animateClass);
                 alert('数据库返回错误');
             }
         });
     });
     // 编辑书签
     $(document).on('click', '.link-edit-btn', function() {
-        var url = $(this).attr('title');
-        last_editor = $(this).parent().parent().parent();
+        last_editor = $(this).closest('.link-item');
+        var url = last_editor.find('.link-title').attr('href');
         last_editor.hide();
         jQuery.getJSON('/link/get_detail', {
             url: url
@@ -190,14 +158,13 @@
         });
     });
     $(document).on('click', '.link-del-btn', function() {
-        var url = $(this).attr('title');
-        var that = $(this);
+        var link_item = $(this).closest('.link-item');
+        var url = link_item.find('.link-title').attr('href');
         jQuery.postJSON('/link/del', {
             url: url
         }, function(response) {
             if (response.success === 'true') {
-                that.parent().parent().parent().remove();
-                $('#waterflowContainer').waterfall('reLayout', $('#waterflowContainer'), null);
+                link_item.remove();
             } else {
                 alert('数据库返回错误');
             }
@@ -215,24 +182,17 @@
             url: url
         }, function(response) {
             if (response.success === 'true') {
-                showArticle(url, response.title, response.article, false);
+                showArticle(url, response.title, response.article);
             } else {
                 alert('数据库返回错误');
             }
         });
     });
 
-    function showArticle(url, title, article, show_last_editor) {
+    function showArticle(url, title, article) {
         $('#article-title').html(title);
         $('#article-content').html('<p><a target="_blank" href="' + url + '">查看原网页</a></p>' + article);
-        if (show_last_editor && last_editor !== null) {
-            last_editor.show();
-            last_editor = null;
-        }
-        $('#article').show();
-        $(".article-edit-panel").mCustomScrollbar("update");
-        $(".article-edit-panel").mCustomScrollbar("scrollTo","top",{scrollInertia:200
-        }); //scroll to top
-        $('#linkForm').hide();
+        // FIXME 应该跳到文章顶部才对...也许该考虑换个插件了...
+        $("#article-panel").customScrollbar("resize");
     }
 })(jQuery);

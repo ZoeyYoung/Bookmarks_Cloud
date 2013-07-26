@@ -1,14 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="tab-content">
+    <div id="tab-panel" class="tab-content">
         <div class="tab-pane active" id="1">
             {% block links_pane %}
             {% end %}
         </div>
         <div class="tab-pane" id="2">
-            <div id="waterflowContainer"></div>
-        </div>
-        <div class="tab-pane" id="3">
             {% block tags_pane %}
             <div id="tagCloud" class="well" style="margin: 0 0 0 20px;">
             {% for tag in tags_cloud %}
@@ -17,7 +14,7 @@
             </div>
             {% end %}
         </div>
-        <div class="tab-pane" id="4">
+        <div class="tab-pane" id="3">
             <div id="randomBookmarks"></div>
         </div>
     </div>

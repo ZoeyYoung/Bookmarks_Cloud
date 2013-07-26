@@ -1,15 +1,15 @@
 <div class="link-item" data-name="{{link['title']}}">
     <div class="link-favicon">
-        <a target="_blank" class="link-title" title="{{link['url']}}" href="{{link['url']}}"><img src="{{link['favicon']}}" onError="this.src='http://ico.ylsnuha.com/{{link['url']}}?defaulticon={{handler.avatar()}}';" alt="{{link['title']}}"/></a>
+        <a target="_blank" title="{{link['title']}}" href="{{link['url']}}"><img src="{{link['favicon']}}" onError="this.src='http://ico.ylsnuha.com/{{link['url']}}?defaulticon={{handler.avatar()}}';" alt="{{link['title']}}"/></a>
     </div>
     <div class="link-content">
-        <a target="_blank" class="link-title" title="{{link['url']}}" href="{{link['url']}}">{{link['title']}}</a>
+        <a target="_blank" class="link-title" title="{{link['title']}}" href="{{link['url']}}">{{link['title']}}</a>
         <time><i class="icon-time"></i> {{locale.format_date(link['post_time'], -480, relative=False)}}</time>
         <div class="icons pull-right">
-            <a title="{{link['url']}}" class="link-refresh-btn"><i class="icon-refresh"></i></a>
-            <a title="{{link['url']}}" class="link-read-btn"><i class="icon-file-text"></i></a>
-            <a title="{{link['url']}}" class="link-edit-btn" href="#top"><i class="icon-edit"></i></a>
-            <a title="{{link['url']}}" class="link-del-btn"><i class="icon-trash"></i></a>
+            <i class="icon-refresh link-refresh-btn"></i>
+            <i class="icon-file-text link-read-btn"></i>
+            <i class="icon-edit link-edit-btn"></i>
+            <i class="icon-trash link-del-btn"></i>
         </div>
         <blockquote><p>{{link['description']}}</p></blockquote>
         <div class="link-note">{{link['note_html']}}</div>
