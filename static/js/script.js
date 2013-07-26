@@ -124,14 +124,15 @@
         var url = link_item.find('.link-title').attr('href');
         var animateClass = "icon-spin";
         $(this).addClass(animateClass);
+        that = $(this);
         jQuery.getJSON('/link/refresh', {
             url: url
         }, function(response) {
             if (response.success === 'true') {
-                that.replaceWith(response.link_module);
+                link_item.replaceWith(response.link_module);
                 showArticle(url, response.title, response.article);
             } else {
-                $(this).removeClass(animateClass);
+                that.removeClass(animateClass);
                 alert('数据库返回错误');
             }
         });
