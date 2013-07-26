@@ -20,7 +20,7 @@ class Page(object):
         self.has_next = (self.cur < self.last_page)
         self.has_prev = (self.cur > 1)
 
-links_db = config['db'].links
+bookmarks_collection = config['db'].bookmarks
 
 
 class Link(object):
@@ -32,7 +32,7 @@ class Link(object):
     @staticmethod
     def get_tags():
         from bson.son import SON
-        tags = links_db.aggregate([
+        tags = bookmarks_collection.aggregate([
             {"$unwind": "$tags"},
             {"$group": {"_id": "$tags", "count": {"$sum": 1}}},
             {"$sort": SON([("_id", 1), ("count", -1)])}
@@ -43,25 +43,25 @@ class Link(object):
     def get_random_one():
         random.seed(a=None, version=2)
         r = random.random()
-        link = links_db.find_one({"random": {"$gt": r}})
+        link = bookmarks_collection.find_one({"random": {"$gt": r}})
         if not link:
-            link = links_db.find_one({"random": {"$lte": r}})
+            link = bookmarks_collection.find_one({"random": {"$lte": r}})
         return link
 
     @staticmethod
     def get_count():
-        return links_db.count()
+        return bookmarks_collection.count()
 
     @staticmethod
     def get_by_url(url):
-        return links_db.find_one({'$or': [
+        return bookmarks_collection.find_one({'$or': [
             {"url": url},
             {"url": cgi.escape(url)}
         ]})
 
     @staticmethod
     def get_by_tag(tag, page):
-        return links_db.find({"tags": tag}).skip((page-1)*page_size).limit(page_size).sort([("post_time", -1)])
+        return bookmarks_collection.find({"tags": tag}).skip((page-1)*page_size).limit(page_size).sort([("post_time", -1)])
 
     # TODO(Zoey) 这样搜索会比较慢, 需改进
     @staticmethod
@@ -82,15 +82,15 @@ class Link(object):
         regex_list.append({'note': {'$regex': regex_keywords, '$options': '-i'}})
         for key in keywords:
             regex_list.append({'tags': {'$regex': r".*"+key+r".*", '$options': '-i'}})
-        return links_db.find({'$or': regex_list})
+        return bookmarks_collection.find({'$or': regex_list})
 
     @staticmethod
     def get_all():
-        return links_db.find().sort([("post_time", -1)])
+        return bookmarks_collection.find().sort([("post_time", -1)])
 
     @staticmethod
     def get_page(page):
-        return links_db.find().skip((page-1)*page_size).limit(page_size).sort([("post_time", -1)])
+        return bookmarks_collection.find().skip((page-1)*page_size).limit(page_size).sort([("post_time", -1)])
 
     @staticmethod
     def get_info(url, html=''):
@@ -117,6 +117,8 @@ class Link(object):
         # print(info['article'].encode('utf-8'))
         # 如果书签已存在, 则更新信息
         if link:
+            if link['title'] is '':
+                link['title'] = new_link['title']
             # favicon 如果是从浏览器添加才能更新, 否则通过链接获取
             if new_link['favicon'] != '':
                 link['favicon'] = new_link['favicon']
@@ -124,16 +126,17 @@ class Link(object):
             link['note'] = new_link['note']
             link['note_html'] = markdown.markdown(new_link['note'], extensions=['codehilite(linenums=True)'])
             link['post_time'] = new_link['post_time']
-            links_db.save(link)
+            bookmarks_collection.save(link)
             return link
         else:
             info = Link.get_info(new_link['url'], new_link['html'])
             if info:
-                new_link['title'] = info['title']
+                if not info['title'] is '':
+                    new_link['title'] = info['title']
                 new_link['description'] = info['description']
                 new_link['article'] = info['article']
             new_link['note_html'] = markdown.markdown(new_link['note'], extensions=['codehilite(linenums=True)'])
-            links_db.insert(new_link)
+            bookmarks_collection.insert(new_link)
             return new_link
 
     @staticmethod
@@ -143,12 +146,12 @@ class Link(object):
             link['title'] = info['title']
             link['article'] = info['article']
             link['description'] = info['description']
-            links_db.save(link)
+            bookmarks_collection.save(link)
         return link
 
     @staticmethod
     def delete(url):
-        links_db.remove({'$or': [
+        bookmarks_collection.remove({'$or': [
             {"url": url},
             {"url": cgi.escape(url)}
         ]})
@@ -158,7 +161,7 @@ class Link(object):
         random.seed(a=None, version=2)
         r = random.random()
         print(r)
-        links = links_db.find({"random": {"$gt": r}}).limit(page_size)
+        links = bookmarks_collection.find({"random": {"$gt": r}}).limit(page_size)
         if not links:
-            links = links_db.find({"random": {"$lte": r}}).limit(page_size)
+            links = bookmarks_collection.find({"random": {"$lte": r}}).limit(page_size)
         return links

@@ -58,9 +58,7 @@ class LinkGetInfoHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args):
         url = self.get_argument('url')
-
         info = Link.get_info(url)
-
         if info:
             self.write(json.dumps({
                 'success': 'true',
@@ -68,7 +66,7 @@ class LinkGetInfoHandler(BaseHandler):
                 'title': info['title'],
                 'description': info['description'],
                 'tags': info['tags'],
-                'note': info['note']  # ,
+                'note': info['note']
                 # 'is_star': info['is_star'],
                 # 'is_readed': info['is_readed']
             }))
@@ -89,7 +87,8 @@ class LinkGetDetailHandler(BaseHandler):
                 'favicon': link['favicon'],
                 'description': link['description'],
                 'tags': ','.join(link['tags']),
-                'note': link['note']
+                'note': link['note'],
+                'article': link['article']
             }))
         else:
             self.write(json.dumps({'success': 'false'}))
@@ -107,7 +106,7 @@ class LinkRefreshHandler(BaseHandler):
             link_module = tornado.escape.to_basestring(
                 self.render_string('modules/link.html', link=link))
             self.write(
-                json.dumps({'success': 'true', 'link_module': link_module, 'title': link['title'], 'article': link['article']}))
+                json.dumps({'success': 'true', 'link_module': link_module, 'title': link['title'], 'article': tornado.escape.to_basestring(link['article'])}))
         else:
             self.write(json.dumps({'success': 'false'}))
 
@@ -138,6 +137,7 @@ class LinkAddHandler(BaseHandler):
         post_time = int(time.time())
         link = dict(
             url=self.get_argument('url'),
+            title=self.get_argument('title'),
             favicon=self.get_argument('favicon'),
             tags=format_tags(self.get_argument('tags')),
             note=note,
@@ -148,7 +148,7 @@ class LinkAddHandler(BaseHandler):
         link = Link.insert_or_update(link)
         link_module = tornado.escape.to_basestring(
             self.render_string('modules/link.html', link=link))
-        self.write(json.dumps({'success': 'true', 'link_module': link_module, 'article': link['article']}))
+        self.write(json.dumps({'success': 'true', 'link_module': link_module, 'article': tornado.escape.to_basestring(link['article'])}))
 
 
 class LinkDelHandler(BaseHandler):

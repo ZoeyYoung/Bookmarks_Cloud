@@ -28,7 +28,7 @@ def get_html(url):
         request = httpclient.HTTPRequest(url)
         response = http_client.fetch(request)
     except httpclient.HTTPError as e:
-        print("Error:", e)
+        print("Error In get_html func:", url, e)
         response = None
     http_client.close()
     if not response:
@@ -41,15 +41,17 @@ def get_bookmark_info(url, html=None):
         html = get_html(url)
         print(get_html.cache_info())
     if not html:
-        return None
+        print("Error: html is None")
+        return dict(title='', favicon="", article="[no-article]", description="[no-description]", tags="")
     doc = Document(html, url=url, debug=True, multipage=False)
-    summary_obj = doc.summary_with_metadata(enclose_with_html_tag=True)
+    summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
     title = summary_obj.short_title
     # print(summary_obj.title)
     # print(summary_obj.short_title)
     article = summary_obj.html  # .decode('utf-8', 'replace')
     description = summary_obj.description
     keywords = summary_obj.keywords
+    print(title, description, keywords)
     return dict(title=title, favicon="", article=article, description=description, tags=keywords)
 
 

@@ -6,7 +6,7 @@ config = {
     "username": "your_name",
     "email": "ydingmiao@gmail.com",
     "password": 'your_password',
-    "db": pymongo.Connection().links,
+    "db": pymongo.Connection().bookmarks_cloud,
     "title": "书签云",
     "url": "",
     "keywords": "链接,书签,收藏,分享",

@@ -65,7 +65,6 @@ def norm_title(title):
 
 def get_title(doc):
     title_node = doc.find('.//title')
-
     if title_node is None:
         return '[no-title]'
     title = title_node.text
@@ -74,18 +73,19 @@ def get_title(doc):
 
 def get_description(doc):
     description_node = doc.xpath("//meta[translate(@name, 'ABCDEFGHJIKLMNOPQRSTUVWXYZ', 'abcdefghjiklmnopqrstuvwxyz')='description']")
-
     if len(description_node) <= 0:
         return '[no-description]'
-    return description_node[0].attrib["content"]
+    description = description_node[0].attrib["content"]
+    # print(description)
+    return normalize_spaces(description)
 
 
 def get_keywords(doc):
     keywords_node = doc.xpath("//meta[translate(@name, 'ABCDEFGHJIKLMNOPQRSTUVWXYZ', 'abcdefghjiklmnopqrstuvwxyz')='keywords']")
     if len(keywords_node) <= 0:
         return ''
-
-    return keywords_node[0].attrib["content"]
+    keywords = keywords_node[0].attrib["content"]
+    return normalize_spaces(keywords)
 
 
 def add_match(collection, text, orig):
@@ -98,7 +98,7 @@ def add_match(collection, text, orig):
 def shorten_title(doc):
     title_node = doc.find('.//title')
     if title_node is None:
-        return ''
+        return '[no-title]'
 
     title = title_node.text
     title = orig = norm_title(title)
@@ -141,7 +141,6 @@ def shorten_title(doc):
 
     if not 15 < len(title) < 150:
         return orig
-
     return title
 
 

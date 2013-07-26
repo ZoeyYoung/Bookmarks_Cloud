@@ -76,6 +76,9 @@ def describe(node, depth=1):
 
 
 def get_clean_html(doc):
+    """暂时没用到
+    """
+    # print("get_clean_html", type(doc))
     return clean_attributes(tounicode(doc))
 
 
@@ -93,7 +96,7 @@ def to_int(x):
 
 
 def clean(text):
-    text = re.sub('\s*\n\s*', '\n', text)
+    text = re.sub('\s*\n+\s*', '\n', text)
     text = re.sub('[ \t]{2,}', ' ', text)
     return text.strip()
 
@@ -109,6 +112,9 @@ def tags(node, *tag_names):
 
 
 def class_weight(e):
+    """id、class属性权重
+    return weight: -50 -25 0 25 50
+    """
     weight = 0
     if e.get('class', None):
         if REGEXES['negativeRe'].search(e.get('class')):
@@ -130,9 +136,9 @@ def class_weight(e):
 def score_node(elem):
     content_score = class_weight(elem)
     name = elem.tag.lower()
-    if name == "div":
+    if name in ["div", "p"]:
         content_score += 5
-    elif name == ["article", "section"]:
+    elif name in ["article", "section"]:
         content_score += 10
     elif name in ["pre", "td", "blockquote", "aside", "code"]:
         content_score += 3
@@ -140,7 +146,8 @@ def score_node(elem):
         content_score -= 1
     elif name in ["address", "form"]:
         content_score -= 3
-    elif name in ["h1", "h2", "h3", "h4", "h5", "h6", "th"]:
+    # elif name in ["h1", "h2", "h3", "h4", "h5", "h6", "th"]:
+    elif name in ["h1", "h2"]:
         content_score -= 2
     return {
         'content_score': content_score,
