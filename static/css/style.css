@@ -15,6 +15,9 @@ body {
     background: #777;
     padding: 20px;
 }
+i {
+    cursor: pointer;
+}
 @media (max-width: 768px) {
     .nav li {
         display: inline;

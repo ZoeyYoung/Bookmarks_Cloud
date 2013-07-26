@@ -1,10 +1,15 @@
 (function($) {
-    $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height()-50).customScrollbar({hScroll: false, updateOnWindowResize: true});
+    $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height() - 50).customScrollbar({
+        hScroll: false,
+        updateOnWindowResize: true
+    });
     $(window).resize(function() {
-        $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height()-50);
+        $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height() - 50);
     });
     $('.link-item').hover(
-        function(){ $('.link-note', this).stop(true, true).slideToggle(); }
+        function() {
+            $('.link-note', this).stop(true, true).slideToggle();
+        }
     );
     jQuery.getJSON('/randomlink', function(response) {
         if (response.success === 'true') {
@@ -55,18 +60,12 @@
         $("#title").val(response.title);
         $('#description').val(response.description);
         tags_t = $('#tags').val();
-        tags = (tags_t === '') ? response.tags : response.tags + ','+ tags_t;
+        tags = (tags_t === '') ? response.tags : response.tags + ',' + tags_t;
         $('#tags').val(tags);
         note_t = $('#note').val();
         note = (note_t === '') ? response.note : response.note + '\n' + note_t;
         $('#note').val(note);
         showArticle(url, response.title, response.article);
-        // if (response.is_star == 1) {
-        //     $('#isstar').prop('checked', true);
-        // }
-        // if (response.is_readed == 1) {
-        //     $('#isreaded').prop('checked', true);
-        // }
         $('#linkForm').show();
         $('#linkInfoInputs').show();
     }
@@ -104,15 +103,18 @@
             note: $('#note').val(),
             html: ''
         }, function(response) {
-            if(response.success === 'true') {
-            // count = parseInt($('#linksCount').text()) + 1;
-            // $('#linksCount').text(count);
-            // $('#linkList').prepend(generateLinkHtml(response));
+            if (response.success === 'true') {
                 $('#linkList').prepend(response.link_module);
+                // FIXME 真的需要这么做吗?
+                $('.link-item').hover(
+                    function() {
+                        $('.link-note', this).stop(true, true).slideToggle();
+                    }
+                );
                 showArticle(url, title, response.article);
                 resetAddLinkForm();
             } else {
-              alert('数据库返回错误');
+                alert('数据库返回错误');
             }
         });
     });
@@ -177,7 +179,8 @@
     });
 
     $(document).on('click', '.link-read-btn', function() {
-        var url = $(this).attr('title');
+        var link_item = $(this).closest('.link-item');
+        var url = link_item.find('.link-title').attr('href');
         jQuery.getJSON('/link/get_article', {
             url: url
         }, function(response) {
