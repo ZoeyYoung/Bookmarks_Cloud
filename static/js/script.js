@@ -6,11 +6,9 @@
     $(window).resize(function() {
         $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height() - 50);
     });
-    $('.link-item').hover(
-        function() {
-            $('.link-note', this).stop(true, true).slideToggle();
-        }
-    );
+    $(document).on('mouseenter mouseleave', '.link-item', function() {
+        $('.link-note', this).stop(true, true).slideToggle();
+    });
     jQuery.getJSON('/randomlink', function(response) {
         if (response.success === 'true') {
             showArticle(response.url, response.title, response.article);
@@ -105,12 +103,6 @@
         }, function(response) {
             if (response.success === 'true') {
                 $('#linkList').prepend(response.link_module);
-                // FIXME 真的需要这么做吗?
-                $('.link-item').hover(
-                    function() {
-                        $('.link-note', this).stop(true, true).slideToggle();
-                    }
-                );
                 showArticle(url, title, response.article);
                 resetAddLinkForm();
             } else {
