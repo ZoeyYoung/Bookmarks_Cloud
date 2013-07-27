@@ -20,6 +20,15 @@ class LinkModule(tornado.web.UIModule):
             print('KeyError ->', link)
 
 
+class PagerModule(tornado.web.UIModule):
+
+    def render(self, page):
+        try:
+            return self.render_string('modules/pager.html', page=page)
+        except KeyError:
+            print('KeyError ->', page)
+
+
 class IndexHandler(BaseHandler):
 
     @tornado.web.authenticated
@@ -46,10 +55,14 @@ class LinkHandler(BaseHandler):
 
 class AjaxLinkHandler(BaseHandler):
 
-    def get(self):
+    def post(self):
         page = self.get_argument('page')
-        links = Link.get_page(int(page))
-        page = Page(Link.get_count(), int(page))
+        tag = self.get_argument('tag')
+        if tag is '':
+            links = Link.get_page(int(page))
+        else:
+            links = Link.get_by_tag(tag, int(page))
+        page = Page(links.count(), int(page))
         self.render('list.html', links=links, page=page)
 
 

@@ -1,33 +1,11 @@
 {% extends 'tabbable.html' %}
 {% block links_pane %}
+<div id="pageLinkList" title="">
     <ul id="linkList">
         {% for link in links %}
             {% module Link(link) %}
         {% end %}
     </ul>
-    <div class="pagination">
-        <ul>
-            {% if page.has_prev %}
-            <li class="previous"><a href="/link/page/{{page.cur-1}}">上一页</a></li>
-            {% end %}
-            <li><a href="/link/page/1"><<</a></li>
-            {% if page.cur < 6 %}
-                {% for i in range(1, 11) %}
-                    {% if page.cur == i %}<li class="active">{% else %}<li>{% end %}<a href="/link/page/{{i}}">{{i}}</a></li>
-                {% end %}
-            {% elif page.cur > page.last_page - 5 %}
-                {% for i in range(page.last_page - 9, page.last_page + 1) %}
-                    {% if page.cur == i %}<li class="active">{% else %}<li>{% end %}<a href="/link/page/{{i}}">{{i}}</a></li>
-                {% end %}
-            {% else %}
-                {% for i in range(page.cur-5, page.cur+5) %}
-                    {% if page.cur == i %}<li class="active">{% else %}<li>{% end %}<a href="/link/page/{{i}}">{{i}}</a></li>
-                {% end %}
-            {% end %}
-            <li><a href="/link/page/{{page.last_page}}" class="fui-arrow-right">>></a></li>
-            {% if page.has_next %}
-            <li class="next"><a href="/link/page/{{page.cur+1}}">下一页</a></li>
-            {% end %}
-        </ul>
-    </div>
+    {% module Pager(page) %}
+</div>
 {% end %}

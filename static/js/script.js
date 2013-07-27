@@ -159,8 +159,13 @@
     });
 
     $(document).on('click', '#randomBookmarksBtn', function() {
-        $('#randomBookmarks').empty();
-        $('#randomBookmarks').load('/random');
+        $('#randomBookmarks').empty().load('/random');
+    });
+
+    $(document).on('click', '.pagination li a', function() {
+        tag = $('#pageLinkList').attr('title');
+        page = $(this).attr('title');
+        $('#pageLinkList').empty().load('/link', {tag: tag, page: page});
     });
 
     $(document).on('click', '.link-read-btn', function() {

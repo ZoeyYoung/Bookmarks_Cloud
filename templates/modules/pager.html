@@ -1,0 +1,29 @@
+<div class="pagination">
+    <ul class="pager">
+        {% if page.has_prev %}
+        <li class="previous"><a href="#" title="{{page.cur-1}}">上一页</a></li>
+        {% end %}
+        <li><a href="#" title="1"><<</a></li>
+        {% if page.last_page < 11 %}
+            {% for i in range(1, page.last_page + 1) %}
+                {% if page.cur == i %}<li class="active">{% else %}<li>{% end %}<a href="#" title="{{i}}">{{i}}</a></li>
+            {% end %}
+        {% elif page.cur < 6 %}
+            {% for i in range(1, 11) %}
+                {% if page.cur == i %}<li class="active">{% else %}<li>{% end %}<a href="#" title="{{i}}">{{i}}</a></li>
+            {% end %}
+        {% elif page.cur > page.last_page - 5 %}
+            {% for i in range(page.last_page - 9, page.last_page + 1) %}
+                {% if page.cur == i %}<li class="active">{% else %}<li>{% end %}<a href="#" title="{{i}}">{{i}}</a></li>
+            {% end %}
+        {% else %}
+            {% for i in range(page.cur-5, page.cur+5) %}
+                {% if page.cur == i %}<li class="active">{% else %}<li>{% end %}<a href="#" title="{{i}}">{{i}}</a></li>
+            {% end %}
+        {% end %}
+        <li><a href="#" title="{{page.last_page}}">>></a></li>
+        {% if page.has_next %}
+        <li class="next"><a href="#" title="{{page.cur+1}}">下一页</a></li>
+        {% end %}
+    </ul>
+</div>
