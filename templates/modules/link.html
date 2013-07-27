@@ -1,6 +1,9 @@
+{% if link['favicon'] is '' %}
+    {% set link['favicon'] = "http://ico.ylsnuha.com/" + link['url'] + "?defaulticon=" + handler.avatar() %}
+{% end %}
 <div class="link-item" data-name="{{link['title']}}">
     <div class="link-favicon">
-        <a target="_blank" title="{{link['title']}}" href="{{link['url']}}"><img src="{{link['favicon']}}" onError="this.src='http://ico.ylsnuha.com/{{link['url']}}?defaulticon={{handler.avatar()}}';" alt="{{link['title']}}"/></a>
+        <a target="_blank" title="{{link['title']}}" href="{{link['url']}}"><img class="lazy" data-src="{{link['favicon']}}" src="" alt="{{link['title']}}"/></a>
     </div>
     <div class="link-content">
         <a target="_blank" class="link-title" title="{{link['url']}}" href="{{link['url']}}">{{link['title']}}</a>

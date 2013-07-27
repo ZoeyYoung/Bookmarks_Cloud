@@ -1,4 +1,5 @@
 (function($) {
+    $("img.lazy").lazy();
     $('.quickflip-wrapper').quickFlip({
         closeSpeed : 200,
         openSpeed : 150
@@ -165,7 +166,9 @@
     $(document).on('click', '.pagination li a', function() {
         tag = $('#pageLinkList').attr('title');
         page = $(this).attr('title');
-        $('#pageLinkList').empty().load('/link', {tag: tag, page: page});
+        $('#pageLinkList').empty().load('/link', {tag: tag, page: page}, function() {
+            $("img.lazy").lazy({ bind: "event", delay: 0});
+        });
     });
 
     $(document).on('click', '.link-read-btn', function() {
