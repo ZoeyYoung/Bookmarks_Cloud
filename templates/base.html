@@ -19,82 +19,88 @@
 </head>
 
 <body id="top">
+    <div id="header">
+        <ul id="navigationMenu" class="nav">
+            <li class="active"><a class="n-cloud" href="/" title="{{escape(handler.settings['title'])}}"><span><i class="icon-cloud"></i> 首页</span></a>
+            </li>
+            <li><a class="n-list" href="#1" data-toggle="tab" title="列表"><span><i class="icon-list"></i> 列表</span></a>
+            </li>
+            <li><a class="n-tags" href="#2" data-toggle="tab" title="标签"><span><i class="icon-tags"></i> 标签</span></a>
+            </li>
+            <li id="randomBookmarksBtn">
+                <a class="n-random" href="#3" data-toggle="tab" title="随机"><span><i class="icon-random"></i> 随机</span></a>
+            </li>
+            <li>
+                <a id="searchBtn" class="n-search" href="#" title="搜索">
+                    <span><i class="icon-search"></i>
+                        <form id="searchForm" action="/search" method="get" name="search">
+                            {% module xsrf_form_html() %}
+                            <input type="search" id="keywords" name="keywords" class="input-medium" placeholder="标题 网址 标签" />
+                        </form>
+                    </span>
+                </a>
+            </li>
+            {% if not handler.get_current_user() is None %}
+            <li><a id="showLinkFormBtn" class="n-add" href="#" title="添加书签"><span><i class="icon-plus"></i> 添加</span></a></li>
+            <li><a class="n-logout" href="/auth/logout" title="登出"><span><i class="icon-off"></i> 登出</span></a></li>
+            {% else %}
+            <li><a href="/auth/login">登录</a></li>
+            {% end %}
+        </ul>
+    </div>
     <div class="container-fluid">
         <div class="row-fluid">
-            <div id="header" class="well span1">
-                <ul class="nav nav-list">
-                    <li class="active"><a href="/" title="{{escape(handler.settings['title'])}}"><i class="icon-cloud"></i></a>
-                    </li>
-                    <li><a href="#1" data-toggle="tab" title="列表"><i class="icon-list"></i></a>
-                    </li>
-                    <li><a href="#2" data-toggle="tab" title="标签"><i class="icon-tags"></i></a>
-                    </li>
-                    <li id="randomBookmarksBtn"><a href="#3" data-toggle="tab" title="随机"><i class="icon-random"></i></a>
-                    </li>
-                    <li style="position: relative;">
-                        <a id="searchBtn" href="#" title="搜索"><i class="icon-search"></i></a>
-                        <form id="searchForm" class="search" action="/search" method="get" name="search" style="display:none;">
-                            {% module xsrf_form_html() %}
-                            <input type="search" id="keywords" name="keywords" class="input-medium search-query" placeholder="搜索: 标题 网址 标签" />
-                        </form>
-                    </li>
-                    {% if not handler.get_current_user() is None %}
-                    <li><a id="showLinkFormBtn" href="#" title="添加书签"><i class="icon-plus"></i></a></li>
-                    <li><a href="/auth/logout" title="登出"><i class="icon-off"></i></a></li>
-                    {% else %}
-                    <li><a href="/auth/login">登录</a></li>
-                    {% end %}
-                </ul>
-            </div>
-            {% block header %}
-            {% if not handler.get_current_user() is None %}
-            <form id="linkForm" class="span5 form-horizontal" action="#">
-                {% module xsrf_form_html() %}
-                <div class="control-group">
-                    <!-- <label class="control-label" for="url">url</label> -->
-                    <div class="controls input-prepend input-append">
-                        <span class="add-on"><i class="icon-bookmark"></i>
-                        </span>
-                        <input type="url" name="url" id="url" class="input-large" placeholder="网址" autofocus required/>
-                        <button class="btn btn-info" type="button" id="getLinkInfoBtn" data-loading-text="载入中...">获取信息</button>
-                    </div>
-                </div>
-                <div id="linkInfoInputs">
-                    <div class="control-group">
-                        <label class="control-label" for="title" >标题</label>
-                        <div class="controls">
-                            <input type="text" name="title" id="title" placeholder="书签标题" class="span12" required disabled>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="description">摘要</label>
-                        <div class="controls">
-                            <textarea name="description" id="description" rows="3" placeholder="书签摘要" class="span12" disabled></textarea>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="tags">标签</label>
-                        <div class="controls">
-                            <input type="text" name="tags" id="tags" class="span12" placeholder="书签标签, 用逗号分隔" required/>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="note">笔记</label>
-                        <div class="controls">
-                            <textarea class="span12" id="note" rows="11" placeholder="some note"></textarea>
-                            <span class="help-block">使用Markdown语法</span>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" id="addLinkBtn" class="btn btn-primary">提交</button>
-                        <button type="button" id="cancelAddLinkBtn" class="btn">取消</button>
-                    </div>
-                </div>
-            </form>
-            {% end %}
-            {% end %}
-            <div id="bookmarks-panel" class="span5 default-skin scrollable">
+            <div class="span6 quickflip-wrapper" style="margin-top: 20px;">
+                <div id="bookmarks-panel" class="default-skin scrollable">
                 {% block content %}{% end %}
+                </div>
+                <div>
+                    {% block header %}
+                    {% if not handler.get_current_user() is None %}
+                    <form id="linkForm" class="form-horizontal" action="#">
+                        {% module xsrf_form_html() %}
+                        <div class="control-group">
+                            <!-- <label class="control-label" for="url">url</label> -->
+                            <div class="controls input-prepend input-append">
+                                <span class="add-on"><i class="icon-bookmark"></i>
+                                </span>
+                                <input type="url" name="url" id="url" class="input-large" placeholder="网址" autofocus required/>
+                                <button class="btn btn-info" type="button" id="getLinkInfoBtn" data-loading-text="载入中...">获取信息</button>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="title" >标题</label>
+                            <div class="controls">
+                                <input type="text" name="title" id="title" placeholder="书签标题" class="span12" required disabled>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="description">摘要</label>
+                            <div class="controls">
+                                <textarea name="description" id="description" rows="3" placeholder="书签摘要" class="span12" disabled></textarea>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="tags">标签</label>
+                            <div class="controls">
+                                <input type="text" name="tags" id="tags" class="span12" placeholder="书签标签, 用逗号分隔" required/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="note">笔记</label>
+                            <div class="controls">
+                                <textarea class="span12" id="note" rows="11" placeholder="还没有记笔记"></textarea>
+                                <span class="help-block">使用Markdown语法</span>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="addLinkBtn" class="btn btn-primary quickFlipCta">提交</button>
+                            <button type="button" id="cancelAddLinkBtn" class="btn quickFlipCta">取消</button>
+                        </div>
+                    </form>
+                    {% end %}
+                    {% end %}
+                </div>
             </div>
             <div id="article-panel" class="span6 default-skin scrollable">
                 <article id="article">
@@ -109,6 +115,7 @@
     </footer>
     <script src="{{static_url('js/jquery-1.10.2.min.js')}}"></script>
     <script src="{{static_url('js/bootstrap.min.js')}}"></script>
+    <script src="{{static_url('js/jquery.quickflip.min.js')}}"></script>
     <script src="{{static_url('js/jquery.placeholder.js')}}"></script>
     <script src="{{static_url('js/jquery.custom-scrollbar.min.js')}}"></script>
     <script src="{{static_url('js/script.js')}}"></script>

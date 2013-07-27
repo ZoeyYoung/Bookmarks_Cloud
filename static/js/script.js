@@ -1,4 +1,8 @@
 (function($) {
+    $('.quickflip-wrapper').quickFlip({
+        closeSpeed : 200,
+        openSpeed : 150
+    });
     $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height() - 50).customScrollbar({
         hScroll: false,
         updateOnWindowResize: true
@@ -38,21 +42,20 @@
     };
 
     function resetAddLinkForm() {
-        $('#url').prop('disabled', false),
-        $('#url').val(''),
-        $('#title').val(''),
-        $('#description').val(''),
-        $('#tags').val(''),
-        $('#note').val(''),
+        $('#url').prop('disabled', false);
+        $('#url').val('');
+        $('#title').val('');
+        $('#description').val('');
+        $('#tags').val('');
+        $('#note').val('');
         //$('#isstar').prop('checked', false),
         //$('#isreaded').prop('checked', false),
-        $('#linkForm').hide(),
-        $('#linkInfoInputs').hide();
-        $('#bookmarks-panel').show();
+        // $('#linkForm').hide(),
+        // $('#bookmarks-panel').show();
     }
 
     function initAddLinkForm(url, response) {
-        $('#bookmarks-panel').hide();
+        // $('#bookmarks-panel').hide();
         $('#url').prop('disabled', true);
         $('#url').val(url);
         $("#title").val(response.title);
@@ -64,16 +67,12 @@
         note = (note_t === '') ? response.note : response.note + '\n' + note_t;
         $('#note').val(note);
         showArticle(url, response.title, response.article);
-        $('#linkForm').show();
-        $('#linkInfoInputs').show();
+        // $('#linkForm').show();
     }
     $(document).on('click', '#showLinkFormBtn', function() {
-        $('#linkForm').toggle();
-        $('#bookmarks-panel').toggle();
-    });
-    $(document).on('click', '#searchBtn', function() {
-        $('#searchForm').toggle();
-        $('#keywords').focus();
+        // $('#linkForm').toggle();
+        // $('#bookmarks-panel').toggle();
+        $('.quickflip-wrapper').quickFlipper();
     });
     // do get link infomation
     $(document).on('click', '#getLinkInfoBtn', function() {
