@@ -3,10 +3,7 @@
         closeSpeed : 200,
         openSpeed : 150
     });
-    $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height() - 50).customScrollbar({
-        hScroll: false,
-        updateOnWindowResize: true
-    });
+    $(".nano").nanoScroller();
     $(window).resize(function() {
         $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height() - 50);
     });
@@ -101,7 +98,7 @@
             html: ''
         }, function(response) {
             if (response.success === 'true') {
-                $('#linkList').prepend(response.link_module);
+                last_editor.replaceWith(response.link_module);
                 showArticle(url, title, response.article);
                 resetAddLinkForm();
             } else {
@@ -112,10 +109,6 @@
     var last_editor = null;
     $(document).on('click', '#cancelAddLinkBtn', function() {
         resetAddLinkForm();
-        if (last_editor !== null) {
-            last_editor.show();
-            last_editor = null;
-        }
     });
     // 刷新书签信息
     $(document).on('click', '.link-refresh-btn', function() {
@@ -138,9 +131,9 @@
     });
     // 编辑书签
     $(document).on('click', '.link-edit-btn', function() {
+        $('.quickflip-wrapper').quickFlipper();
         last_editor = $(this).closest('.link-item');
         var url = last_editor.find('.link-title').attr('href');
-        last_editor.hide();
         jQuery.getJSON('/link/get_detail', {
             url: url
         }, function(response) {
@@ -188,6 +181,6 @@
         $('#article-title').html(title);
         $('#article-content').html('<p><a target="_blank" href="' + url + '">查看原网页</a></p>' + article);
         // FIXME 应该跳到文章顶部才对...也许该考虑换个插件了...
-        $("#article-panel").customScrollbar("resize");
+        $('#article-panel').nanoScroller({ scroll: 'top' });
     }
 })(jQuery);

@@ -145,6 +145,9 @@ ins, del {
     background-color:#FF7665;
     color:#223a44;
 }
+.tab-pane h3 {
+    margin: 0 0 10px 24px;
+}
 #article-panel, #bookmarks-panel {
     height: 600px;
     padding: 0 20px 0 0;
@@ -164,7 +167,7 @@ ins, del {
     width: 50px;
 }
 /* Bookmark Item */
- .link-title {
+.link-title {
     font-size: 16px;
     line-height: 30px;
 }
@@ -241,6 +244,9 @@ ins, del {
     color:#696A52;
     border-radius:5px;
     box-shadow:0 1px 2px rgba(0, 0, 0, .15), 0 1px 0 rgba(255, 255, 255, .75) inset;
+}
+.pagination {
+    margin: 0 0 0 24px;
 }
 #footer {
     margin-bottom: 20px;
