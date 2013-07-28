@@ -23,14 +23,14 @@ htmlstrip = re.compile("<"  # open
                        re.I)
 
 
-def clean_attributes(html):
+def clean_attributes(html_str):
     """移除HTML标签中无用的属性, 即上面的bad_attrs
     例如: <div id="main" class="content" style="font-size:18px;">content</div>
     变成: <div id="main" class="content">content</div>
     """
-    while htmlstrip.search(html):
-        html = htmlstrip.sub(r'<\1\2>', html)
-    return html
+    while htmlstrip.search(html_str):
+        html_str = htmlstrip.sub(r'<\1\2>', html_str)
+    return html_str
 
 
 def normalize_spaces(s):
@@ -40,6 +40,12 @@ def normalize_spaces(s):
     if not s:
         return ''
     return ' '.join(s.split())
+
+
+def text_content(s):
+    if not s:
+        return ''
+    return re.sub(r'</?\w+[^>]*>', '', s)
 
 
 html_cleaner = Cleaner(scripts=True, javascript=True, comments=True,

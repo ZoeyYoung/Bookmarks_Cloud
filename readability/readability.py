@@ -29,9 +29,9 @@ log = logging.getLogger()
 
 PAGE_CLASS = 'article-page'
 REGEXES = {
-    'unlikelyCandidatesRe': re.compile('combx|comment|community|disqus|extra|foot|header|menu|nav|remark|rss|shoutbox|sidebar|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|back|dig|rat|tool|share|vote|left|bottom|uyan_frame', re.I),
-    'okMaybeItsACandidateRe': re.compile('and|article|body|column|main|shadow|post|topic|document|news', re.I),
-    'positiveRe': re.compile('article|body|content|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news', re.I),
+    'unlikelyCandidatesRe': re.compile('combx|comment|community|disqus|extra|foot|header|menu|nav|remark|rss|shoutbox|sidebar|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|back|dig|rat|tool|share|vote|left|bottom|uyan_frame|google_ads|answer', re.I),
+    'okMaybeItsACandidateRe': re.compile('and|article|body|column|main|shadow|post|topic|document|news|highlight|accept', re.I),
+    'positiveRe': re.compile('article|body|content|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news|highlight|code', re.I),
     'negativeRe': re.compile('combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|outbrain|promo|related|scroll|shoutbox|sidebar|sponsor|shopping|tags|tool|widget', re.I),
     'extraneous': re.compile(r'print|archive|comment|discuss|e[\-]?mail|share|reply|all|login|sign|single', re.I),
     'divToPElementsRe': re.compile('<(a|blockquote|dl|div|img|ol|p|pre|table|ul)', re.I),
@@ -76,15 +76,13 @@ def describe(node, depth=1):
 
 
 def get_clean_html(doc):
-    """暂时没用到
-    """
+    """暂时没用到"""
     # print("get_clean_html", type(doc))
     return clean_attributes(tounicode(doc))
 
 
 def to_int(x):
-    """没有用到?
-    """
+    """没有用到?"""
     if not x:
         return None
     x = x.strip()
@@ -96,16 +94,19 @@ def to_int(x):
 
 
 def clean(text):
+    """移除多余的\n与\t"""
     text = re.sub('\s*\n+\s*', '\n', text)
     text = re.sub('[ \t]{2,}', ' ', text)
     return text.strip()
 
 
 def text_length(i):
+    """返回文本长度"""
     return len(clean(i.text_content() or ""))
 
 
 def tags(node, *tag_names):
+    """返回不包含根元素的所有特定标签元素"""
     for tag_name in tag_names:
         for e in node.findall('.//%s' % tag_name):
             yield e
@@ -134,6 +135,7 @@ def class_weight(e):
 
 
 def score_node(elem):
+    # TODO 仍需要调整
     content_score = class_weight(elem)
     name = elem.tag.lower()
     if name in ["div", "p"]:
@@ -920,7 +922,9 @@ def append_next_page(parsed_urls, page_index, page_url, doc, options):
 
 
 def parse(input, url):
+    # 含有样式和JS的lxml.html.HtmlElement对象
     raw_doc = build_doc(input)
+    # 去除样式和JS的lxml.html.HtmlElement对象
     doc = html_cleaner.clean_html(raw_doc)
     log.debug('parse url: %s', url)
     if url:

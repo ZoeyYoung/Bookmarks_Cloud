@@ -8,6 +8,7 @@ from lxml.html import soupparser
 
 from .cleaners import clean_attributes
 from .cleaners import normalize_spaces
+from .cleaners import text_content
 from .encoding import decode_html
 
 logging.getLogger().setLevel(logging.DEBUG)
@@ -77,7 +78,7 @@ def get_description(doc):
         return '[no-description]'
     description = description_node[0].attrib["content"]
     # print(description)
-    return normalize_spaces(description)
+    return text_content(normalize_spaces(description))
 
 
 def get_keywords(doc):
