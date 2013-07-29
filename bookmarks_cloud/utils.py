@@ -48,7 +48,7 @@ def get_bookmark_info(url, html=None):
     title = summary_obj.short_title
     # print(summary_obj.title)
     # print(summary_obj.short_title)
-    article = summary_obj.html  # .decode('utf-8', 'replace')
+    article = summary_obj.html
     description = summary_obj.description
     keywords = summary_obj.keywords
     print(title, description, keywords)

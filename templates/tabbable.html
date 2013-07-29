@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="tab-content content">
-    <div class="tab-pane active" id="1" style="margin: 0 20px 0 0;">
+    <div class="tab-pane active" id="1">
         {% block links_pane %}
         {% end %}
     </div>
     <div class="tab-pane" id="2">
         {% block tags_pane %}
-        <div id="tagCloud" class="well" style="margin: 0 0 0 20px;">
+        <div id="tagCloud" class="well">
         {% for tag in tags_cloud %}
             <a style="font-size:{{tag['font_size']}}pt" href="/tag/1/{{tag['tag']['_id']}}">{{tag['tag']['_id']}}({{tag['tag']['count']}})</a>
         {% end %}

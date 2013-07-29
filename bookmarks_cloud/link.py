@@ -205,11 +205,14 @@ class RandomLinkHandler(BaseHandler):
 
     def get(self):
         link = Link.get_random_one()
+        link_module = tornado.escape.to_basestring(
+            self.render_string('modules/link.html', link=link))
         self.write(json.dumps({
             'success': 'true',
             'url': link['url'],
             'title': link['title'],
-            'article': link['article']
+            'article': link['article'],
+            'link_module': link_module
         }))
 
 

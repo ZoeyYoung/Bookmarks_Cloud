@@ -167,6 +167,9 @@ ins, del {
     width: 50px;
 }
 /* Bookmark Item */
+.tab-pane {
+    margin: 0 20px 0 0;
+}
 .link-title {
     font-size: 16px;
     line-height: 30px;

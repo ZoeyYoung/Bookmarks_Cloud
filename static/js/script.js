@@ -11,13 +11,18 @@
     $(document).on('mouseenter mouseleave', '.link-item', function() {
         $('.link-note', this).stop(true, true).slideToggle();
     });
-    jQuery.getJSON('/randomlink', function(response) {
-        if (response.success === 'true') {
-            showArticle(response.url, response.title, response.article);
-        } else {
-            alert('数据库返回错误');
-        }
-    });
+    function getRandomLink() {
+        jQuery.getJSON('/randomlink', function(response) {
+            if (response.success === 'true') {
+                $('#linkList').prepend(response.link_module);
+                $("img.lazy").lazy();
+                showArticle(response.url, response.title, response.article);
+            } else {
+                alert('数据库返回错误');
+            }
+        });
+    }
+    getRandomLink();
     // Placeholders for input/textarea
     $("input, textarea").placeholder();
 
