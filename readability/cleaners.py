@@ -53,5 +53,5 @@ html_cleaner = Cleaner(scripts=True, javascript=True, comments=True,
                        page_structure=False, processing_instructions=True,
                        embedded=False, frames=False, forms=False,
                        annoying_tags=False, remove_tags=None,
-                       kill_tags=['footer', 'nav'],
+                       kill_tags=['footer', 'nav', 'form', 'noscript'],
                        remove_unknown_tags=False, safe_attrs_only=False)

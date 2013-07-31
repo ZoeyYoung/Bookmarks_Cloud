@@ -4,13 +4,12 @@ from tornado import httpclient
 from readability.readability import Document
 from functools import lru_cache
 import math
+import re
 
 
 # 格式化标签
 def format_tags(str):
-    str = str.replace("|", ",")
-    str = str.replace("，", ",")
-    tags = str.split(",")
+    tags = re.split('[,，|]', str)
     tags = [tag.strip() for tag in tags]
     tags = [tag for tag in tags if len(tag) > 0]
     tags = list(set(tags))
@@ -51,7 +50,7 @@ def get_bookmark_info(url, html=None):
     article = summary_obj.html
     description = summary_obj.description
     keywords = summary_obj.keywords
-    print(title, description, keywords)
+    # print(title, description, keywords)
     return dict(title=title, favicon="", article=article, description=description, tags=keywords)
 
 

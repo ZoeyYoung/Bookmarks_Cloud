@@ -2,6 +2,7 @@ import logging
 import re
 
 from lxml.html import document_fromstring
+from lxml.html import html5parser
 from lxml.html import HTMLParser
 from lxml.html import tostring
 from lxml.html import soupparser
@@ -27,14 +28,16 @@ def build_doc(page):
     if page is None:
         LOG.error("Page content is None, can't build_doc")
         return ''
-    doc = document_fromstring(decode_html(page))
-    try:
-        tostring(doc, encoding='unicode')
-    except UnicodeDecodeError:
-        """Using soupparser as a fallback
-        """
-        print("Using soupparser as a fallback")
-        doc = soupparser.fromstring(decode_html(page))
+    html5doc = html5parser.fromstring(decode_html(page))
+    content = tostring(html5doc, method='html')
+    doc = document_fromstring(content)
+    # try:
+    #     tostring(doc, encoding='unicode')
+    # except UnicodeDecodeError:
+    #     """Using soupparser as a fallback
+    #     """
+    #     print("Using soupparser as a fallback")
+    #     doc = soupparser.fromstring(decode_html(page))
     return doc
 
 

@@ -28,13 +28,16 @@ log = logging.getLogger()
 
 
 PAGE_CLASS = 'article-page'
+BLOCK_CONTENT_TAG = ['div', 'header', 'article', 'section']
 REGEXES = {
-    'unlikelyCandidatesRe': re.compile('combx|comment|community|disqus|extra|foot|header|menu|nav|remark|rss|shoutbox|sidebar|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|back|dig|rat|tool|share|vote|left|bottom|uyan_frame|google_ads|answer', re.I),
-    'okMaybeItsACandidateRe': re.compile('and|article|body|column|main|shadow|post|topic|document|news|highlight|accept', re.I),
+    'unlikelyCandidatesRe': re.compile('answer|avatar|blurb|combx|comment|community|disqus|extra|foot|header|menu|nav|notify|remark|rss|shoutbox|sidebar|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|dig|rat|tool|share|vote|bottom|uyan_frame|google_ads|user', re.I),
+    'okMaybeItsACandidateRe': re.compile('and|article|body|brand|column|main|shadow|post|topic|document|news|highlight|accept|section', re.I),
     'positiveRe': re.compile('article|body|content|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news|highlight|code', re.I),
     'negativeRe': re.compile('combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|outbrain|promo|related|scroll|shoutbox|sidebar|sponsor|shopping|tags|tool|widget', re.I),
     'extraneous': re.compile(r'print|archive|comment|discuss|e[\-]?mail|share|reply|all|login|sign|single', re.I),
-    'divToPElementsRe': re.compile('<(a|blockquote|dl|div|img|ol|p|pre|table|ul)', re.I),
+    # Block-level elements
+    # https://developer.mozilla.org/en-US/docs/HTML/Block-level_elements
+    'divToPElementsRe': re.compile('<(address|blockquote|canvas|dd|dl|div|fig|h1|h2|h3|h4|h5|h6|hr|img|noscript|ol|p|pre|section|table|ul|video)', re.I),
     # Match: next, continue, >, >>, but not >|, as those usually mean last.
     'nextLink': re.compile(r'(next|weiter|continue|>[^\|]$)', re.I),  # Match: next, continue, >, >>, but not >|, as those usually mean last.
     'prevLink': re.compile(r'(prev|earl|old|new|<)', re.I),
@@ -101,13 +104,14 @@ def clean(text):
 
 
 def text_length(i):
-    """返回文本长度"""
+    """返回文本长度, 含子元素"""
     return len(clean(i.text_content() or ""))
 
 
 def tags(node, *tag_names):
     """返回不包含根元素的所有特定标签元素"""
     for tag_name in tag_names:
+        # print(tag_name)
         for e in node.findall('.//%s' % tag_name):
             yield e
 
@@ -141,8 +145,8 @@ def score_node(elem):
     if name in ["div", "p"]:
         content_score += 5
     elif name in ["article", "section"]:
-        content_score += 10
-    elif name in ["pre", "td", "blockquote", "aside", "code"]:
+        content_score += 50
+    elif name in ["pre", "td", "blockquote", "aside", "code", "table"]:
         content_score += 3
     elif name in ["ol", "ul", "li", "dd", "dt"]:
         content_score -= 1
@@ -158,22 +162,28 @@ def score_node(elem):
 
 
 def transform_misused_divs_into_paragraphs(doc):
-    for elem in tags(doc, 'div'):
+    """首先将不含任何块级元素的<div>变成<p>
+    然后为<div>中不含<p>的段落加上<p>
+    例如 <div>TEXT<P>HELLO</P>TAIL<br/>TAIL2</div>
+    转变后变成 <div><p>TEXT</p><p>HELLO</p><p>TAIL</p><p>TAIL2</p></div>
+    """
+    for elem in tags(doc, *BLOCK_CONTENT_TAG):
+    # for elem in tags(doc, 'div'):
         # transform <div>s that do not contain other block elements into <p>s
         if not REGEXES['divToPElementsRe'].search(
                 ''.join(str(list(map(tostring, list(elem)))))):
             # log.debug("Altering %s to p" % (describe(elem)))
             elem.tag = "p"
-            # print "Fixed element "+describe(elem)
-
-    for elem in tags(doc, 'div'):
+            # print("Fixed element "+describe(elem))
+    for elem in tags(doc, *BLOCK_CONTENT_TAG):
+    # for elem in tags(doc, 'div'):
         if elem.text and elem.text.strip():
             p = fragment_fromstring('<p/>')
             p.text = elem.text
             elem.text = None
             elem.insert(0, p)
             # log.debug("Appended %s to %s" % (tounicode(p), describe(elem)))
-            # print "Appended "+tounicode(p)+" to "+describe(elem)
+            # print("Appended "+tounicode(p)+" to "+describe(elem))
 
         for pos, child in reversed(list(enumerate(elem))):
             if child.tail and child.tail.strip():
@@ -184,34 +194,45 @@ def transform_misused_divs_into_paragraphs(doc):
                 # log.debug("Inserted %s to %s" % (
                     # tounicode(p),
                     # describe(elem)))
-                # print "Inserted "+tounicode(p)+" to "+describe(elem)
+                # print("Inserted "+tounicode(p)+" to "+describe(elem))
             if child.tag == 'br':
-                # print 'Dropped <br> at '+describe(elem)
+                # print('Dropped <br> at '+describe(elem))
                 child.drop_tree()
 
 
 def remove_unlikely_candidates(doc):
-    for elem in doc.iter():
-    # for elem in tags(doc, 'div'):
+    """移除可能不会作为正文的元素
+    注意: 可能会误删
+    """
+    allelem = doc.iter()
+    for elem in allelem:
         s = "%s %s" % (elem.get('class', ''), elem.get('id', ''))
         # log.debug(s)
+        # output = open('elem.txt', 'a')
+        # print("_tree %s class-id %s" % (describe(elem), s), file=output)
         if REGEXES['unlikelyCandidatesRe'].search(s) and (not REGEXES['okMaybeItsACandidateRe'].search(s)) and elem.tag != 'body' and elem.getparent() is not None:
-            # print("drop_tree %s" % (describe(elem)))
-            # log.debug("Removing unlikely candidate - %s" % describe(elem))
-            elem.drop_tree()
+            # print("_drop_tree %s" % (describe(elem)), file=output)
+            for i in range(len(elem.findall('.//*'))):
+                allelem.__next__()
+            elem.getparent().remove(elem)
 
 
 def get_link_density(elem):
+    """获得链接密度
+    注意: 有的正文也会有很多链接
+    """
     link_length = 0
     for i in elem.findall(".//a"):
         link_length += text_length(i)
     # if len(elem.findall(".//div") or elem.findall(".//p")):
     #    link_length = link_length
     total_length = text_length(elem)
+    # print(describe(elem), "link_density", float(link_length), max(total_length, 1))
     return float(link_length) / max(total_length, 1)
 
 
 def score_paragraphs(doc, options):
+    output = open('elem.txt', 'a')
     candidates = {}
     # log.debug(str([describe(node) for node in tags(doc, "div")]))
 
@@ -232,15 +253,18 @@ def score_paragraphs(doc, options):
 
         if parent_node not in candidates:
             candidates[parent_node] = score_node(parent_node)
+            # print("parent_node", describe(parent_node), candidates[parent_node]['content_score'], file=output)
             ordered.append(parent_node)
 
         if grand_parent_node is not None and grand_parent_node not in candidates:
             candidates[grand_parent_node] = score_node(grand_parent_node)
+            # print("grand_parent_node", describe(grand_parent_node), candidates[grand_parent_node]['content_score'], file=output)
             ordered.append(grand_parent_node)
 
         content_score = 1
-        content_score += len(inner_text.split(','))
+        content_score += len(re.split('[,，.。]', inner_text))
         content_score += min((inner_text_len / 100), 3)
+        # print("content_score", content_score, len(re.split('[,，.。]', inner_text)), min((inner_text_len / 100), 3), file=output)
         # if elem not in candidates:
         #    candidates[elem] = score_node(elem)
 
@@ -291,15 +315,16 @@ def reverse_tags(node, *tag_names):
 
 
 def sanitize(node, candidates, options):
-    for header in tags(node, "h1", "h2", "h3", "h4", "h5", "h6"):
-        if class_weight(header) < 0 or get_link_density(header) > 0.33:
-            header.drop_tree()
+    # 不过滤标题
+    # for header in tags(node, "h1", "h2", "h3", "h4", "h5", "h6"):
+    #     if class_weight(header) < 0 or get_link_density(header) > 0.33:
+    #         header.drop_tree()
 
     for elem in tags(node, "form", "iframe", "textarea"):
         elem.drop_tree()
     allowed = {}
     # Conditionally clean <table>s, <ul>s, and <div>s
-    for el in reverse_tags(node, "table", "ul", "div"):
+    for el in reverse_tags(node, "ul", "div"):
     # for el in reverse_tags(node, "table", "ul", "div"):
         if el in allowed:
             continue
@@ -397,7 +422,8 @@ def sanitize(node, candidates, options):
                 if siblings and sum(siblings) > 1000:
                     to_remove = False
                     log.debug("Allowing %s" % describe(el))
-                    for desnode in tags(el, "table", "ul", "div"):
+                    # for desnode in tags(el, "table", "ul", "div"):
+                    for desnode in tags(el, "ul", "div"):
                         allowed[desnode] = True
 
             if to_remove:
@@ -481,8 +507,8 @@ def get_article(doc, options, enclose_with_html_tag=True):
     try:
         ruthless = True
         while True:
-            for i in tags(doc, 'script', 'style'):
-                i.drop_tree()
+            # for i in tags(doc, 'script', 'style'):
+            #     i.drop_tree()
             for i in tags(doc, 'body'):
                 i.set('id', 'readabilityBody')
             if ruthless:
@@ -938,7 +964,7 @@ def parse(input, url):
 class Document:
 
     """Class to build a etree document out of html."""
-    TEXT_LENGTH_THRESHOLD = 25
+    TEXT_LENGTH_THRESHOLD = 10  # 25
     RETRY_LENGTH = 250
 
     def __init__(self, input_doc, **options):
