@@ -54,8 +54,8 @@ def get_bookmark_info(url, html=None):
     # print(summary_obj.short_title)
     article = summary_obj.html
     description = summary_obj.description
-    keywords = ",".join(get_keywords(article)) + ',' + summary_obj.keywords
-    segmentation = text_segmentation(article)
+    keywords = ",".join(get_keywords(summary_obj.title + article)) + ',' + summary_obj.keywords
+    segmentation = text_segmentation(summary_obj.title + article)
     # print(title, description, keywords)
     bookmark = dict(title=title, favicon="", article=article, segmentation=segmentation, description=description, tags=keywords)
     return bookmark
