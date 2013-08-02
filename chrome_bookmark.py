@@ -5,6 +5,7 @@
 # Jan Eden <software (a) janeden net>
 # based on a Groovy script by Dan Fraser [http://www.capybara.org/~dfraser/archives/355]
 # This file is public domain. Python 2.6 or newer required
+# 暂时不能使用, 代码修改太多
 
 import json
 import cgi

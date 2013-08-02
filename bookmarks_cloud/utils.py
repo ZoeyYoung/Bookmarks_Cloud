@@ -54,8 +54,17 @@ def get_bookmark_info(url, html=None):
     # print(summary_obj.short_title)
     article = summary_obj.html
     description = summary_obj.description
-    keywords = ",".join(get_keywords(summary_obj.title + article)) + ',' + summary_obj.keywords
-    segmentation = text_segmentation(summary_obj.title + article)
+    keywords = get_keywords(str(title) + str(article))
+    if keywords:
+        keywords = ",".join(keywords) + ',' + summary_obj.keywords
+    else:
+        keywords = summary_obj.keywords
+    if title and article:
+        segmentation = text_segmentation(str(title) + str(article))
+    elif title:
+        segmentation = text_segmentation(str(title))
+    else:
+        segmentation = ' '
     # print(title, description, keywords)
     bookmark = dict(title=title, favicon="", article=article, segmentation=segmentation, description=description, tags=keywords)
     return bookmark
@@ -70,11 +79,15 @@ def text_content(s):
 
 
 def text_segmentation(article):
+    if not article:
+        return ''
     words = "/ ".join(jieba.cut(text_content(article)))
     return words.encode('utf-8')
 
 
 def get_keywords(article):
+    if not article:
+        return ''
     return jieba.analyse.extract_tags(text_content(article), 10)
 
 

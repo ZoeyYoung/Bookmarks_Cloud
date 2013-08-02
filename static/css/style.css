@@ -17,10 +17,21 @@ i {
 }
 blockquote {
     clear: both;
-    border-color: rgba(0, 0, 0, 0.15);
+    border: 0;
     font-size: 14px;
+    font-style: italic;
+    color: #7a7a7a;
+}
+blockquote p:before {
+    font-family: FontAwesome;
+    display: block;
+    content: "\f10d";
+    position:absolute;
+    top:0;
+    left:-20px;
 }
 blockquote p {
+    position: relative;
     font-size: 14px;
 }
 aside {
@@ -188,12 +199,16 @@ ins, del {
     line-height: 20px;
     margin: 0 2px 0 0;
 }
+.tags a {
+    color: #FF7665;
+}
 .bookmark-item blockquote, .bookmark-note {
     word-wrap:break-word;
     overflow:hidden;
 }
 .bookmark-item blockquote {
-    margin-bottom: 10px;
+    margin: 0;
+    padding: 0 0 5px 20px;
 }
 .bookmark-note {
     display: none;

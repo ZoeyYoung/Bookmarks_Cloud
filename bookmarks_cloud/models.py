@@ -86,7 +86,7 @@ class Bookmark(object):
 
     @staticmethod
     def get_all():
-        return bookmarks_collection.find().sort([("post_time", -1)])
+        return bookmarks_collection.find(timeout=False).sort([("post_time", -1)])
 
     @staticmethod
     def get_page(page):
@@ -124,7 +124,7 @@ class Bookmark(object):
                 bookmark['favicon'] = new_bookmark['favicon']
             bookmark['tags'] = new_bookmark['tags']
             bookmark['note'] = new_bookmark['note']
-            bookmark['note_html'] = markdown.markdown(new_bookmark['note'], extensions=['codehilite(linenums=True)'])
+            bookmark['note_html'] = markdown.markdown(new_bookmark['note'], extensions=['codehilite(linenums=False)'])
             bookmark['post_time'] = new_bookmark['post_time']
             bookmarks_collection.save(bookmark)
             return bookmark
