@@ -232,7 +232,7 @@ def get_link_density(elem):
 
 
 def score_paragraphs(doc, options):
-    output = open('elem.txt', 'a')
+    # output = open('elem.txt', 'a')
     candidates = {}
     # log.debug(str([describe(node) for node in tags(doc, "div")]))
 
