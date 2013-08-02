@@ -186,6 +186,7 @@ ins, del {
 }
 .tags li {
     line-height: 20px;
+    margin: 0 2px 0 0;
 }
 .bookmark-item blockquote, .bookmark-note {
     word-wrap:break-word;

@@ -32,8 +32,6 @@
         });
     }
     getRandomBookmark();
-    // Placeholders for input/textarea
-    $("input, textarea").placeholder();
 
     function getCookie(name) {
         var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
