@@ -5,6 +5,11 @@ from readability.readability import Document
 from functools import lru_cache
 import math
 import re
+import jieba
+import jieba.analyse
+
+
+jieba.initialize()
 
 
 # 格式化标签
@@ -49,9 +54,28 @@ def get_bookmark_info(url, html=None):
     # print(summary_obj.short_title)
     article = summary_obj.html
     description = summary_obj.description
-    keywords = summary_obj.keywords
+    keywords = ",".join(get_keywords(article)) + ',' + summary_obj.keywords
+    segmentation = text_segmentation(article)
     # print(title, description, keywords)
-    return dict(title=title, favicon="", article=article, description=description, tags=keywords)
+    bookmark = dict(title=title, favicon="", article=article, segmentation=segmentation, description=description, tags=keywords)
+    return bookmark
+
+
+def text_content(s):
+    if not s:
+        return ''
+    s = re.sub(r'<pre>.*</pre>', '', s)
+    s = re.sub(r'</?\w+[^>]*>', '', s)
+    return ' '.join(s.split())
+
+
+def text_segmentation(article):
+    words = "/ ".join(jieba.cut(text_content(article)))
+    return words.encode('utf-8')
+
+
+def get_keywords(article):
+    return jieba.analyse.extract_tags(text_content(article), 10)
 
 
 def get_tags_cloud(tags):

@@ -1,6 +1,6 @@
-<ul id="linkList">
-    {% for link in links %}
-        {% module Link(link) %}
+<ul id="bookmarkList">
+    {% for bookmark in bookmarks %}
+        {% module Bookmark(bookmark) %}
     {% end %}
 </ul>
 {% module Pager(page) %}

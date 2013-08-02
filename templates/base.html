@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8" />
     <!-- saved from url=(0014)about:internet -->
     <title>{{ escape(handler.settings['title'])}}</title>
     <meta name="keywords" content="{{ escape(handler.settings['keywords']) }}">
     <meta name="description" content="{{ escape(handler.settings['desc']) }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{{static_url('css/bootstrap-journal.min.css')}}" rel="stylesheet" media="screen">
+    <!-- Bootstrap -->
+    <link href="{{static_url('css/bootstrap3.min.css')}}" rel="stylesheet" media="screen">
     <link href="{{static_url('css/font-awesome.min.css')}}" rel="stylesheet" media="screen">
+    <link href="{{static_url('css/magicsuggest-1.3.0.css')}}" rel="stylesheet" media="screen">
     <!-- font-awesome如果需要IE7支持要添加额外的CSS -->
     <link href="{{static_url('css/pygments.css')}}" rel="stylesheet" media="screen">
     <link href="{{static_url('css/style.css') }}" rel="stylesheet" />
     <link href="{{static_url('css/nanoscroller.css')}}" rel="stylesheet" media="screen">
-    <link href="{{static_url('css/bootstrap-responsive.min.css')}}" rel="stylesheet" media="screen">
     <script src="{{static_url('js/prefixfree.min.js')}}"></script>
 </head>
-
 <body id="top">
     <header id="header">
-        <ul id="navigationMenu" class="nav">
+        <ul id="navigationMenu">
             <li class="active"><a class="n-cloud" href="/"><span><i class="icon-cloud"></i> 首页</span></a>
             </li>
             <li><a class="n-list" href="#1" data-toggle="tab"><span><i class="icon-list"></i> 列表</span></a>
@@ -41,69 +41,70 @@
                 </a>
             </li>
             {% if not handler.get_current_user() is None %}
-            <li><a id="showLinkFormBtn" class="n-add" href="#"><span><i class="icon-plus"></i> 添加</span></a></li>
+            <li><a id="showBookmarkFormBtn" class="n-add" href="#"><span><i class="icon-plus"></i> 添加</span></a></li>
             <li><a class="n-logout" href="/auth/logout"><span><i class="icon-off"></i> 登出</span></a></li>
             {% else %}
             <li><a href="/auth/login">登录</a></li>
             {% end %}
         </ul>
     </header>
-    <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span6 quickflip-wrapper" style="margin-top: 20px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 quickflip-wrapper" style="margin-top: 20px;">
                 <div id="bookmarks-panel" class="nano">
                 {% block content %}{% end %}
                 </div>
                 <div>
                     {% block header %}
                     {% if not handler.get_current_user() is None %}
-                    <form id="linkForm" class="form-horizontal" action="#">
+                    <form id="bookmarkForm" class="form-horizontal" action="#">
                         {% module xsrf_form_html() %}
-                        <div class="control-group">
-                            <!-- <label class="control-label" for="url">url</label> -->
-                            <div class="controls input-prepend input-append">
-                                <span class="add-on"><i class="icon-bookmark"></i>
+                        <div class="form-group">
+                            <label class="control-label col-lg-1" for="url"></label>
+                            <div class="col-lg-11 input-group">
+                                <span class="input-group-addon"><i class="icon-bookmark"></i>
                                 </span>
-                                <input type="url" name="url" id="url" class="input-large" placeholder="网址" autofocus required/>
-                                <button class="btn btn-info" type="button" id="getLinkInfoBtn" data-loading-text="载入中...">获取信息</button>
+                                <input type="url" name="url" id="url" class="form-control" placeholder="网址" autofocus required/>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-info" type="button" id="getBookmarkInfoBtn" data-loading-text="载入中...">获取信息</button>
+                                </span>
                             </div>
                         </div>
-                        <div class="control-group">
-                            <label class="control-label" for="title" >标题</label>
-                            <div class="controls">
-                                <input type="text" name="title" id="title" placeholder="书签标题" class="span12" required disabled>
+                        <div class="form-group">
+                            <label class="control-label col-lg-1" for="title" >标题</label>
+                            <div class="col-lg-11">
+                                <input type="text" name="title" id="title" placeholder="书签标题" class="form-control" required disabled>
                             </div>
                         </div>
-                        <div class="control-group">
-                            <label class="control-label" for="description">摘要</label>
-                            <div class="controls">
-                                <textarea name="description" id="description" rows="3" placeholder="书签摘要" class="span12" disabled></textarea>
+                        <div class="form-group">
+                            <label class="control-label col-lg-1" for="description">摘要</label>
+                            <div class="col-lg-11">
+                                <textarea name="description" id="description" rows="3" placeholder="书签摘要" class="form-control" disabled></textarea>
                             </div>
                         </div>
-                        <div class="control-group">
-                            <label class="control-label" for="tags">标签</label>
-                            <div class="controls">
-                                <input type="text" name="tags" id="tags" class="span12" placeholder="书签标签, 用逗号分隔" required/>
+                        <div class="form-group">
+                            <label class="control-label col-lg-1" for="tags">标签</label>
+                            <div class="col-lg-11">
+                                <input type="text" name="tags" id="tags" class="form-control" placeholder="书签标签, 用逗号分隔" required/>
+                                <ul id="suggestTags" class="tags"></ul>
                             </div>
                         </div>
-                        <div class="control-group">
-                            <label class="control-label" for="note">笔记</label>
-                            <div class="controls">
-                                <textarea class="span12" id="note" rows="11" placeholder="还没有记笔记"></textarea>
+                        <div class="form-group">
+                            <label class="control-label col-lg-1" for="note">笔记</label>
+                            <div class="col-lg-11">
+                                <textarea class="form-control" id="note" rows="10" placeholder="还没有记笔记"></textarea>
                                 <span class="help-block">使用Markdown语法</span>
+                                <button type="button" id="addBookmarkBtn" class="btn btn-primary quickFlipCta">提交</button>
+                                <button type="button" id="cancelAddBookmarkBtn" class="btn quickFlipCta">取消</button>
                             </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="button" id="addLinkBtn" class="btn btn-primary quickFlipCta">提交</button>
-                            <button type="button" id="cancelAddLinkBtn" class="btn quickFlipCta">取消</button>
                         </div>
                     </form>
                     {% end %}
                     {% end %}
                 </div>
             </div>
-            <div id="article-panel" class="span6 nano">
-                <article id="article" class="content">
+            <div id="article-panel" class="col-lg-6 nano">
+                <article id="article" class="content nanocontent">
                     <h3 id="article-title"></h3>
                     <div id="article-content">
                     </div>
@@ -114,11 +115,13 @@
     <footer id="footer">
     </footer>
     <script src="{{static_url('js/jquery-1.10.2.min.js')}}"></script>
-    <script src="{{static_url('js/bootstrap.min.js')}}"></script>
+    <script src="{{static_url('js/bootstrap3.min.js')}}"></script>
+    <!-- Optionally enable responsive features in IE8 -->
+    <script src="{{static_url('js/respond.min.js')}}"></script>
     <script src="{{static_url('js/jquery.lazy.min.js')}}"></script>
     <script src="{{static_url('js/jquery.quickflip.min.js')}}"></script>
-    <script src="{{static_url('js/jquery.placeholder.js')}}"></script>
     <script src="{{static_url('js/jquery.nanoscroller.min.js')}}"></script>
+    <script src="{{static_url('js/magicsuggest-1.3.0.js')}}"></script>
     <script src="{{static_url('js/script.js')}}"></script>
 </body>
 </html>

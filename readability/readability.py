@@ -30,7 +30,7 @@ log = logging.getLogger()
 PAGE_CLASS = 'article-page'
 BLOCK_CONTENT_TAG = ['div', 'header', 'article', 'section']
 REGEXES = {
-    'unlikelyCandidatesRe': re.compile('answer|avatar|blurb|combx|comment|community|disqus|extra|foot|header|menu|nav|notify|remark|rss|shoutbox|sidebar|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|dig|rat|tool|share|vote|bottom|uyan_frame|google_ads|user', re.I),
+    'unlikelyCandidatesRe': re.compile('answer|avatar|banner|blurb|combx|comment|community|disqus|extra|foot|header|menu|nav|notify|remark|rss|shoutbox|sidebar|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|dig|rat|tool|share|vote|bottom|uyan_frame|google_ads|user', re.I),
     'okMaybeItsACandidateRe': re.compile('and|article|body|brand|column|main|shadow|post|topic|document|news|highlight|accept|section', re.I),
     'positiveRe': re.compile('article|body|content|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news|highlight|code', re.I),
     'negativeRe': re.compile('combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|outbrain|promo|related|scroll|shoutbox|sidebar|sponsor|shopping|tags|tool|widget', re.I),

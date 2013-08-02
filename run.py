@@ -18,10 +18,6 @@ if __name__ == "__main__":
         if hasattr(handler, 'baseFilename'):
             print('Logging to', handler.baseFilename)
             break
-
-    # db = motor.MotorClient().open_sync().links
-    # db = pymongo.Connection().links
-    # cache.startup(db)
     if options.rebuild_indexes or options.ensure_indexes:
         indexes.ensure_indexes(
             config.config['db'],

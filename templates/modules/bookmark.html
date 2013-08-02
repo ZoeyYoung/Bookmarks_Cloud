@@ -1,0 +1,23 @@
+{% if bookmark['favicon'] is '' %}
+    {% set bookmark['favicon'] = "http://ico.ylsnuha.com/" + bookmark['url'] + "?defaulticon=" + handler.avatar() %}
+{% end %}
+<div class="bookmark-item" data-name="{{bookmark['title']}}">
+    <a class="bookmark-favicon" target="_blank" title="{{bookmark['title']}}" href="{{bookmark['url']}}"><img class="lazy" data-src="{{bookmark['favicon']}}" src="" alt="{{bookmark['title']}}"/></a>
+    <a target="_blank" class="bookmark-title" title="{{bookmark['url']}}" href="{{bookmark['url']}}">{{bookmark['title']}}</a>
+    <time><i class="icon-time"></i> {{locale.format_date(bookmark['post_time'], -480, relative=False)}}</time>
+    <div class="icons pull-right">
+        <i class="icon-refresh bookmark-refresh-btn"></i>
+        <i class="icon-file-text bookmark-read-btn"></i>
+        <i class="icon-edit bookmark-edit-btn"></i>
+        <i class="icon-trash bookmark-del-btn"></i>
+    </div>
+    <blockquote><p>{{escape(bookmark['description'])}}</p></blockquote>
+    <div class="bookmark-note">{{bookmark['note_html']}}</div>
+    {% if len(bookmark['tags']) > 0 %}
+    <ul class="tags">
+        {% for tag in bookmark['tags'] %}
+            <li class="label label-info"><a style="color:white;" href="/tag/1/{{tag}}"><i class="icon-tag icon-white"></i> {{tag}}</a></li>
+        {% end %}
+    </ul>
+    {% end %}
+</div>

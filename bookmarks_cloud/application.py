@@ -5,8 +5,8 @@ import os
 import tornado.web
 
 from .handlers import handlers
-from .link import LinkModule
-from .link import PagerModule
+from .bookmarks_handlers import BookmarkModule
+from .bookmarks_handlers import PagerModule
 from .config import config
 
 
@@ -16,7 +16,7 @@ def get_application(root_dir, db, option_parser):
         template_path=os.path.join(root_dir, 'templates'),
         static_path=os.path.join(root_dir, "static"),
         db=db,
-        ui_modules={'Link': LinkModule, 'Pager': PagerModule},
+        ui_modules={'Bookmark': BookmarkModule, 'Pager': PagerModule},
         cookie_secret=config['cookie_secret'],
         xsrf_cookies=False,
         gzip=True,

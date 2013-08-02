@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 import tornado.web
 from .base import BaseHandler
-import json
 import tornado.auth
 from .config import config
-import logging
 
 
 class AuthLoginHandler(BaseHandler):

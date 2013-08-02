@@ -23,7 +23,7 @@ class Page(object):
 bookmarks_collection = config['db'].bookmarks
 
 
-class Link(object):
+class Bookmark(object):
 
     def __init__(self):
         pass
@@ -43,10 +43,10 @@ class Link(object):
     def get_random_one():
         random.seed(a=None, version=2)
         r = random.random()
-        link = bookmarks_collection.find_one({"random": {"$gt": r}})
-        if not link:
-            link = bookmarks_collection.find_one({"random": {"$lte": r}})
-        return link
+        bookmark = bookmarks_collection.find_one({"random": {"$gt": r}})
+        if not bookmark:
+            bookmark = bookmarks_collection.find_one({"random": {"$lte": r}})
+        return bookmark
 
     @staticmethod
     def get_count():
@@ -94,14 +94,14 @@ class Link(object):
 
     @staticmethod
     def get_info(url, html=''):
-        link = Link.get_by_url(url)
+        bookmark = Bookmark.get_by_url(url)
         info = get_bookmark_info(url, html)
         if info:
-            if link:
-                info['note'] = link['note']
-                info['tags'] = link['tags']
-                # info['is_star'] = link['is_star']
-                # info['is_readed'] = link['is_readed']
+            if bookmark:
+                info['note'] = bookmark['note']
+                info['tags'] = bookmark['tags']
+                # info['is_star'] = bookmark['is_star']
+                # info['is_readed'] = bookmark['is_readed']
             else:
                 info['note'] = ''
                 # info['is_star'] = 0
@@ -111,43 +111,44 @@ class Link(object):
             return None
 
     @staticmethod
-    def insert_or_update(new_link):
-        link = Link.get_by_url(new_link['url'])
+    def insert_or_update(new_bookmark):
+        bookmark = Bookmark.get_by_url(new_bookmark['url'])
         # 更新信息
         # print(info['article'].encode('utf-8'))
         # 如果书签已存在, 则更新信息
-        if link:
-            if link['title'] is '':
-                link['title'] = new_link['title']
+        if bookmark:
+            if bookmark['title'] is '':
+                bookmark['title'] = new_bookmark['title']
             # favicon 如果是从浏览器添加才能更新, 否则通过链接获取
-            if new_link['favicon'] != '':
-                link['favicon'] = new_link['favicon']
-            link['tags'] = new_link['tags']
-            link['note'] = new_link['note']
-            link['note_html'] = markdown.markdown(new_link['note'], extensions=['codehilite(linenums=True)'])
-            link['post_time'] = new_link['post_time']
-            bookmarks_collection.save(link)
-            return link
+            if new_bookmark['favicon'] != '':
+                bookmark['favicon'] = new_bookmark['favicon']
+            bookmark['tags'] = new_bookmark['tags']
+            bookmark['note'] = new_bookmark['note']
+            bookmark['note_html'] = markdown.markdown(new_bookmark['note'], extensions=['codehilite(linenums=True)'])
+            bookmark['post_time'] = new_bookmark['post_time']
+            bookmarks_collection.save(bookmark)
+            return bookmark
         else:
-            info = Link.get_info(new_link['url'], new_link['html'])
+            info = Bookmark.get_info(new_bookmark['url'], new_bookmark['html'])
             if info:
                 if not info['title'] is '':
-                    new_link['title'] = info['title']
-                new_link['description'] = info['description']
-                new_link['article'] = info['article']
-            new_link['note_html'] = markdown.markdown(new_link['note'], extensions=['codehilite(linenums=True)'])
-            bookmarks_collection.insert(new_link)
-            return new_link
+                    new_bookmark['title'] = info['title']
+                new_bookmark['description'] = info['description']
+                new_bookmark['article'] = info['article']
+            new_bookmark['note_html'] = markdown.markdown(new_bookmark['note'], extensions=['codehilite(linenums=True)'])
+            bookmarks_collection.insert(new_bookmark)
+            return new_bookmark
 
     @staticmethod
-    def refresh(link):
-        info = Link.get_info(link['url'])
+    def refresh(bookmark):
+        info = Bookmark.get_info(bookmark['url'])
         if info:
-            link['title'] = info['title']
-            link['article'] = info['article']
-            link['description'] = info['description']
-            bookmarks_collection.save(link)
-        return link
+            bookmark['title'] = info['title']
+            bookmark['article'] = info['article']
+            bookmark['segmentation'] = info['segmentation']
+            bookmark['description'] = info['description']
+            bookmarks_collection.save(bookmark)
+        return bookmark
 
     @staticmethod
     def delete(url):
@@ -157,11 +158,11 @@ class Link(object):
         ]})
 
     @staticmethod
-    def get_random_links():
+    def get_random_bookmarks():
         random.seed(a=None, version=2)
         r = random.random()
         print(r)
-        links = bookmarks_collection.find({"random": {"$gt": r}}).limit(page_size)
-        if not links:
-            links = bookmarks_collection.find({"random": {"$lte": r}}).limit(page_size)
-        return links
+        bookmarks = bookmarks_collection.find({"random": {"$gt": r}}).limit(page_size)
+        if not bookmarks:
+            bookmarks = bookmarks_collection.find({"random": {"$lte": r}}).limit(page_size)
+        return bookmarks

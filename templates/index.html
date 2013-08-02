@@ -1,9 +1,9 @@
 {% extends 'tabbable.html' %}
-{% block links_pane %}
-<div id="pageLinkList" title="">
-    <ul id="linkList">
-        {% for link in links %}
-            {% module Link(link) %}
+{% block bookmarks_pane %}
+<div id="pageBookmarkList" title="">
+    <ul id="bookmarkList">
+        {% for bookmark in bookmarks %}
+            {% module Bookmark(bookmark) %}
         {% end %}
     </ul>
     {% module Pager(page) %}

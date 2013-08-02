@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="tab-content content">
+<div class="tab-content content nanocontent">
     <div class="tab-pane active" id="1">
-        {% block links_pane %}
+        {% block bookmarks_pane %}
         {% end %}
     </div>
-    <div class="tab-pane" id="2">
+    <div class="tab-pane fade" id="2">
         {% block tags_pane %}
         <div id="tagCloud" class="well">
         {% for tag in tags_cloud %}
@@ -14,7 +14,7 @@
         </div>
         {% end %}
     </div>
-    <div class="tab-pane" id="3">
+    <div class="tab-pane fade" id="3">
         <div id="randomBookmarks"></div>
     </div>
 </div>

@@ -2,7 +2,10 @@
  body {
     font-family:'Alegreya SC', 'Garamond', 'Georgia', \5fae\8f6f\96c5\9ed1, tahoma, arial, \5b8b\4f53;
     overflow: hidden;
-    background: #e5e6d0 url(../img/bg.jpg) repeat 0 0;
+    background: #fff url(../img/light-paper.png) repeat 0 0;
+}
+.container {
+    max-width: 95%;
 }
 ::selection {
     background: #fe57a1;
@@ -58,7 +61,7 @@ ins, del {
     position: fixed;
     z-index: 99999;
     top: 100px;
-    left: -25px;
+    left: -65px;
     font-size: 18px;
     font-weight: bold;
     letter-spacing: 0.6px;
@@ -130,12 +133,10 @@ ins, del {
     display: inline;
 }
 #keywords {
-    margin: 0 0 1px 0;
     background: inherit;
     border: 0;
     color: white;
     outline: none;
-    height: 26px;
 }
 #navigationMenu .n-add span, #navigationMenu .n-add {
     background-color:#AA41D4;
@@ -152,93 +153,98 @@ ins, del {
     height: 600px;
     padding: 0 20px 0 0;
 }
+#bookmarks-panel {
+    border-right: 3px solid rgba(244, 13, 13, 0.25);
+}
 #article-panel {
     margin-top: 20px;
 }
 /* Add Bookmark Form */
-#linkForm {
+#bookmarkForm {
     /*display: none;*/
     padding-top: 20px;
 }
-.form-horizontal .controls {
+/*.form-horizontal .controls {
     margin-left: 60px;
-}
+}*/
 .form-horizontal .control-label {
-    width: 50px;
+    padding: 0;
 }
 /* Bookmark Item */
 .tab-pane {
     margin: 0 20px 0 0;
 }
-.link-title {
+.bookmark-title {
     font-size: 16px;
     line-height: 30px;
 }
 .icons {
     font-size: 24px;
 }
-.tags li {
-    margin-bottom: 5px;
+.tags {
+    padding: 0;
 }
-.link-item blockquote, .link-note {
+.tags li {
+    line-height: 20px;
+}
+.bookmark-item blockquote, .bookmark-note {
     word-wrap:break-word;
     overflow:hidden;
 }
-.link-item blockquote {
+.bookmark-item blockquote {
     margin-bottom: 10px;
 }
-.link-note {
+.bookmark-note {
     display: none;
 }
-/* link style */
-.link-item {
+/* bookmark style */
+.bookmark-item {
     position:relative;
     margin-bottom:20px;
+    border-top: 1px dashed rgba(100, 100, 100, 0.4);
 }
-.link-favicon {
+.bookmark-favicon {
     z-index:2;
     position:absolute;
-    top:20px;
-    left:-20px;
-    padding:5px;
-    width:36px;
-    height:36px;
+    top:5px;
+    left:-25px;
+    width:20px;
+    height:20px;
     border-radius:50%;
     box-shadow:-1px 0 1px rgba(0, 0, 0, .15) inset;
-    background:#e5e6d0;
 }
-.link-favicon a {
+.bookmark-favicon a {
     display:block;
     padding:1px;
-    width:32px;
-    height:32px;
-    border:1px solid #B9BAA6;
+    width:20px;
+    height:20px;
+    /*border:1px solid #B9BAA6;*/
     border-radius:50%;
-    background-color:#e5e6d0;
+    /*background-color:#e5e6d0;*/
     transition:color 0.15s linear;
 }
-.link-favicon img {
+.bookmark-favicon img {
     display:block;
-    width:32px;
-    height:32px;
+    width:20px;
+    height:20px;
     border-radius:50%;
-    box-shadow:0 1px 5px rgba(0, 0, 0, 0.22)
+    box-shadow:0 1px 2px rgba(0, 0, 0, 0.22)
 }
-.link-content, .link-favicon, .link-favicon a, .link-favicon img {
+.bookmark-content, .bookmark-favicon, .bookmark-favicon a, .bookmark-favicon img {
     -webkit-transition:.4s all ease-in-out;
     -moz-transition:.4s all ease-in-out;
     -o-transition:.4s all ease-in-out;
     -ms-transition:.4s all ease-in-out;
     transition:.4s all ease-in-out
 }
-.link-item:hover .link-favicon img {
+.bookmark-item:hover .bookmark-favicon img {
     -webkit-transform:rotate(360deg);
     -moz-transform:rotate(360deg);
     -o-transform:rotate(360deg);
     -ms-transform:rotate(360deg);
     transform:rotate(360deg);
 }
-.link-content {
+.bookmark-content {
     z-index:1;
     position:relative;
     left:0;
@@ -254,6 +260,6 @@ ins, del {
 #footer {
     margin-bottom: 20px;
 }
-#footer .links a {
+#footer .bookmarks a {
     margin-right: 10px;
 }

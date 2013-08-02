@@ -1,9 +1,9 @@
 {% extends 'tabbable.html' %}
-{% block links_pane %}
+{% block bookmarks_pane %}
 <h3>搜索 "{{keywords}}" 共搜到 {{count}} 个书签:</h3>
-<ul id="linkList">
-{% for link in links %}
-    {% module Link(link) %}
+<ul id="bookmarkList">
+{% for bookmark in bookmarks %}
+    {% module Bookmark(bookmark) %}
 {% end %}
 </ul>
 {% end %}
