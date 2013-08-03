@@ -100,12 +100,8 @@ class Bookmark(object):
             if bookmark:
                 info['note'] = bookmark['note']
                 info['tags'] = bookmark['tags']
-                # info['is_star'] = bookmark['is_star']
-                # info['is_readed'] = bookmark['is_readed']
             else:
                 info['note'] = ''
-                # info['is_star'] = 0
-                # info['is_readed'] = 0
             return info
         else:
             return None
@@ -143,6 +139,7 @@ class Bookmark(object):
     def refresh(bookmark):
         info = Bookmark.get_info(bookmark['url'])
         if info:
+            bookmark['html'] = info['html']
             bookmark['title'] = info['title']
             bookmark['article'] = info['article']
             bookmark['segmentation'] = info['segmentation']

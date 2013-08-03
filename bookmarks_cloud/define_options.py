@@ -29,6 +29,7 @@ def define_options(option_parser):
     # Startup
     option_parser.define('ensure_indexes', default=False, type=bool, help=(
         "Ensure collection indexes before starting"), group='Startup')
+
     option_parser.define('rebuild_indexes', default=False, type=bool, help=(
         "Drop all indexes and recreate before starting"), group='Startup')
 
@@ -42,7 +43,6 @@ def define_options(option_parser):
     option_parser.define(
         'timezone', type=str, default='America/New_York',
         help="Your timezone name", group='Appearance')
-
     option_parser.add_parse_callback(
         functools.partial(check_required_options, option_parser))
 

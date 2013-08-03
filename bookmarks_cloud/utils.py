@@ -7,7 +7,10 @@ import math
 import re
 import jieba
 import jieba.analyse
+import logging
+import urllib
 
+log = logging.getLogger('bookmarks_cloud_log')
 
 jieba.initialize()
 
@@ -25,14 +28,44 @@ def format_tags(str):
 @lru_cache(maxsize=32)
 def get_html(url):
     # request = urllib2.Request(url)
-    # request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1485.0 Safari/537.36')
+    # request.add_header()
     # html_doc = urllib2.urlopen(request, timeout=10)
+    # url = parse_url(url)
     http_client = httpclient.HTTPClient()
     try:
-        request = httpclient.HTTPRequest(url)
+        request = httpclient.HTTPRequest(
+            url,
+            method='GET',
+            headers={"content-type": "text/html", "Referer": 'http://www.baidu.com'},
+            # body=None,
+            # auth_username=None,
+            # auth_password=None,
+            # auth_mode=None,
+            # connect_timeout=60,
+            request_timeout=60,
+            # if_modified_since=None,
+            follow_redirects=True,
+            # max_redirects=None,
+            user_agent='Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1485.0 Safari/537.36',
+            # use_gzip=None,
+            # network_interface=None,
+            # streaming_callback=None,
+            # header_callback=None,
+            # prepare_curl_callback=None,
+            # proxy_host=None,
+            # proxy_port=None,
+            # proxy_username=None,
+            # proxy_password=None,
+            # allow_nonstandard_methods=None,
+            # validate_cert=False,
+            # ca_certs=None,
+            allow_ipv6=True,
+            # client_key=None,
+            # client_cert=None
+        )
         response = http_client.fetch(request)
     except httpclient.HTTPError as e:
-        print("Error In get_html func:", url, e)
+        log.debug("Error In get_html func:", url, e.code)
         response = None
     http_client.close()
     if not response:
@@ -40,18 +73,21 @@ def get_html(url):
     return response.body
 
 
+# def parse_url(url):
+#     url = urllib.quote(url.split('#')[0].encode('utf8'), safe="%/:=&?~#+!$,;'@()*[]")
+#     return url
+
+
 def get_bookmark_info(url, html=None):
-    if html is '':
-        html = get_html(url)
-        print(get_html.cache_info())
     if not html:
-        print("Error: html is None")
-        return dict(title='', favicon="", article="[no-article]", description="[no-description]", tags="")
+        html = get_html(url)
+        # log.info(get_html.cache_info())
+        if not html:
+            log.error("Error: html is None", url)
+            return dict(html='', title='[html is null]', favicon="", article="[no-article]", description="[something wrong happened]", tags="")
     doc = Document(html, url=url, debug=True, multipage=False)
     summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
     title = summary_obj.short_title
-    # print(summary_obj.title)
-    # print(summary_obj.short_title)
     article = summary_obj.html
     description = summary_obj.description
     keywords = get_keywords(str(title) + str(article))
@@ -65,8 +101,7 @@ def get_bookmark_info(url, html=None):
         segmentation = text_segmentation(str(title))
     else:
         segmentation = ' '
-    # print(title, description, keywords)
-    bookmark = dict(title=title, favicon="", article=article, segmentation=segmentation, description=description, tags=keywords)
+    bookmark = dict(html=html, title=title, favicon="", article=article, segmentation=segmentation, description=description, tags=keywords)
     return bookmark
 
 

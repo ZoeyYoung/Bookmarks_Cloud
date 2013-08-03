@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import logging
+# from mongolog.handlers import MongoHandler
 import tornado.ioloop
 import tornado.web
 from tornado.options import options
@@ -12,6 +13,9 @@ from bookmarks_cloud import indexes, application, config
 
 
 if __name__ == "__main__":
+    log = logging.getLogger('bookmarks_cloud_log')
+    log.setLevel(logging.DEBUG)
+    # log.addHandler(MongoHandler.to(db='bookmarks_cloud', collection='log'))
     define_options(options)
     options.parse_command_line()
     for handler in logging.getLogger().handlers:
@@ -28,5 +32,5 @@ if __name__ == "__main__":
     http_server.listen(options.port)
     msg = 'Listening on port %s' % options.port
     print(msg)
-    logging.info(msg)
+    log.info(msg)
     tornado.ioloop.IOLoop.instance().start()
