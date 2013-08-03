@@ -53,5 +53,8 @@ html_cleaner = Cleaner(scripts=True, javascript=True, comments=True,
                        page_structure=False, processing_instructions=True,
                        embedded=False, frames=False, forms=False,
                        annoying_tags=False, remove_tags=None,
-                       kill_tags=['footer', 'nav', 'form', 'noscript'],
+                       kill_tags=['footer', 'nav', 'input'],
                        remove_unknown_tags=False, safe_attrs_only=False)
+
+# kill_tags 不能删除tag说明
+# form: 部分网站直接将form作为最外层- -|||

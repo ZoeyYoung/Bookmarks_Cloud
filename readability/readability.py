@@ -24,15 +24,16 @@ from .htmls import get_keywords
 
 
 logging.basicConfig(level=logging.INFO)
-log = logging.getLogger()
+log = logging.getLogger('bookmarks_cloud_log')
 
-
+# 'unlikelyCandidatesRe'中不能有的元素
+# header: 部分网站直接将header作为主内容的class, 例如: http://www.mopiaoyao.com/
 PAGE_CLASS = 'article-page'
 BLOCK_CONTENT_TAG = ['div', 'header', 'article', 'section']
 REGEXES = {
-    'unlikelyCandidatesRe': re.compile('answer|avatar|banner|blurb|combx|comment|community|disqus|extra|foot|header|menu|nav|notify|remark|rss|shoutbox|sidebar|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|dig|rat|tool|share|vote|bottom|uyan_frame|google_ads|user', re.I),
+    'unlikelyCandidatesRe': re.compile('answer|avatar|banner|blurb|combx|comment|community|disqus|extra|foot|menu|nav|notify|remark|rss|shoutbox|sidebar|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|dig|rat|tool|share|vote|bottom|uyan_frame|google_ads|user', re.I),
     'okMaybeItsACandidateRe': re.compile('and|article|body|brand|column|main|shadow|post|topic|document|news|highlight|accept|section', re.I),
-    'positiveRe': re.compile('article|body|content|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news|highlight|code', re.I),
+    'positiveRe': re.compile('article|body|content|detail|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news|highlight|code', re.I),
     'negativeRe': re.compile('combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|outbrain|promo|related|scroll|shoutbox|sidebar|sponsor|shopping|tags|tool|widget', re.I),
     'extraneous': re.compile(r'print|archive|comment|discuss|e[\-]?mail|share|reply|all|login|sign|single', re.I),
     # Block-level elements
@@ -234,11 +235,11 @@ def get_link_density(elem):
 def score_paragraphs(doc, options):
     # output = open('elem.txt', 'a')
     candidates = {}
-    # log.debug(str([describe(node) for node in tags(doc, "div")]))
+    log.debug(str([describe(node) for node in tags(doc, "div")]))
 
     ordered = []
-    for elem in tags(doc, "p", "pre", "td"):
-        # log.debug('Scoring %s' % describe(elem))
+    for elem in tags(doc, "p", "pre", "td", "div"):
+        log.debug('Scoring %s' % describe(elem))
         parent_node = elem.getparent()
         if parent_node is None:
             continue
@@ -287,6 +288,7 @@ def score_paragraphs(doc, options):
             # score * (1 - ld)))
         candidate['content_score'] *= (1 - ld)
 
+    log.debug("len candidates %d" % (len(candidates)))
     return candidates
 
 
@@ -294,7 +296,6 @@ def select_best_candidate(candidates):
     sorted_candidates = sorted(candidates.values(),
                                key=lambda x: x['content_score'],
                                reverse=True)
-
     for candidate in sorted_candidates[:5]:
         elem = candidate['elem']
         log.debug("Top 5 : %6.3f %s" % (
@@ -514,8 +515,11 @@ def get_article(doc, options, enclose_with_html_tag=True):
             if ruthless:
                 remove_unlikely_candidates(doc)
             transform_misused_divs_into_paragraphs(doc)
+            output = open('output.txt', 'w')
+            print(tostring(doc), file=output)
             candidates = score_paragraphs(doc, options)
             best_candidate = select_best_candidate(candidates)
+            print(best_candidate)
             if best_candidate:
                 confidence = best_candidate['content_score']
                 article = get_raw_article(candidates, best_candidate,
@@ -531,7 +535,7 @@ def get_article(doc, options, enclose_with_html_tag=True):
                 else:
                     log.debug(
                         "Ruthless and lenient parsing did not work. Returning raw html")
-                    return Summary(None, 0, '', '', '', '')
+                    return Summary('[something-wrong]', 0, '[something-wrong]', '[something-wrong]', '[something-wrong]', '[something-wrong]')
 
             cleaned_article = sanitize(article, candidates, options)
 

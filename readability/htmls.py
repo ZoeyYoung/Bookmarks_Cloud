@@ -5,7 +5,7 @@ from lxml.html import document_fromstring
 from lxml.html import html5parser
 from lxml.html import HTMLParser
 from lxml.html import tostring
-from lxml.html import soupparser
+# from lxml.html import soupparser
 
 from .cleaners import clean_attributes
 from .cleaners import normalize_spaces
