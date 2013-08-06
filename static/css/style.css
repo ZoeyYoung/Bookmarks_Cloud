@@ -23,7 +23,8 @@ pre ins,pre del{line-height:2.154;text-decoration:none;font-style:normal;display
 #navigationMenu .n-logout span,#navigationMenu .n-logout{background-color:#FF7665;color:#223a44;}
 #article-panel{padding:0 20px 0 0;height:600px;}
 #bookmarks-panel{padding:0 20px 0 0;height:600px;border-right:3px solid rgba(244, 13, 13, 0.25);}
-#bookmarkForm{padding:0 20px 0 0;height:600px;}#bookmarkForm .form-horizontal .control-label{padding:0;}
+#bookmarkForm{padding:0 20px 0 0;height:600px;}
+.form-horizontal .control-label{padding:0;}
 .tab-pane{margin:0 20px 0 0;}.tab-pane h3{margin:0 0 10px 24px;}
 .tags{padding:0;}.tags li{line-height:20px;margin:0 2px 0 0;}
 .tags a{color:#ff7665;}
