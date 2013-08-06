@@ -2,11 +2,11 @@
 {% block bookmarks_pane %}
 <h3>{{cur_tag}} ({{tag_count}} 个书签):</h3>
 <div id="pageBookmarkList" title="{{cur_tag}}">
-    <ul id="bookmarkList">
+    <div id="bookmarkList">
     {% for bookmark in bookmarks %}
         {% module Bookmark(bookmark) %}
     {% end %}
-    </ul>
+    </div>
     {% module Pager(page) %}
 </div>
 {% end %}

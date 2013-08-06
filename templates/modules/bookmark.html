@@ -1,7 +1,7 @@
 {% if bookmark['favicon'] is '' %}
     {% set bookmark['favicon'] = "http://ico.ylsnuha.com/" + bookmark['url'] + "?defaulticon=" + handler.avatar() %}
 {% end %}
-<li class="bookmark-item" data-name="{{bookmark['title']}}">
+<div class="bookmark-item" data-name="{{bookmark['title']}}">
     <a class="bookmark-favicon" target="_blank" title="{{bookmark['title']}}" href="{{bookmark['url']}}"><img class="lazy" data-src="{{bookmark['favicon']}}" src="" alt="{{bookmark['title']}}"/></a>
     <div class="bookmark-title">
         <a target="_blank" title="{{bookmark['url']}}" href="{{bookmark['url']}}"> {{bookmark['title']}} </a>
@@ -31,4 +31,4 @@
         {% end %}
     </ul>
     {% end %}
-</li>
+</div>

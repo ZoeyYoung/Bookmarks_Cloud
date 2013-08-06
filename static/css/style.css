@@ -27,6 +27,7 @@ pre ins,pre del{line-height:2.154;text-decoration:none;font-style:normal;display
 .tab-pane{margin:0 20px 0 0;}.tab-pane h3{margin:0 0 10px 24px;}
 .tags{padding:0;}.tags li{line-height:20px;margin:0 2px 0 0;}
 .tags a{color:#ff7665;}
+#bookmarkList{margin-left:30px;}
 .bookmark-item{position:relative;padding:5px 0;border-bottom:1px dashed rgba(100, 100, 100, 0.4);}.bookmark-item .btn{padding:0 5px;}
 .bookmark-item .dropdown-menu{padding:0;min-width:10px;}
 .bookmark-item .dropdown-menu>li>a{padding:3px 6px;}

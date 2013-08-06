@@ -1,11 +1,11 @@
 {% extends 'tabbable.html' %}
 {% block bookmarks_pane %}
 <div id="pageBookmarkList" title="">
-    <ul id="bookmarkList">
+    <div id="bookmarkList">
         {% for bookmark in bookmarks %}
             {% module Bookmark(bookmark) %}
         {% end %}
-    </ul>
+    </div>
     {% module Pager(page) %}
 </div>
 {% end %}

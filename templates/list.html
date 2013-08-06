@@ -1,6 +1,6 @@
-<ul id="bookmarkList">
+<div id="bookmarkList">
     {% for bookmark in bookmarks %}
         {% module Bookmark(bookmark) %}
     {% end %}
-</ul>
+</div>
 {% module Pager(page) %}
