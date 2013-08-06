@@ -5,6 +5,10 @@ Bookmarks_Cloud
 
 [更新历史](http://zoeyyoung.gitcafe.com/bookmarks-cloud-tornado-project.html)
 
+### 安装
+
+在安装Python与virtualenv的基础上
+
 Windows下安装记录
 
     virtualenv Bookmarks_Cloud
@@ -12,6 +16,21 @@ Windows下安装记录
     activate.bat
     cd ..
     pip install -r requirements.txt
+
+安装[lxml](http://www.lfd.uci.edu/~gohlke/pythonlibs/), 复制安装文件(lxml和lxml-x.x.x-py3.3.egg-info文件夹)到**F:\Bookmarks_Cloud\Lib\site-packages**下
+
+安装[MongoDB](http://www.mongodb.org/)
+
+### 运行
+
+    cd Bookmarks_Cloud/Scripts
+    activate.bat
+    cd ..
+    python run.py
+
+打开 http://localhost:8888/ 即可使用.
+
+### 后台
 
 Web框架使用[Tornado](https://github.com/facebook/tornado)
 
@@ -21,9 +40,7 @@ Web框架使用[Tornado](https://github.com/facebook/tornado)
 
 分词采用[结巴分词](https://github.com/fxsjy/jieba/tree/jieba3k)
 
-安装[lxml](http://www.lfd.uci.edu/~gohlke/pythonlibs/)
-
-复制安装文件(lxml和lxml-x.x.x-py3.3.egg-info文件夹)到**F:\Bookmarks_Cloud\Lib\site-packages**下
+### 前端
 
 界面以[Bootstrap 3](http://getbootstrap.com/)为基础进行设计
 
