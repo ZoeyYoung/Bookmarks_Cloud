@@ -131,6 +131,7 @@ class Bookmark(object):
                     new_bookmark['title'] = info['title']
                 new_bookmark['description'] = info['description']
                 new_bookmark['article'] = info['article']
+                new_bookmark['segmentation'] = info['segmentation']
             new_bookmark['note_html'] = markdown.markdown(new_bookmark['note'], extensions=['codehilite(linenums=True)'])
             bookmarks_collection.insert(new_bookmark)
             return new_bookmark

@@ -25,7 +25,7 @@ def get_application(root_dir, db, option_parser):
         url=config['url'],
         keywords=config['keywords'],
         desc=config['description'],
-        autoescape=None,
+        # autoescape=None,
         analytics=config['analytics'],
         **{k: v.value() for k, v in list(option_parser._options.items())}
     )

@@ -8,7 +8,7 @@ import re
 import jieba
 import jieba.analyse
 import logging
-import urllib
+# import urllib
 
 log = logging.getLogger('bookmarks_cloud_log')
 
@@ -36,13 +36,13 @@ def get_html(url):
         request = httpclient.HTTPRequest(
             url,
             method='GET',
-            headers={"content-type": "text/html", "Referer": 'http://www.baidu.com'},
+            headers={"content-type": "text/html", 'Referer': 'http://www.google.com', "Accept": "*/*"},
             # body=None,
             # auth_username=None,
             # auth_password=None,
             # auth_mode=None,
             # connect_timeout=60,
-            request_timeout=60,
+            request_timeout=10,
             # if_modified_since=None,
             follow_redirects=True,
             # max_redirects=None,
@@ -73,7 +73,25 @@ def get_html(url):
     return response.body
 
 
-# def parse_url(url):
+def video_site(url):
+    players_settings = {
+        r'http://v\.youku\.com/v_show/id_(\S+)\.html': '<div><iframe class="video_player" src="http://player.youku.com/embed/%s?wmode=transparent" frameborder=0 allowfullscreen wmode="transparent"></iframe></div>',
+        r'http://www\.xiami\.com/song/(\d+).*': '<div><embed src="http://www.xiami.com/widget/0_%s/singlePlayer.swf" type="application/x-shockwave-flash" width="257" height="33" wmode="transparent"></embed></div>',
+        r'http://www\.xiami\.com/album/(\d+).*': '<div><embed src="http://www.xiami.com/widget/0_%s_235_346_FF8719_494949/albumPlayer.swf" type="application/x-shockwave-flash" width="235" height="346" wmode="transparent"></embed></div>',
+        r'http://v\.ku6\.com/show/(\S+)\.\.\.html.*': '<div><embed src="http://player.ku6.com/refer/%s../v.swf" class="video_player" allowscriptaccess="always" wmode="transparent" allowfullscreen="true" type="application/x-shockwave-flash" flashvars="from=ku6"></embed></div>',
+        r'http://v\.qq\.com/cover/.+/.+\.html\?vid=(\w+)': '<div><embed src="http://static.video.qq.com/TPout.swf?vid=%s&auto=0" allowFullScreen="true" quality="high" width="480" height="400" wmode="transparent" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed></div>',
+        r'http://v\.qq\.com/cover/.+/.+/(\w+)\.html': '<div><embed src="http://static.video.qq.com/TPout.swf?vid=%s&auto=0" allowFullScreen="true" quality="high" width="480" height="400" wmode="transparent" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed></div>',
+        r'http://www\.yinyuetai\.com/video/(\d+)': '<div><embed src="http://player.yinyuetai.com/video/player/%s/v_2932937.swf" class="video_player" quality="high" align="middle" wmode="transparent" allowScriptAccess="sameDomain" allowfullscreen="true" type="application/x-shockwave-flash"></embed></div>'
+    }
+    for (k, v) in players_settings.items():
+        p = re.compile(k, re.I)
+        m = p.match(url)
+        if m:
+            html = v % (m.group(1))
+            return html
+        else:
+            return None
+
 #     url = urllib.quote(url.split('#')[0].encode('utf8'), safe="%/:=&?~#+!$,;'@()*[]")
 #     return url
 
@@ -81,26 +99,34 @@ def get_html(url):
 def get_bookmark_info(url, html=None):
     if not html:
         html = get_html(url)
-        # log.info(get_html.cache_info())
+        # print(get_html.cache_info())
         if not html:
-            log.error("Error: html is None", url)
-            return dict(html='', title='[html is null]', favicon="", article="[no-article]", description="[something wrong happened]", tags="")
+            print("Error: html is None", url)
+            return dict(html='', title='[html is null]', favicon="", article="[no-article]", segmentation='', description="[something wrong happened]", tags="")
     doc = Document(html, url=url, debug=True, multipage=False)
     summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
     title = summary_obj.short_title
-    article = summary_obj.html
+    article = video_site(url)
+    if article is None:
+        article = summary_obj.html
     description = summary_obj.description
-    keywords = get_keywords(str(title) + str(article))
+    keywords_t = []
+    keywords_a = []
+    segmentation = ''
+    segmentation_t = ''
+    segmentation_a = ''
+    if title:
+        keywords_t = get_keywords(title)
+        segmentation_t = text_segmentation(title)
+    if article:
+        keywords_a = get_keywords(article)
+        segmentation_a = text_segmentation(article)
+    keywords = keywords_t + keywords_a
+    segmentation = segmentation_t + segmentation_a
+    if summary_obj.keywords:
+        keywords = keywords + format_tags(summary_obj.keywords)
     if keywords:
-        keywords = ",".join(keywords) + ',' + summary_obj.keywords
-    else:
-        keywords = summary_obj.keywords
-    if title and article:
-        segmentation = text_segmentation(str(title) + str(article))
-    elif title:
-        segmentation = text_segmentation(str(title))
-    else:
-        segmentation = ' '
+        keywords = ",".join(set(keywords))
     bookmark = dict(html=html, title=title, favicon="", article=article, segmentation=segmentation, description=description, tags=keywords)
     return bookmark
 
@@ -117,7 +143,7 @@ def text_segmentation(article):
     if not article:
         return ''
     words = "/ ".join(jieba.cut(text_content(article)))
-    return words.encode('utf-8')
+    return words
 
 
 def get_keywords(article):
