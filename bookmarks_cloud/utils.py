@@ -65,7 +65,7 @@ def get_html(url):
         )
         response = http_client.fetch(request)
     except httpclient.HTTPError as e:
-        log.debug("Error In get_html func:", url, e.code)
+        log.debug("Error In get_html func:", url, str(e))
         response = None
     http_client.close()
     if not response:
@@ -102,7 +102,7 @@ def get_bookmark_info(url, html=None):
         # print(get_html.cache_info())
         if not html:
             print("Error: html is None", url)
-            return dict(html='', title='[html is null]', favicon="", article="[no-article]", segmentation='', description="[something wrong happened]", tags="")
+            return None
     doc = Document(html, url=url, debug=True, multipage=False)
     summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
     title = summary_obj.short_title
@@ -153,16 +153,7 @@ def get_keywords(article):
 
 
 def get_tags_cloud(tags):
-    tags_cloud = []
-    max = 2
-    for tag in tags:
-        if max < tag['count']:
-            max = tag['count']
-    for tag in tags:
-        if tag['count'] > 0:
-            temp = math.log(tag['count'], max)
-        else:
-            temp = 0
-        font_size = round(temp, 1)*14 + 8
-        tags_cloud.append({'tag': tag, 'font_size': font_size})
-    return tags_cloud
+    max_count = max(tag['count'] for tag in tags)
+    if max_count < 2:
+        max_count = 2
+    return [{'tag': tag, 'font_size': round(math.log(tag['count'], max_count), 1)*14 + 8} for tag in tags if tag['count'] > 0]

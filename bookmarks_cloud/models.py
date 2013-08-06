@@ -127,8 +127,7 @@ class Bookmark(object):
         else:
             info = Bookmark.get_info(new_bookmark['url'], new_bookmark['html'])
             if info:
-                if not info['title'] is '':
-                    new_bookmark['title'] = info['title']
+                new_bookmark['title'] = info['title']
                 new_bookmark['description'] = info['description']
                 new_bookmark['article'] = info['article']
                 new_bookmark['segmentation'] = info['segmentation']
