@@ -16,7 +16,7 @@ def decode_html(html_string):
     """
     dammit = UnicodeDammit(html_string, ['GB2312', 'GBK', 'GB18030'], smart_quotes_to="html", is_html=True)
     doc = dammit.unicode_markup
-    print("dammit —— ", dammit.original_encoding)
+    # print("dammit —— ", dammit.original_encoding)
     # FIXME 部分网页判断是'ISO-8859-2', 不知道为什么, 这时使用备选方案进行判断
     if dammit.original_encoding == 'ISO-8859-2':
         enc = get_encoding(html_string)

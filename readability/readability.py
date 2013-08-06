@@ -31,8 +31,8 @@ log = logging.getLogger('bookmarks_cloud_log')
 PAGE_CLASS = 'article-page'
 BLOCK_CONTENT_TAG = ['div', 'header', 'article', 'section']
 REGEXES = {
-    'unlikelyCandidatesRe': re.compile('answer|avatar|banner|blurb|combx|comment|community|disqus|extra|foot|menu|nav|notify|remark|rss|shoutbox|sidebar|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|dig|rat|tool|share|vote|bottom|uyan_frame|google_ads|user', re.I),
-    'okMaybeItsACandidateRe': re.compile('and|article|body|brand|column|main|shadow|post|topic|document|news|highlight|accept|section', re.I),
+    'unlikelyCandidatesRe': re.compile('avatar|banner|bread|biaoqing|blurb|combx|comment|community|db-usr-profile|disqus|dialog|extra|feedback|foot|form|login|menu|nav|notify|notice|remark|rss|shoutbox|side|sponsor|skip|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|dig|rat|tool|share|submit|score|vote|bottom|uyan_frame|ujian|google_ads|user|sign', re.I),
+    'okMaybeItsACandidateRe': re.compile('and|article|brush|body|brand|column|main|shadow|post|topic|document|news|highlight|accept|section', re.I),
     'positiveRe': re.compile('article|body|content|detail|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news|highlight|code', re.I),
     'negativeRe': re.compile('combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|outbrain|promo|related|scroll|shoutbox|sidebar|sponsor|shopping|tags|tool|widget', re.I),
     'extraneous': re.compile(r'print|archive|comment|discuss|e[\-]?mail|share|reply|all|login|sign|single', re.I),
@@ -80,9 +80,15 @@ def describe(node, depth=1):
 
 
 def get_clean_html(doc):
-    """暂时没用到"""
-    # print("get_clean_html", type(doc))
-    return clean_attributes(tounicode(doc))
+    for tag in doc.xpath('//*[@class]'):
+    # For each element with a class attribute, remove that class attribute
+        tag.attrib.pop('class')
+    for el in tags(doc, 'a'):
+        el.set('target', '_blank')
+    for el in tags(doc, 'table'):
+        el.set('class', 'table table-bordered')
+    doc = clean_attributes(tounicode(doc))
+    return doc
 
 
 def to_int(x):
@@ -150,7 +156,7 @@ def score_node(elem):
     elif name in ["pre", "td", "blockquote", "aside", "code", "table"]:
         content_score += 3
     elif name in ["ol", "ul", "li", "dd", "dt"]:
-        content_score -= 1
+        content_score += 1
     elif name in ["address", "form"]:
         content_score -= 3
     # elif name in ["h1", "h2", "h3", "h4", "h5", "h6", "th"]:
@@ -325,7 +331,7 @@ def sanitize(node, candidates, options):
         elem.drop_tree()
     allowed = {}
     # Conditionally clean <table>s, <ul>s, and <div>s
-    for el in reverse_tags(node, "ul", "div"):
+    for el in reverse_tags(node, "div"):
     # for el in reverse_tags(node, "table", "ul", "div"):
         if el in allowed:
             continue
@@ -380,13 +386,12 @@ def sanitize(node, candidates, options):
                 reason = "too short content length %s without a single image" % content_length
                 to_remove = True
             elif weight < 25 and link_density > 0.2:
-                    reason = "too many links %.3f for its weight %s" % (
-                        link_density, weight)
-                    to_remove = True
-            elif weight >= 25 and link_density > 0.5:
-                reason = "too many links %.3f for its weight %s" % (
-                    link_density, weight)
+                reason = "too many links %.3f for its weight %s" % (link_density, weight)
                 to_remove = True
+            # elif weight >= 25 and link_density > 0.8:
+            #     reason = "too many links %.3f for its weight %s" % (
+            #         link_density, weight)
+            #     to_remove = True
             elif (counts["embed"] == 1 and content_length < 75) or counts["embed"] > 1:
                 reason = "<embed>s with too short content length, or too many <embed>s"
                 to_remove = True
@@ -437,8 +442,8 @@ def sanitize(node, candidates, options):
         # if not (options['attributes']):
             # el.attrib = {}  # FIXME:Checkout the effects of disabling this
             # pass
-    return clean_attributes(tounicode(node))
-    # return get_clean_html(node)
+    # return clean_attributes(tounicode(node))
+    return get_clean_html(node)
 
 
 def get_raw_article(candidates, best_candidate, enclose_with_html_tag=True):
@@ -491,11 +496,9 @@ def get_raw_article(candidates, best_candidate, enclose_with_html_tag=True):
                 if enclose_with_html_tag:
                     if sibling.tag == 'body':
                         for elem in sibling.getchildren():
-                            output.getchildren()[
-                                0].getchildren()[0].append(elem)
+                            output.getchildren()[0].getchildren()[0].append(elem)
                     else:
-                        output.getchildren()[
-                            0].getchildren()[0].append(sibling)
+                        output.getchildren()[0].getchildren()[0].append(sibling)
                 else:
                     output.append(sibling)
 
@@ -517,9 +520,14 @@ def get_article(doc, options, enclose_with_html_tag=True):
             transform_misused_divs_into_paragraphs(doc)
             output = open('output.txt', 'w')
             print(tostring(doc), file=output)
+            for i in tags(doc, 'body'):
+                div = fragment_fromstring("<div/>")
+                for e in i.iterchildren():
+                    div.append(e)
+                i.insert(0, div)
             candidates = score_paragraphs(doc, options)
             best_candidate = select_best_candidate(candidates)
-            print(best_candidate)
+            # print(best_candidate)
             if best_candidate:
                 confidence = best_candidate['content_score']
                 article = get_raw_article(candidates, best_candidate,
@@ -1099,5 +1107,18 @@ class Document:
                            description=get_description(output),
                            keywords=get_keywords(output))
 
-        return get_article(doc, self.options,
-                           enclose_with_html_tag=enclose_with_html_tag)
+        summary = get_article(doc, self.options, enclose_with_html_tag=enclose_with_html_tag)
+        print(len(summary.html), "============================")
+        if summary.title == "[something-wrong]" or len(summary.html) < 500:
+            output = parse(self.input_doc, self.options.get('url'))
+            remove_unlikely_candidates(output)
+            o = open('something-wrong.txt', 'w')
+            print("[something-wrong]", tostring(output), file=o)
+            return Summary(get_clean_html(output),
+                           0,
+                           short_title=shorten_title(output),
+                           title=get_title(output),
+                           description=get_description(output),
+                           keywords=get_keywords(output))
+        else:
+            return summary

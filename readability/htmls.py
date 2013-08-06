@@ -1,7 +1,7 @@
 import logging
 import re
 
-from lxml.html import document_fromstring
+from lxml.html import document_fromstring, fragment_fromstring
 from lxml.html import html5parser
 from lxml.html import HTMLParser
 from lxml.html import tostring
@@ -28,9 +28,11 @@ def build_doc(page):
     if page is None:
         LOG.error("Page content is None, can't build_doc")
         return ''
-    html5doc = html5parser.fromstring(decode_html(page))
-    content = tostring(html5doc, method='html')
-    doc = document_fromstring(content)
+    html5doc = html5parser.document_fromstring(decode_html(page))
+    doc = fragment_fromstring(tostring(html5doc))
+    # doc = document_fromstring(decode_html(page))
+    output = open('parse.txt', 'w')
+    print(tostring(doc), file=output)
     # try:
     #     tostring(doc, encoding='unicode')
     # except UnicodeDecodeError:
@@ -77,7 +79,7 @@ def get_title(doc):
 
 def get_description(doc):
     description_node = doc.xpath("//meta[translate(@name, 'ABCDEFGHJIKLMNOPQRSTUVWXYZ', 'abcdefghjiklmnopqrstuvwxyz')='description']")
-    if len(description_node) <= 0:
+    if len(description_node) <= 0 or 'content' not in description_node[0].attrib:
         return '[no-description]'
     description = description_node[0].attrib["content"]
     # print(description)
@@ -86,7 +88,7 @@ def get_description(doc):
 
 def get_keywords(doc):
     keywords_node = doc.xpath("//meta[translate(@name, 'ABCDEFGHJIKLMNOPQRSTUVWXYZ', 'abcdefghjiklmnopqrstuvwxyz')='keywords']")
-    if len(keywords_node) <= 0:
+    if len(keywords_node) <= 0 or 'content' not in keywords_node[0].attrib:
         return ''
     keywords = keywords_node[0].attrib["content"]
     return normalize_spaces(keywords)
