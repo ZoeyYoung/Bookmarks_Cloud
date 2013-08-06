@@ -1,0 +1,237 @@
+/* ===[ Base ]=== */
+body {
+    font-family: 'Alegreya SC', 'Garamond', 'Georgia', '\5fae\8f6f\96c5\9ed1', tahoma, arial, '\5b8b\4f53';
+    overflow: hidden;
+    background: #fff url(../img/light-paper.png) repeat 0 0;
+}
+.container { max-width: 95% }
+::selection {
+    background: #fe57a1;
+    color: #fff;
+    text-shadow: none;
+}
+blockquote {
+    clear: both;
+    border: 0;
+    word-wrap: break-word;
+    overflow: hidden;
+    margin: 0;
+    padding: 0 0 5px 20px;
+    min-height: 20px;
+    p {
+        position: relative;
+        color: #7a7a7a;
+        font-size: 14px;
+        font-style: italic;
+        &:before {
+            position: absolute;
+            font-family: FontAwesome;
+            content: "\f10d";
+            display: block;
+            top: 0;
+            left: -20px;
+        }
+    }
+}
+aside {
+    min-height: 20px;
+    padding: 19px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+}
+mark {
+    font-weight: bold;
+    display: inline-block;
+    width: 100%;
+    background: #ff8;
+}
+pre {
+    ins { background: #9f9 }
+    del { background: #f87 }
+    ins, del {
+        line-height: 2.154;
+        text-decoration: none;
+        font-style: normal;
+        display: inline-block;
+        width: 100%;
+    }
+}
+.btn-ttc, .btn-ttc:hover, .btn-ttc:active {
+    color: white;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    background-color: #007da7;
+}
+.btn-ttc {
+    background-repeat: repeat-x;
+    background-image: linear-gradient(top, #009ED2 0%, #007DA7 100%);
+}
+.btn-ttc:hover { background-position: 0 -15px }
+/* navigation  */
+#navigationMenu {
+    position: fixed;
+    z-index: 99999;
+    top: 100px;
+    left: -65px;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.6px;
+    white-space: nowrap;
+    line-height: 40px;
+    text-shadow: rgba(255,255,255,0.5) 0 1px 1px;
+    li {
+        list-style: none;
+        height: 40px;
+        opacity: 0.8;
+        a {
+            height: 40px;
+            width: 40px;
+            display: block;
+            position: relative;
+            span {
+                width: 0;
+                overflow: hidden;
+                position: absolute;
+                left: 10px;
+                transition: 0.25s;
+            }
+            &:hover {
+                text-decoration: none;
+                span {
+                    width: auto;
+                    padding: 0 20px;
+                    overflow: visible;
+                }
+            }
+        }
+    }
+    form { display: inline }
+    input {
+        background: inherit;
+        border: 0;
+        color: white;
+        outline: none;
+    }
+    .n-cloud span, .n-cloud {
+        background-color: #A3D92A;
+        color: #3d4f0c;
+    }
+    .n-list span, .n-list {
+        background-color: #FCDF33;
+        color: #223a44;
+    }
+    .n-tags span, .n-tags {
+        background-color: #FB852D;
+        color: #5a3517;
+    }
+    .n-random span, .n-random {
+         background-color: #FF6EAC;
+         color: #604e18;
+    }
+    .n-search span, .n-search {
+        background-color: #4BB1DC;
+        color: #460f35;
+    }
+    .n-add span, .n-add {
+        background-color: #AA41D4;
+        color: #3d4f0c;
+    }
+    .n-logout span, .n-logout {
+        background-color: #FF7665;
+        color: #223a44;
+    }
+}
+.panel (@top: 20px) {
+    padding: 0 @top 0 0;
+    height: 600px;
+}
+#article-panel {
+    .panel;
+}
+#bookmarks-panel {
+    .panel;
+    border-right: 3px solid rgba(244, 13, 13, 0.25);
+}
+#bookmarkForm {
+    .panel;
+    .form-horizontal .control-label { padding: 0 }
+}
+.tab-pane {
+    margin: 0 20px 0 0;
+    h3 {
+        margin: 0 0 10px 24px;
+    }
+}
+.tags {
+    padding: 0;
+    li {
+        line-height: 20px;
+        margin: 0 2px 0 0;
+    }
+    a {
+        color: #FF7665
+    }
+}
+.bookmark-item {
+    position: relative;
+    padding: 5px 0;
+    border-bottom: 1px dashed rgba(100, 100, 100, 0.4);
+    .btn { padding: 0 5px; }
+    .dropdown-menu {
+        padding: 0;
+        min-width: 10px;
+    }
+    .dropdown-menu>li>a {
+        padding: 3px 6px
+    }
+    .bookmark-title {
+        float: left;
+        line-height: 30px;
+        max-width: 90%;
+    }
+    .bookmark-note {
+        word-wrap: break-word;
+        overflow: hidden;
+        display: none;
+    }
+    /* bookmark style  */
+    .bookmark-favicon {
+        z-index: 2;
+        position: absolute;
+        top: 5px;
+        left: -25px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        box-shadow: -1px 0 1px rgba(0, 0, 0, .15) inset;
+        transition: .4s all ease-in-out;
+        a {
+            display: block;
+            padding: 1px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            transition: color 0.15s linear;
+            transition: .4s all ease-in-out;
+        }
+        img {
+            display: block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+            transition: .4s all ease-in-out;
+        }
+    }
+    &:hover .bookmark-favicon img {
+        transform: rotate(360deg);
+    }
+}
+.pagination { margin: 0 0 0 24px; }
+.video_player {
+    width: 510px;
+    height: 498px;
+}
+footer { margin-bottom: 20px; }

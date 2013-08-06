@@ -1,18 +1,28 @@
 {% if bookmark['favicon'] is '' %}
     {% set bookmark['favicon'] = "http://ico.ylsnuha.com/" + bookmark['url'] + "?defaulticon=" + handler.avatar() %}
 {% end %}
-<div class="bookmark-item" data-name="{{bookmark['title']}}">
+<li class="bookmark-item" data-name="{{bookmark['title']}}">
     <a class="bookmark-favicon" target="_blank" title="{{bookmark['title']}}" href="{{bookmark['url']}}"><img class="lazy" data-src="{{bookmark['favicon']}}" src="" alt="{{bookmark['title']}}"/></a>
-    <a target="_blank" class="bookmark-title" title="{{bookmark['url']}}" href="{{bookmark['url']}}">{{bookmark['title']}}</a>
-    <time><i class="icon-time"></i> {{locale.format_date(bookmark['post_time'], -480, relative=False)}}</time>
-    <div class="icons pull-right">
-        <i class="icon-refresh bookmark-refresh-btn"></i>
-        <i class="icon-file-text bookmark-read-btn"></i>
-        <i class="icon-edit bookmark-edit-btn"></i>
-        <i class="icon-trash bookmark-del-btn"></i>
+    <div class="bookmark-title">
+        <a target="_blank" title="{{bookmark['url']}}" href="{{bookmark['url']}}"> {{bookmark['title']}} </a>
+        <time><i class="icon-time"></i> {{locale.format_date(bookmark['post_time'], -480, relative=False)}}</time>
     </div>
-    <blockquote><p>{{escape(bookmark['description'])}}</p></blockquote>
-    <div class="bookmark-note">{{bookmark['note_html']}}</div>
+    <div class="pull-right">
+        <div class="btn-group">
+            <button type="button" class="btn btn-ttc"><i class="icon-file-text bookmark-read-btn"></i></button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-ttc dropdown-toggle" data-toggle="dropdown"><i class="icon-chevron-sign-down"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="javascript:;" class="bookmark-edit-btn" title="编辑"><i class="icon-edit"></i></a></li>
+                    <li><a href="javascript:;" class="bookmark-refresh-btn" title="更新"><i class="icon-refresh"></i></a></li>
+                    <li><a href="javascript:;" class="bookmark-del-btn" title="删除"><i class="icon-trash"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <blockquote><p>{{bookmark['description']}}</p></blockquote>
+    <div class="bookmark-note">{% raw bookmark['note_html'] %}</div>
     {% if len(bookmark['tags']) > 0 %}
     <ul class="list-inline tags">
         <li><i class="icon-tags"></i></li>
@@ -21,4 +31,4 @@
         {% end %}
     </ul>
     {% end %}
-</div>
+</li>
