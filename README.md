@@ -9,6 +9,8 @@ Bookmarks_Cloud
 
 在安装Python与virtualenv的基础上
 
+#### Windows (目前在Windows下开发)
+
 Windows下安装记录
 
     virtualenv Bookmarks_Cloud
@@ -20,6 +22,29 @@ Windows下安装记录
 安装[lxml](http://www.lfd.uci.edu/~gohlke/pythonlibs/), 复制安装文件(lxml和lxml-x.x.x-py3.3.egg-info文件夹)到**F:\Bookmarks_Cloud\Lib\site-packages**下
 
 安装[MongoDB](http://www.mongodb.org/)
+
+#### Ubuntu (未测试)
+
+在Ubuntu下安装
+
+    :::bat
+    sudo apt-get install python-pip
+    sudo pip install virtualenv
+    virtualenv HelloTornado
+    cd HelloTornado
+    source bin/activate
+    pip install tornado
+    sudo apt-get install python-pycurl
+
+[安装virtualenv参考](http://www.virtualenv.org/en/latest/)
+
+### 配置config.py
+
+生成`cookie_secret`，在Python shell中运行：
+
+    :::bat
+    >>> import base64, uuid
+    >>> base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes)
 
 ### 运行
 
@@ -39,6 +64,8 @@ Web框架使用[Tornado](https://github.com/facebook/tornado)
 正文提取在[readability-lxml](https://github.com/buriy/python-readability)基础上进行修改
 
 分词采用[结巴分词](https://github.com/fxsjy/jieba/tree/jieba3k)
+
+全文搜索[Whoosh](http://pythonhosted.org/Whoosh/index.html)
 
 ### 前端
 

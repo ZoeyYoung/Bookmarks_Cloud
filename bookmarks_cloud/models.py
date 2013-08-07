@@ -5,6 +5,7 @@ from .utils import get_bookmark_info
 import random
 import cgi
 import markdown
+from bson.objectid import ObjectId
 
 page_size = config['page_size']
 
@@ -21,7 +22,8 @@ class Page(object):
         self.has_prev = (self.cur > 1)
 
 bookmarks_collection = config['db'].bookmarks
-
+from .whoosh_fts import SearchIndex
+fts = SearchIndex()
 
 class Bookmark(object):
 
@@ -84,6 +86,16 @@ class Bookmark(object):
             regex_list.append({'tags': {'$regex': r".*"+key+r".*", '$options': '-i'}})
         return bookmarks_collection.find({'$or': regex_list})
 
+
+    @staticmethod
+    def whoose_ftx(keywords, page):
+        results = fts.search(keywords, page)
+        search_results = []
+        for r in results['results']:
+            search_results.append(bookmarks_collection.find_one(ObjectId(r["nid"])))
+        return {'results': search_results, 'total': results['total'] }
+
+
     @staticmethod
     def get_all():
         return bookmarks_collection.find(timeout=False).sort([("post_time", -1)])
@@ -123,6 +135,7 @@ class Bookmark(object):
             bookmark['note_html'] = markdown.markdown(new_bookmark['note'], extensions=['codehilite(linenums=False)'])
             bookmark['post_time'] = new_bookmark['post_time']
             bookmarks_collection.save(bookmark)
+            fts.update(bookmark)
             return bookmark
         else:
             info = Bookmark.get_info(new_bookmark['url'], new_bookmark['html'])
@@ -133,6 +146,7 @@ class Bookmark(object):
                 new_bookmark['segmentation'] = info['segmentation']
             new_bookmark['note_html'] = markdown.markdown(new_bookmark['note'], extensions=['codehilite(linenums=True)'])
             bookmarks_collection.insert(new_bookmark)
+            fts.update(new_bookmark)
             return new_bookmark
 
     @staticmethod
@@ -145,6 +159,7 @@ class Bookmark(object):
             bookmark['segmentation'] = info['segmentation']
             bookmark['description'] = info['description']
             bookmarks_collection.save(bookmark)
+            fts.update(bookmark)
         return bookmark
 
     @staticmethod
@@ -153,6 +168,7 @@ class Bookmark(object):
             {"url": url},
             {"url": cgi.escape(url)}
         ]})
+        fts.delele_by_url(url)
 
     @staticmethod
     def get_random_bookmarks():

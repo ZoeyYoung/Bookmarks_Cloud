@@ -32,8 +32,7 @@
             <li>
                 <a id="searchBtn" class="n-search" href="javascript:;">
                     <span><i class="icon-search"></i>
-                        <form id="searchForm" action="/search" method="get" name="search">
-                            {% module xsrf_form_html() %}
+                        <form id="searchForm" action="/ftxsearch">
                             <input type="search" id="keywords" name="keywords" class="input-medium" placeholder="标题 网址 标签" />
                         </form>
                     </span>

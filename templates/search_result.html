@@ -1,9 +1,13 @@
 {% extends 'tabbable.html' %}
 {% block bookmarks_pane %}
 <h3>搜索 "{{keywords}}" 共搜到 {{count}} 个书签:</h3>
-<div id="bookmarkList">
-{% for bookmark in bookmarks %}
-    {% module Bookmark(bookmark) %}
-{% end %}
+<div id="pageBookmarkList" title="" >
+    <input type="hidden" id="ftsKeywords" value="{{keywords}}" />
+    <div id="bookmarkList">
+        {% for bookmark in bookmarks %}
+            {% module Bookmark(bookmark) %}
+        {% end %}
+    </div>
+    {% module Pager(page) %}
 </div>
 {% end %}

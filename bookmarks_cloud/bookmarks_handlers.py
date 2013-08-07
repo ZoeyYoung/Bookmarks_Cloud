@@ -57,11 +57,17 @@ class AjaxBookmarkHandler(BaseHandler):
     def post(self):
         page = self.get_argument('page')
         tag = self.get_argument('tag')
-        if tag is '':
-            bookmarks = Bookmark.get_page(int(page))
-        else:
+        keywords = self.get_argument('keywords')
+        if tag:
             bookmarks = Bookmark.get_by_tag(tag, int(page))
-        page = Page(bookmarks.count(), int(page))
+            page = Page(bookmarks.count(), int(page))
+        elif keywords:
+            results = Bookmark.whoose_ftx(keywords, int(page))
+            bookmarks = results['results']
+            page = Page(results['total'], int(page))
+        else:
+            bookmarks = Bookmark.get_page(int(page))
+            page = Page(bookmarks.count(), int(page))
         self.render('list.html', bookmarks=bookmarks, page=page)
 
 
@@ -225,6 +231,19 @@ class SearchHandler(BaseHandler):
         result = Bookmark.get_by_keywords(keywords)
         count = result.count()
         self.render('search_result.html', keywords=keywords, tags_cloud=tags_cloud, bookmarks=result, count=count)
+
+
+class FullTextSearchHandler(BaseHandler):
+    """搜索书签
+    """
+    @tornado.web.authenticated
+    def get(self):
+        keywords = self.get_argument('keywords')
+        tags = Bookmark.get_tags()
+        tags_cloud = get_tags_cloud(tags)
+        results = Bookmark.whoose_ftx(keywords, 1)
+        page = Page(results['total'], 1)
+        self.render('search_result.html', keywords=keywords, tags_cloud=tags_cloud, bookmarks=results['results'], count=results['total'], page=page)
 
 
 class TagsHandler(BaseHandler):

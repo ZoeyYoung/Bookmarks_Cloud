@@ -20,6 +20,7 @@ handlers = [
     (r'/randombookmark', RandomBookmarkHandler),
     (r'/random', RandomBookmarksHandler),
     (r'/search', SearchHandler),
+    (r'/ftxsearch', FullTextSearchHandler),
     (r'/tags', TagsHandler),
     (r'/segmentation/(.*)', SegmentationHandler)
 ]

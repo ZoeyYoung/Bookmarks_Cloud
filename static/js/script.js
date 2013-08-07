@@ -168,7 +168,8 @@
     $(document).on('click', '.pagination li a', function() {
         tag = $('#pageBookmarkList').attr('title');
         page = $(this).attr('title');
-        $('#pageBookmarkList').empty().load('/bookmark', {tag: tag, page: page}, function() {
+        keywords = $('#ftsKeywords').val();
+        $('#pageBookmarkList').empty().load('/bookmark', {keywords: keywords, tag: tag, page: page}, function() {
             $("img.lazy").lazy({ bind: "event", delay: 0});
         });
     });
@@ -193,4 +194,9 @@
         // FIXME 应该跳到文章顶部才对...也许该考虑换个插件了...
         $('#article-panel').nanoScroller({ scroll: 'top' });
     }
+
+    // $('#searchForm').submit(function() {
+    //     var keywords = $('#keywords').val();
+    //     $('#pageBookmarkList').empty().load('/ftxsearch/1/' + keywords);
+    // });
 })(jQuery);
