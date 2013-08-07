@@ -85,6 +85,8 @@ def get_clean_html(doc):
         tag.attrib.pop('class')
     for el in tags(doc, 'a'):
         el.set('target', '_blank')
+    for el in tags(doc, 'img'):
+        el.set('class', 'img-responsive')
     for el in tags(doc, 'table'):
         el.set('class', 'table table-bordered')
     doc = clean_attributes(tounicode(doc))
