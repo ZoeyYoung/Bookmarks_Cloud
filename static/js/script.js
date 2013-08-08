@@ -168,7 +168,7 @@
     $(document).on('click', '.pagination li a', function() {
         tag = $('#pageBookmarkList').attr('title');
         page = $(this).attr('title');
-        keywords = $('#ftsKeywords').val();
+        keywords = $('#ftsKeywords').val() ? $('#ftsKeywords').val() : '';
         $('#pageBookmarkList').empty().load('/bookmark', {keywords: keywords, tag: tag, page: page}, function() {
             $("img.lazy").lazy({ bind: "event", delay: 0});
         });
