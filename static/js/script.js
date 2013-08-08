@@ -8,8 +8,8 @@
     $(window).resize(function() {
         $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height() - 50);
     });
-    $(document).on('mouseenter mouseleave', '.bookmark-item', function() {
-        $('.bookmark-note', this).stop(true, true).slideToggle();
+    $(document).on('mouseenter mouseleave', 'div.bookmark-item', function() {
+        $(this).find('.bookmark-note').stop(true, true).slideToggle();
     });
     function getRandomBookmark() {
         jQuery.getJSON('/randombookmark', function(response) {
@@ -65,9 +65,9 @@
         $('#tags').val(tags);
         var stagsarr = response.suggest_tags;
         var stagshtml = (stagsarr.length) ? '<li class="stag label label-info">' + stagsarr.join('</li><li class="stag label label-info">') + '</li>' : '';
-        $('#suggestTags').html(stagshtml);
-        note_t = $('#note').val();
-        note = (note_t === '') ? response.note : response.note + '\n' + note_t;
+        $('#suggestTags')[0].innerHTML = stagshtml;
+        var note_t = $('#note').val();
+        var note = (note_t === '') ? response.note : response.note + '\n' + note_t;
         $('#note').val(note);
         showArticle(url, response.title, response.article);
     }
@@ -166,9 +166,9 @@
     });
 
     $(document).on('click', '.pagination li a', function() {
-        tag = $('#pageBookmarkList').attr('title');
-        page = $(this).attr('title');
-        keywords = $('#ftsKeywords').val() ? $('#ftsKeywords').val() : '';
+        keywords = $('#pageBookmarkList').attr('keywords');
+        tag = $('#pageBookmarkList').attr('tag');
+        page = this.title;
         $('#pageBookmarkList').empty().load('/bookmark', {keywords: keywords, tag: tag, page: page}, function() {
             $("img.lazy").lazy({ bind: "event", delay: 0});
         });
@@ -189,14 +189,9 @@
     });
 
     function showArticle(url, title, article) {
-        $('#article-title').html(title);
-        $('#article-content').html('<p><a target="_blank" href="' + url + '">查看原网页</a> <a target="_blank" href="/segmentation/' + url + '">查看分词结果</a></p>' + article);
+        $('#article-title')[0].innerHTML = title;
+        $('#article-content')[0].innerHTML = '<p><a target="_blank" href="' + url + '">查看原网页</a> <a target="_blank" href="/segmentation/' + url + '">查看分词结果</a></p>' + article;
         // FIXME 应该跳到文章顶部才对...也许该考虑换个插件了...
         $('#article-panel').nanoScroller({ scroll: 'top' });
     }
-
-    // $('#searchForm').submit(function() {
-    //     var keywords = $('#keywords').val();
-    //     $('#pageBookmarkList').empty().load('/ftxsearch/1/' + keywords);
-    // });
 })(jQuery);

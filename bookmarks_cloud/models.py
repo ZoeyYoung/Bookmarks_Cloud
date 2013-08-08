@@ -22,8 +22,8 @@ class Page(object):
         self.has_prev = (self.cur > 1)
 
 bookmarks_collection = config['db'].bookmarks
-from .whoosh_fts import SearchIndex
-fts = SearchIndex()
+from .whoosh_fts import WhooshBookmarks
+fts = WhooshBookmarks()
 
 class Bookmark(object):
 

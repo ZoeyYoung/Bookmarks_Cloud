@@ -1,9 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
-from whoosh.analysis import Tokenizer,Token
-import jieba
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, TEXT, ID, KEYWORD
+from whoosh.analysis import Tokenizer,Token
 from whoosh import qparser
+from .config import config
+import jieba
+
+page_size = config['page_size']
+bookmarks_collection = config['db'].bookmarks
 
 class ChineseTokenizer(Tokenizer):
     def __call__(self, value, positions=False, chars=False,
@@ -13,7 +19,7 @@ class ChineseTokenizer(Tokenizer):
         t = Token(positions, chars, removestops=removestops, mode=mode,
             **kwargs)
         seglist=jieba.cut_for_search(value)
-        #使用结巴分词库进行分词
+        # 使用结巴分词库进行分词
         for w in seglist:
             t.original = t.text = w
             t.boost = 1.0
@@ -29,7 +35,7 @@ def ChineseAnalyzer():
     return ChineseTokenizer()
 
 
-class SearchIndex(object):
+class WhooshBookmarks(object):
     """
     Object utilising Whoosh (http://woosh.ca/) to create a search index of all
     crawled rss feeds, parse queries and search the index for related mentions.
@@ -38,24 +44,38 @@ class SearchIndex(object):
         """
         Instantiate the whoosh schema and writer and create/open the index.
         """
-        # get the absolute path and create the dir if required
-        if not os.path.exists("index"):
-            os.mkdir("index")
-            create_in("index", self.get_schema(), indexname="bookmarks")
+        self.indexdir = "index"
+        self.indexname = "bookmarks"
+        self.schema = self.get_schema()
+        if not os.path.exists(self.indexdir):
+            os.mkdir(self.indexdir)
+            create_in(self.indexdir, self.schema, indexname=self.indexname)
         # create an index obj and buffered writer
-        self.ix = open_dir("index", indexname="bookmarks")
+        self.ix = open_dir(self.indexdir, indexname=self.indexname)
 
+    def rebuild_index(self):
+        ix = create_in(self.indexdir, self.schema, indexname=self.indexname)
+        writer = ix.writer()
+        for bookmark in bookmarks_collection.find(timeout=False):
+            writer.update_document(
+                nid=str(bookmark['_id']),
+                url=bookmark['url'],
+                title=bookmark['title'],
+                tags=bookmark['tags'],
+                note=bookmark['note'],
+                article=bookmark['article']
+            )
+        writer.commit()
 
     def get_schema(self):
         return Schema(
             nid=ID(unique=True, stored=True),
             url=ID(unique=True, stored=True),
-            title=TEXT(stored=True, phrase=False),
-            tags=KEYWORD,
-            note=TEXT(stored=True, analyzer=ChineseAnalyzer()),
+            title=TEXT(phrase=False),
+            tags=KEYWORD(lowercase=True, commas=True, scorable=True),
+            note=TEXT(analyzer=ChineseAnalyzer()),
             article=TEXT(stored=True, analyzer=ChineseAnalyzer())
         )
-
 
     def commit(self, writer):
         """
@@ -64,14 +84,9 @@ class SearchIndex(object):
         writer.commit()
         return True
 
-    def update(self, bookmark):
-        """
-        Add an item to the index. If commit is set to False, remember to commit
-        the data to the index manually using self.commit().
-        """
-        # instantiate the writer
-        writer = self.ix.writer()
-        # add the document to the search index and commit
+    def update(self, bookmark, writer=None):
+        if writer is None:
+            writer = self.ix.writer()
         writer.update_document(
             nid=str(bookmark['_id']),
             url=bookmark['url'],
@@ -80,21 +95,9 @@ class SearchIndex(object):
             note=bookmark['note'],
             article=bookmark['article']
         )
-        self.commit(writer)
-
-    def get(self, id):
-        """
-        Get an index object by its hashed id.
-        """
-        with self.ix.searcher() as searcher:
-            result = searcher.document(uid=id)
-            searcher.close()
-            return result
+        writer.commit()
 
     def parse_query(self, query):
-        """
-        Parses the the string query into a usable format.
-        """
         parser = qparser.MultifieldParser(["url", "title", "tags", "note", "article"], self.ix.schema)
         return parser.parse(query)
 
@@ -104,12 +107,12 @@ class SearchIndex(object):
         """
         results = []
         with self.ix.searcher() as searcher:
-            page = searcher.search_page(self.parse_query(query), page, pagelen=20)
+            result_page = searcher.search_page(self.parse_query(query), page, pagelen=page_size)
             # create a results list from the search results
-            for result in page.results:
+            for result in result_page:
             # for result in searcher.search(self.parse_query(query)):
                 results.append(dict(result))
-        return { 'results': results, 'total': page.total }
+        return { 'results': results, 'total': result_page.total }
 
 
     def delele_by_url(self, url):
@@ -122,4 +125,3 @@ class SearchIndex(object):
         Closes the searcher obj. Must be done manually.
         """
         self.ix.close()
-

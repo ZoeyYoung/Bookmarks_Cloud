@@ -1,7 +1,7 @@
 {% extends 'tabbable.html' %}
 {% block bookmarks_pane %}
 <h3>{{cur_tag}} ({{tag_count}} 个书签):</h3>
-<div id="pageBookmarkList" title="{{cur_tag}}">
+<div id="pageBookmarkList" tag="{{cur_tag}}" keywords="">
     <div id="bookmarkList">
     {% for bookmark in bookmarks %}
         {% module Bookmark(bookmark) %}
