@@ -65,7 +65,7 @@ Web框架使用[Tornado](https://github.com/facebook/tornado)
 
 分词采用[结巴分词](https://github.com/fxsjy/jieba/tree/jieba3k)
 
-全文搜索[Whoosh](http://pythonhosted.org/Whoosh/index.html)
+全文搜索[Whoosh](http://pythonhosted.org/Whoosh/index.html), 支持中文
 
 ### 前端
 
