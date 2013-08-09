@@ -1,4 +1,3 @@
-
 (function($) {
     var App = (function(){
         var lastEditor = null,
@@ -140,7 +139,9 @@
                     var url = bookmark_item.find('.bookmark-favicon').attr('href');
                     $.ajax({
                         url: '/bookmark/del',
-                        data: { url: url }
+                        data: { url: url },
+                        dataType: 'json',
+                        type: "POST"
                     }).done(function(response) {
                         if (response.success === 'true') {
                             bookmark_item.remove();
