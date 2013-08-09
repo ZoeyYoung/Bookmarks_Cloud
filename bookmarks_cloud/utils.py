@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from tornado import httpclient
-from readability.readability import Document
 from functools import lru_cache
+from readability.readability import Document
 import math
 import re
 import jieba
@@ -14,7 +14,6 @@ log = logging.getLogger('bookmarks_cloud_log')
 
 jieba.initialize()
 
-
 # 格式化标签
 def format_tags(str):
     tags = re.split('[,，|]', str)
@@ -24,53 +23,18 @@ def format_tags(str):
     return tags
 
 
-# TODO(Zoey) 需要调整到尽量快, 主要是为了防止连续多次抓取同一个网站
 @lru_cache(maxsize=32)
-def get_html(url):
-    # request = urllib2.Request(url)
-    # request.add_header()
-    # html_doc = urllib2.urlopen(request, timeout=10)
-    # url = parse_url(url)
-    http_client = httpclient.HTTPClient()
-    try:
-        request = httpclient.HTTPRequest(
-            url,
-            method='GET',
-            headers={"content-type": "text/html", 'Referer': 'http://www.google.com', "Accept": "*/*"},
-            # body=None,
-            # auth_username=None,
-            # auth_password=None,
-            # auth_mode=None,
-            # connect_timeout=60,
-            request_timeout=10,
-            # if_modified_since=None,
-            follow_redirects=True,
-            # max_redirects=None,
-            user_agent='Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1485.0 Safari/537.36',
-            # use_gzip=None,
-            # network_interface=None,
-            # streaming_callback=None,
-            # header_callback=None,
-            # prepare_curl_callback=None,
-            # proxy_host=None,
-            # proxy_port=None,
-            # proxy_username=None,
-            # proxy_password=None,
-            # allow_nonstandard_methods=None,
-            # validate_cert=False,
-            # ca_certs=None,
-            allow_ipv6=True,
-            # client_key=None,
-            # client_cert=None
-        )
-        response = http_client.fetch(request)
-    except httpclient.HTTPError as e:
-        log.debug("Error In get_html func:", url, str(e))
-        response = None
-    http_client.close()
-    if not response:
-        return None
-    return response.body
+def fetch_url(url):
+    request = httpclient.HTTPRequest(
+        url,
+        method='GET',
+        headers={"content-type": "text/html", 'Referer': 'http://www.google.com', "Accept": "*/*"},
+        request_timeout=10,
+        follow_redirects=True,
+        user_agent='Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1485.0 Safari/537.36',
+        allow_ipv6=True
+    )
+    return httpclient.AsyncHTTPClient().fetch(request)
 
 
 def video_site(url):
@@ -92,17 +56,13 @@ def video_site(url):
         else:
             return None
 
-#     url = urllib.quote(url.split('#')[0].encode('utf8'), safe="%/:=&?~#+!$,;'@()*[]")
-#     return url
-
 
 def get_bookmark_info(url, html=None):
     if not html:
-        html = get_html(url)
-        # print(get_html.cache_info())
-        if not html:
-            print("Error: html is None", url)
-            return None
+        # html = get_html(url)
+        # if not html:
+        print("Error: html is None", url)
+        return None
     doc = Document(html, url=url, debug=True, multipage=False)
     summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
     title = summary_obj.short_title

@@ -6,7 +6,6 @@ from .config import config
 from hashlib import md5
 from .models import Bookmark
 
-
 class BaseHandler(tornado.web.RequestHandler):
 
     @property

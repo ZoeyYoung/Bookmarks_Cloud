@@ -150,8 +150,8 @@ class Bookmark(object):
             return new_bookmark
 
     @staticmethod
-    def refresh(bookmark):
-        info = Bookmark.get_info(bookmark['url'])
+    def refresh(bookmark, html=''):
+        info = Bookmark.get_info(bookmark['url'], html)
         if info:
             bookmark['html'] = info['html']
             bookmark['title'] = info['title']
@@ -168,7 +168,8 @@ class Bookmark(object):
             {"url": url},
             {"url": cgi.escape(url)}
         ]})
-        fts.delele_by_url(url)
+        return fts.delele_by_url(url)
+
 
     @staticmethod
     def get_random_bookmarks():

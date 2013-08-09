@@ -4,11 +4,12 @@ from .base import BaseHandler
 import json
 import time
 import random
+from .utils import fetch_url
 from .utils import get_keywords
 from .utils import format_tags
 from .utils import get_tags_cloud
 from .models import Page, Bookmark
-
+import tornado
 
 class BookmarkModule(tornado.web.UIModule):
 
@@ -74,18 +75,22 @@ class AjaxBookmarkHandler(BaseHandler):
 class BookmarkGetInfoHandler(BaseHandler):
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self, *args):
         url = self.get_argument('url')
-        info = Bookmark.get_info(url)
-        if info:
-            self.write(json.dumps({
-                'success': 'true',
-                'favicon': info['favicon'],
-                'title': info['title'],
-                'description': info['description'],
-                'tags': info['tags'],
-                'note': info['note']
-            }))
+        response = yield fetch_url(url)
+        print(fetch_url.cache_info())
+        if response:
+            info = Bookmark.get_info(url, html=response.body)
+            if info:
+                self.write(json.dumps({
+                    'success': 'true',
+                    'favicon': info['favicon'],
+                    'title': info['title'],
+                    'description': info['description'],
+                    'tags': info['tags'],
+                    'note': info['note']
+                }))
         else:
             self.write(json.dumps({'success': 'false'}))
 
@@ -115,16 +120,20 @@ class BookmarkGetDetailHandler(BaseHandler):
 class BookmarkRefreshHandler(BaseHandler):
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self, *args):
         url = self.get_argument('url')
         bookmark = Bookmark.get_by_url(url)
         if bookmark:
-            bookmark = Bookmark.refresh(bookmark)
-            bookmark = Bookmark.insert_or_update(bookmark)
-            bookmark_module = tornado.escape.to_basestring(
-                self.render_string('modules/bookmark.html', bookmark=bookmark))
-            self.write(
-                json.dumps({'success': 'true', 'bookmark_module': bookmark_module, 'title': bookmark['title'], 'article': tornado.escape.to_basestring(bookmark['article'])}))
+            response = yield fetch_url(url)
+            if response:
+                bookmark = Bookmark.refresh(bookmark, html=response.body)
+                bookmark_module = tornado.escape.to_basestring(
+                    self.render_string('modules/bookmark.html', bookmark=bookmark))
+                self.write(
+                    json.dumps({'success': 'true', 'bookmark_module': bookmark_module, 'title': bookmark['title'], 'article': tornado.escape.to_basestring(bookmark['article'])}))
+            else:
+                self.write(json.dumps({'success': 'false'}))
         else:
             self.write(json.dumps({'success': 'false'}))
 
@@ -174,8 +183,10 @@ class BookmarkDelHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self, *args):
         url = self.get_argument('url')
-        Bookmark.delete(url)
-        self.write(json.dumps({'success': 'true'}))
+        if Bookmark.delete(url) == 1:
+            self.write(json.dumps({'success': 'true'}))
+        else:
+            self.write(json.dumps({'success': 'false'}))
 
 
 class TagBookmarksHandler(BaseHandler):

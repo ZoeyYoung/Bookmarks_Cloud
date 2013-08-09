@@ -116,8 +116,10 @@ class WhooshBookmarks(object):
 
 
     def delele_by_url(self, url):
-        self.ix.delete_by_term('url', url)
-        self.ix.commit()
+        writer = self.ix.writer()
+        result = writer.delete_by_term('url', url)
+        writer.commit()
+        return result
 
 
     def close(self):
