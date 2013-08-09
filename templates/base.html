@@ -62,7 +62,7 @@
                             <div class="col-lg-11 input-group">
                                 <span class="input-group-addon"><i class="icon-bookmark"></i>
                                 </span>
-                                <input type="url" name="url" id="url" class="form-control" placeholder="网址" autofocus required/>
+                                <input type="url" name="url" id="url" class="form-control" placeholder="http://www.website.com" autofocus required/>
                                 <span class="input-group-btn">
                                     <button class="btn btn-info" type="button" id="getBookmarkInfoBtn" data-loading-text="载入中...">获取信息</button>
                                 </span>
@@ -83,14 +83,14 @@
                         <div class="form-group">
                             <label class="control-label col-lg-1" for="tags">标签</label>
                             <div class="col-lg-11">
-                                <input type="text" name="tags" id="tags" class="form-control" placeholder="书签标签, 用逗号分隔" required/>
+                                <input type="text" name="tags" id="tags" class="form-control" placeholder="标签1,标签2,标签3..." required/>
                                 <ul id="suggestTags" class="tags"></ul>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="control-label col-lg-1" for="note">笔记</label>
                             <div class="col-lg-11">
-                                <textarea class="form-control" id="note" rows="10" placeholder="还没有记笔记"></textarea>
+                                <textarea class="form-control" id="note" rows="10" placeholder="还神马都没有记."></textarea>
                                 <span class="help-block">使用Markdown语法</span>
                                 <button type="button" id="addBookmarkBtn" class="btn btn-primary quickFlipCta">提交</button>
                                 <button type="button" id="cancelAddBookmarkBtn" class="btn quickFlipCta">取消</button>
