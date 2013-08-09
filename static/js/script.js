@@ -42,6 +42,10 @@
                 });
             },
             init = function() {
+                $("#vcard").popover({
+                    trigger: "hover",
+                    placement: "left"
+                });
                 $("img.lazy").lazy();
                 $("div.nano").nanoScroller();
                 $('div.quickflip-wrapper').quickFlip({

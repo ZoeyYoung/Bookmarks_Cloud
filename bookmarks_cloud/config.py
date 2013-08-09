@@ -1,5 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+__author__ = "Zoey Young (ydingmiao@gmail.com)"
 import pymongo
 config = {
     "cookie_secret": "/ymPerf5TCOOMRayr7LT8EuXv1PDAk4Ole+VbdxN81A=",
@@ -14,9 +15,5 @@ config = {
     "analytics": '''<script type="text/javascript">
                     </script>
                   ''',
-    "smtp_server": "smtp.gmail.com",
-    "smtp_port": 587,
-    "smtp_user": "your_email@gmail.com",
-    "smtp_password": "",
     "page_size": 20
 }

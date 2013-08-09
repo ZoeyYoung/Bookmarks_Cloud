@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+__author__ = "Zoey Young (ydingmiao@gmail.com)"
 import os
 
 import tornado.web
@@ -27,5 +28,5 @@ def get_application(root_dir, db, option_parser):
         desc=config['description'],
         # autoescape=None,
         analytics=config['analytics'],
-        **{k: v.value() for k, v in list(option_parser._options.items())}
+        **{k: v.value() for k, v in option_parser._options.items()}
     )

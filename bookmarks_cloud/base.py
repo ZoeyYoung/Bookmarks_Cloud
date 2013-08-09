@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+__author__ = "Zoey Young (ydingmiao@gmail.com)"
 import tornado.web
 from .config import config
 from hashlib import md5
@@ -17,10 +17,14 @@ class BaseHandler(tornado.web.RequestHandler):
         return Bookmark.get_count()
 
     def avatar(self, size=40):
-        return 'http://www.gravatar.com/avatar/' + md5(config['email'].lower().encode('utf-8')).hexdigest() + '?d=mm&s=' + str(size)
+        return 'http://www.gravatar.com/avatar/' + md5(self.get_current_user()['email'].lower().encode('utf-8')).hexdigest() + '?d=mm&s=' + str(size)
 
     def get_current_user(self):
-        return self.get_secure_cookie("user")
+        user_json = self.get_secure_cookie("auth_user")
+        if not user_json:
+            return  None
+        print(user_json)
+        return tornado.escape.json_decode(user_json)
 
     def write_error(self, status_code, **kwargs):
         if status_code == 404:

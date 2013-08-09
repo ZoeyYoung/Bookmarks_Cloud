@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+__author__ = "Zoey Young (ydingmiao@gmail.com)"
 from .auth import *
 from .bookmarks_handlers import *
 

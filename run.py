@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+__author__ = "Zoey Young (ydingmiao@gmail.com)"
 import os
 import logging
 # from mongolog.handlers import MongoHandler
@@ -7,7 +8,6 @@ import tornado.ioloop
 import tornado.web
 from tornado.options import options
 from tornado import httpserver
-
 from bookmarks_cloud.define_options import define_options
 from bookmarks_cloud import indexes, application, config
 
@@ -33,4 +33,6 @@ if __name__ == "__main__":
     msg = 'Listening on port %s' % options.port
     print(msg)
     log.info(msg)
+    # TODO: Can't Work In Windows
+    # httpclient.AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
     tornado.ioloop.IOLoop.instance().start()

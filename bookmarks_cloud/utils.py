@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+__author__ = "Zoey Young (ydingmiao@gmail.com)"
 from tornado import httpclient
 from functools import lru_cache
 from readability.readability import Document

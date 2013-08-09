@@ -17,11 +17,15 @@
     <link href="{{static_url('css/style.css') }}" rel="stylesheet" />
 </head>
 <body id="top">
+    {% set user=handler.get_current_user() %}
+    <div id="vcard" class="profile" data-title="{{user['name']}} - {{user['email']}}" data-content="共收藏了{{handler.total}}个书签">
+        <img src="{{handler.avatar(100)}}" class="img-circle avatar" alt="当前用户" />
+    </div>
     <header id="header">
         <ul id="navigationMenu">
             <li class="active"><a class="n-cloud" href="/"><span><i class="icon-cloud"></i> 首页</span></a>
             </li>
-            <li><a class="n-list" href="#1" data-toggle="tab"><span><i class="icon-list"></i> 列表({{handler.total}})</span></a>
+            <li><a class="n-list" href="#1" data-toggle="tab"><span><i class="icon-list"></i> 列表</span></a>
             </li>
             <li><a class="n-tags" href="#2" data-toggle="tab"><span><i class="icon-tags"></i> 标签</span></a>
             </li>
@@ -37,12 +41,8 @@
                     </span>
                 </a>
             </li>
-            {% if not handler.get_current_user() is None %}
             <li><a id="showBookmarkFormBtn" class="n-add" href="#"><span><i class="icon-plus"></i> 添加</span></a></li>
             <li><a class="n-logout" href="/auth/logout"><span><i class="icon-off"></i> 登出</span></a></li>
-            {% else %}
-            <li><a href="/auth/login">登录</a></li>
-            {% end %}
         </ul>
     </header>
     <div class="container">

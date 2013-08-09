@@ -70,6 +70,20 @@ pre {
     background-image: linear-gradient(top, #009ED2 0%, #007DA7 100%);
 }
 .btn-ttc:hover { background-position: 0 -15px }
+.profile {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    z-index: 9999;
+}
+.avatar {
+    opacity: 0.8;
+    .transition(.4s all ease-in-out);
+    border: 1px solid;
+    &:hover {
+        .transform(rotate(360deg));
+    }
+}
 /* navigation  */
 #navigationMenu {
     position: fixed;

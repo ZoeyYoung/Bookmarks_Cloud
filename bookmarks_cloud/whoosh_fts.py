@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+__author__ = "Zoey Young (ydingmiao@gmail.com)"
 import os
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, TEXT, ID, KEYWORD
