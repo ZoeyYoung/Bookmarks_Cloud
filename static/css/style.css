@@ -2,7 +2,7 @@ body{font-family:'Alegreya SC','Garamond','Georgia','\5fae\8f6f\96c5\9ed1',tahom
 .container{max-width:95%;}
 ::selection{background:#fe57a1;color:#fff;text-shadow:none;}
 blockquote{clear:both;border:0;word-wrap:break-word;overflow:hidden;margin:0;padding:0 0 5px 20px;min-height:20px;}blockquote p{position:relative;color:#7a7a7a;font-size:14px;font-style:italic;}blockquote p:before{position:absolute;font-family:FontAwesome;content:"\f10d";display:block;top:0;left:-20px;}
-aside{min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;border-radius:4px;box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);}
+aside{min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;-webkit-background-clip:padding-box;-moz-background-clip:padding;background-clip:padding-box;-webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);-moz-box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);}
 mark{font-weight:bold;display:inline-block;width:100%;background:#ff8;}
 pre ins{background:#99ff99;}
 pre del{background:#ff8877;}
@@ -10,7 +10,7 @@ pre ins,pre del{line-height:2.154;text-decoration:none;font-style:normal;display
 .btn-ttc,.btn-ttc:hover,.btn-ttc:active{color:white;text-shadow:0 -1px 0 rgba(0, 0, 0, 0.25);background-color:#007da7;}
 .btn-ttc{background-repeat:repeat-x;background-image:linear-gradient(top, #009ed2 0%, #007da7 100%);}
 .btn-ttc:hover{background-position:0 -15px;}
-#navigationMenu{position:fixed;z-index:99999;top:100px;left:-65px;font-size:18px;font-weight:bold;letter-spacing:0.6px;white-space:nowrap;line-height:40px;text-shadow:rgba(255, 255, 255, 0.5) 0 1px 1px;}#navigationMenu li{list-style:none;height:40px;opacity:0.8;}#navigationMenu li a{height:40px;width:40px;display:block;position:relative;}#navigationMenu li a span{width:0;overflow:hidden;position:absolute;left:10px;transition:0.25s;}
+#navigationMenu{position:fixed;z-index:99999;top:100px;left:-65px;font-size:18px;font-weight:bold;letter-spacing:0.6px;white-space:nowrap;line-height:40px;text-shadow:rgba(255, 255, 255, 0.5) 0 1px 1px;}#navigationMenu li{list-style:none;height:40px;opacity:0.8;}#navigationMenu li a{height:40px;width:40px;display:block;position:relative;}#navigationMenu li a span{width:0;overflow:hidden;position:absolute;left:10px;-webkit-transition:0.25s;-moz-transition:0.25s;-ms-transition:0.25s;-o-transition:0.25s;transition:0.25s;}
 #navigationMenu li a:hover{text-decoration:none;}#navigationMenu li a:hover span{width:auto;padding:0 20px;overflow:visible;}
 #navigationMenu form{display:inline;}
 #navigationMenu input{background:inherit;border:0;color:white;outline:none;}
@@ -34,9 +34,9 @@ pre ins,pre del{line-height:2.154;text-decoration:none;font-style:normal;display
 .bookmark-item .dropdown-menu>li>a{padding:3px 6px;}
 .bookmark-item .bookmark-title{float:left;line-height:30px;max-width:90%;}
 .bookmark-item .bookmark-note{word-wrap:break-word;overflow:hidden;display:none;}
-.bookmark-item .bookmark-favicon{z-index:2;position:absolute;top:5px;left:-25px;width:20px;height:20px;border-radius:50%;box-shadow:-1px 0 1px rgba(0, 0, 0, 0.15) inset;transition:0.4s all ease-in-out;}.bookmark-item .bookmark-favicon a{display:block;padding:1px;width:20px;height:20px;border-radius:50%;transition:color 0.15s linear;transition:0.4s all ease-in-out;}
-.bookmark-item .bookmark-favicon img{display:block;width:20px;height:20px;border-radius:50%;box-shadow:0 1px 2px rgba(0, 0, 0, 0.22);transition:0.4s all ease-in-out;}
-.bookmark-item:hover .bookmark-favicon img{transform:rotate(360deg);}
+.bookmark-item .bookmark-favicon{z-index:2;position:absolute;top:5px;left:-25px;width:20px;height:20px;-webkit-border-radius:50%;-moz-border-radius:50%;border-radius:50%;-webkit-background-clip:padding-box;-moz-background-clip:padding;background-clip:padding-box;-webkit-box-shadow:-1px 0 1px rgba(0, 0, 0, 0.15) inset;-moz-box-shadow:-1px 0 1px rgba(0, 0, 0, 0.15) inset;box-shadow:-1px 0 1px rgba(0, 0, 0, 0.15) inset;-webkit-transition:0.4s all ease-in-out;-moz-transition:0.4s all ease-in-out;-ms-transition:0.4s all ease-in-out;-o-transition:0.4s all ease-in-out;transition:0.4s all ease-in-out;}.bookmark-item .bookmark-favicon a{display:block;padding:1px;width:20px;height:20px;-webkit-border-radius:50%;-moz-border-radius:50%;border-radius:50%;-webkit-background-clip:padding-box;-moz-background-clip:padding;background-clip:padding-box;-webkit-transition:color 0.15s linear;-moz-transition:color 0.15s linear;-ms-transition:color 0.15s linear;-o-transition:color 0.15s linear;transition:color 0.15s linear;-webkit-transition:0.4s all ease-in-out;-moz-transition:0.4s all ease-in-out;-ms-transition:0.4s all ease-in-out;-o-transition:0.4s all ease-in-out;transition:0.4s all ease-in-out;}
+.bookmark-item .bookmark-favicon img{display:block;width:20px;height:20px;-webkit-border-radius:50%;-moz-border-radius:50%;border-radius:50%;-webkit-background-clip:padding-box;-moz-background-clip:padding;background-clip:padding-box;-webkit-box-shadow:0 1px 2px rgba(0, 0, 0, 0.22);-moz-box-shadow:0 1px 2px rgba(0, 0, 0, 0.22);box-shadow:0 1px 2px rgba(0, 0, 0, 0.22);-webkit-transition:0.4s all ease-in-out;-moz-transition:0.4s all ease-in-out;-ms-transition:0.4s all ease-in-out;-o-transition:0.4s all ease-in-out;transition:0.4s all ease-in-out;}
+.bookmark-item:hover .bookmark-favicon img{-webkit-transform:rotate(360deg);-moz-transform:rotate(360deg);-ms-transform:rotate(360deg);-o-transform:rotate(360deg);transform:rotate(360deg);}
 .pagination{margin:0 0 0 24px;}
 .video_player{width:510px;height:498px;}
 footer{margin-bottom:20px;}

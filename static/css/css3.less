@@ -1,0 +1,1078 @@
+/************************************************************
+ *
+ * honey-less
+ *
+ * @description CSS3 mixins for projects using LESS
+ * @see http: //lesscss.org/
+ * @version 2.10
+ *
+ * @author Matthew Wagerfield
+ * @see http: //matthew.wagerfield.com
+ * @see http: //twitter.com/mwagerfield
+ *
+ * @author XiaoQiang
+ * @see http: //xiaoqiang.org
+ *
+ * ---------- INDEX ----------
+ *
+ * Display:
+ * @mixin display-box
+ * @mixin box-orient
+ * @mixin box-pack
+ * @mixin box-align
+ * @mixin box-flex
+ * @mixin box-sizing
+ * @mixin background-size
+ * @mixin user-select
+ * @mixin appearance
+ *
+ * Decoration:
+ * @mixin border-radius
+ * @mixin box-shadow
+ * @mixin text-shadow
+ * @mixin linear-gradient
+ * @mixin radial-gradient
+ *
+ * Transformation:
+ * @mixin transform
+ * @mixin transform-origin
+ * @mixin transform-style
+ * @mixin perspective
+ * @mixin perspective-origin
+ * @mixin backface-visibility
+ * @mixin matrix
+ * @mixin translate
+ * @mixin scale
+ * @mixin rotate
+ * @mixin skew
+ *
+ * Transition:
+ * @mixin transition
+ * @mixin transition-property
+ * @mixin transition-duration
+ * @mixin transition-timing-function
+ * @mixin transition-delay
+ *
+ * Animation
+ * @mixin animation
+ * @mixin animation-name
+ * @mixin animation-duration
+ * @mixin animation-timing-function
+ * @mixin animation-delay
+ * @mixin animation-iteration-count
+ * @mixin animation-direction
+ * @mixin animation-play-state
+ * @mixin keyframes interface
+ * @mixin keyframes
+************************************************************/
+
+
+
+/************************************************************
+ *
+ * display-box
+ *
+ * @see http: //www.w3.org/TR/css3-flexbox/
+ * @see http: //www.html5rocks.com/en/tutorials/flexbox/quick/
+ *
+************************************************************/
+
+.display-box() {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-box;
+    display: -o-box;
+    display: box;
+}
+
+
+
+/************************************************************
+ *
+ * box-orient
+ *
+ * @param value               :  horizontal |
+ *                               vertical   |
+ *                               inherit
+ *
+ * @see http: //www.w3.org/TR/css3-flexbox/
+ * @see http: //www.html5rocks.com/en/tutorials/flexbox/quick/
+ *
+************************************************************/
+
+.box-orient(...) {
+    .display-box();
+    -webkit-box-orient: @arguments;
+       -moz-box-orient: @arguments;
+        -ms-box-orient: @arguments;
+         -o-box-orient: @arguments;
+            box-orient: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * box-pack
+ *
+ * @param value               :  start   |
+ *                               end     |
+ *                               center  |
+ *                               justify
+ *
+ * @see http: //www.w3.org/TR/css3-flexbox/
+ * @see http: //www.html5rocks.com/en/tutorials/flexbox/quick/
+ *
+************************************************************/
+
+.box-pack(...) {
+    .display-box();
+    -webkit-box-pack: @arguments;
+       -moz-box-pack: @arguments;
+        -ms-box-pack: @arguments;
+         -o-box-pack: @arguments;
+            box-pack: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * box-align
+ *
+ * @param value               :  start    |
+ *                               end      |
+ *                               center   |
+ *                               baseline |
+ *                               stretch
+ *
+ * @see http: //www.w3.org/TR/css3-flexbox/
+ * @see http: //www.html5rocks.com/en/tutorials/flexbox/quick/
+ *
+************************************************************/
+
+.box-align(...) {
+    .display-box();
+    -webkit-box-align: @arguments;
+       -moz-box-align: @arguments;
+        -ms-box-align: @arguments;
+         -o-box-align: @arguments;
+            box-align: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * box-flex
+ *
+ * @param value               :  0 | Integer
+ *
+ * @see http: //www.w3.org/TR/css3-flexbox/
+ * @see http: //www.html5rocks.com/en/tutorials/flexbox/quick/
+ *
+************************************************************/
+
+.box-flex(...) {
+    .display-box();
+    -webkit-box-flex: @arguments;
+       -moz-box-flex: @arguments;
+        -ms-box-flex: @arguments;
+         -o-box-flex: @arguments;
+            box-flex: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * box-sizing
+ *
+ * @param value               :  content-box |
+ *                               padding-box |
+ *                               border-box  |
+ *                               inherit
+ *
+ * @see http://www.w3.org/TR/css3-ui/#box-sizing0
+ *
+************************************************************/
+
+.box-sizing(...) {
+    -webkit-box-sizing: @arguments; /* <=iOS4, <= Android  2.3 */
+       -moz-box-sizing: @arguments; /* FF1+ */
+        -ms-box-sizing: @arguments;
+         -o-box-sizing: @arguments;
+            box-sizing: @arguments; /* Chrome, IE8, Opera, Safari 5.1*/
+}
+
+
+
+/************************************************************
+ *
+ * background-size
+ *
+ * @param value               :  px       |
+ *                               %        |
+ *                               auto     |
+ *                               cover    |
+ *                               contain  |
+ *
+ * @see http://www.w3.org/TR/2002/WD-css3-background-20020802/#background-size
+ *
+************************************************************/
+
+.background-size(...) {
+    -webkit-background-size: @arguments; /* Saf3-4 */
+            background-size: @arguments; /* Opera, IE9, Saf5.1, Chrome13.0, FF4.0 */
+}
+
+
+
+/************************************************************
+ *
+ * user-select
+ *
+ * @param value               :  none     |
+ *                               text     |
+ *                               toggle   |
+ *                               element  |
+ *                               elements |
+ *                               all      |
+ *                               inherit
+ *
+ * @see http: //www.w3.org/TR/2000/WD-css3-userint-20000216#user-select
+ *
+************************************************************/
+
+.user-select(...) {
+    -webkit-touch-callout: @arguments;
+      -webkit-user-select: @arguments;
+         -moz-user-select: @arguments;
+          -ms-user-select: @arguments;
+           -o-user-select: @arguments;
+              user-select: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * appearance
+ *
+ * @param value               :  button         |
+ *                               push-button    |
+ *                               hyperlink      |
+ *                               radio-button   |
+ *                               checkbox       |
+ *                               pop-up-menu    |
+ *                               list-menu      |
+ *                               radio-group    |
+ *                               checkbox-group |
+ *                               field          |
+ *                               password       |
+ *                               normal         |
+ *                               inherit        |
+ *                               none
+ *
+ * @see http: //www.w3.org/TR/css3-ui/#appearance
+ * @see http: //www.cssportal.com/css-properties/appearance.htm
+ * @see https: *developer.mozilla.org/en/CSS/-moz-appearance
+ *
+************************************************************/
+
+.appearance(...) {
+    -webkit-appearance: @arguments;
+       -moz-appearance: @arguments;
+        -ms-appearance: @arguments;
+         -o-appearance: @arguments;
+            appearance: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * font-face
+ *
+ * @param url                  :  local or net
+ * @param font-name            :  font-name
+ *
+ * @example .font-face('xiaoqiang.org/', 'myfont');
+ *
+ * @see http://www.w3.org/TR/css3-fonts/
+ *
+************************************************************/
+
+.font-face(@url, @font-name) {
+    font-family: '@{font-name}';
+    src: url('//@{url}@{font-name}.eot'); /* IE9 Compat Modes */
+    src: url('//@{url}@{font-name}.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('//@{url}@{font-name}.woff') format('woff'), /* Modern Browsers */
+         url('//@{url}@{font-name}.ttf')  format('truetype'), /* Safari, Android, iOS */
+         url('//@{url}@{font-name}.svg#@{font-name}') format('svg'); /* Legacy iOS */
+}
+
+
+
+/************************************************************
+ *
+ * border-radius
+ *
+ * @param top-left-radius     :  px, em, %
+ * @param top-right-radius    :  px, em, %
+ * @param bottom-right-radius :  px, em, %
+ * @param bottom-left-radius  :  px, em, %
+ *
+ * @see http: //www.w3.org/TR/css3-background/#border-radius
+ *
+************************************************************/
+
+.border-radius(...) {
+      -webkit-border-radius: @arguments; /* Saf3-4, iOS 1-3.2, Android ≤1.6 */
+         -moz-border-radius: @arguments;
+              border-radius: @arguments; /* Opera 10.5 IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
+
+    /* useful if you don't want a bg color from leaking outside the border: */
+    -webkit-background-clip: padding-box;
+       -moz-background-clip: padding;
+            background-clip: padding-box;
+}
+
+
+
+/************************************************************
+ *
+ * box-shadow
+ *
+ * @param colour              :  #000, rgba, hsla
+ * @param horizontal-offset   :  px, em
+ * @param vertical-offset     :  px, em
+ * @param blur-radius         :  px, em
+ * @param spread-distance     :  px, em
+ * @param inset               :  inset
+ *
+ * @see http: //www.w3.org/TR/css3-background/#box-shadow
+ *
+************************************************************/
+
+.box-shadow(...) {
+    -webkit-box-shadow: @arguments; /* Saf3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+       -moz-box-shadow: @arguments;
+            box-shadow: @arguments; /* Opera 10.5, IE9, FF4+, Chrome 6+, iOS 5 */
+}
+
+
+
+/************************************************************
+ *
+ * text-shadow
+ *
+ * @param colour              :  #000, rgba, hsla
+ * @param horizontal-offset   :  px, em
+ * @param vertical-offset     :  px, em
+ * @param blur-radius         :  px, em
+ *
+ * @see http: //www.w3.org/TR/css3-text/#text-shadow
+ *
+************************************************************/
+
+.text-shadow(...) {
+    text-shadow: @arguments; /* FF3.5+, Opera 9+, Saf1+, Chrome, IE10 */
+}
+
+
+
+/************************************************************
+ *
+ * linear-gradient
+ *
+ * @param angle               :  top, left, 90deg
+ * @param colourA             :  #000 0%, red 0%
+ * @param colourB             :  #000 50%, red 50%
+ * @param colourC             :  #000 100%, red 100%
+ *
+ * @example .linear-gradient(top, ~',crimson 0%', ~',black 100%');
+ *
+ * @see http: //dev.w3.org/csswg/css3-images/#linear-gradients
+ *
+************************************************************/
+
+.linear-gradient(...) {
+    background-image: -webkit-linear-gradient(@arguments); /* Chrome 10+, Saf5.1+, iOS 5+ */
+    background-image: -moz-linear-gradient(@arguments); /* FF3.6 */
+    background-image: -ms-linear-gradient(@arguments);
+    background-image: -o-linear-gradient(@arguments); /* Opera 11.10+ */
+    background-image: linear-gradient(@arguments);
+}
+
+
+
+/************************************************************
+ *
+ * radial-gradient
+ *
+ * @param location            :  left top, 50% 50%
+ * @param shape               :  circle, ellipse, 100% 75%
+ * @param colourA             :  #000 0%, red 0%
+ * @param colourB             :  #000 50%, red 50%
+ * @param colourC             :  #000 100%, red 100%
+ *
+ * @example .radial-gradient(~'50% 50%,', circle, ~',crimson 0%', ~',black 100%');
+ *
+ * @see http: //dev.w3.org/csswg/css3-images/#radial-gradients
+ *
+************************************************************/
+
+.radial-gradient(...) {
+    background-image: -webkit-radial-gradient(@arguments);
+    background-image: -moz-radial-gradient(@arguments);
+    background-image: -ms-radial-gradient(@arguments);
+    background-image: -o-radial-gradient(@arguments);
+    background-image: radial-gradient(@arguments);
+}
+
+
+
+/************************************************************
+ *
+ * transform
+ *
+ * @param functions           :  matrix()
+ *                            :  translate()
+ *                            :  scale()
+ *                            :  rotate()
+ *                            :  skew()
+ *
+ * @see http: //www.w3.org/TR/css3-2d-transforms/
+ *
+************************************************************/
+
+.transform(...) {
+    -webkit-transform: @arguments; /* Saf3.2+, Chrome */
+       -moz-transform: @arguments; /* FF4+ */
+        -ms-transform: @arguments; /* IE10 */
+         -o-transform: @arguments; /* Opera 10.5+ */
+            transform: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * transform-origin
+ *
+ * @param value               :  left   |
+ *                               center |
+ *                               right  |
+ *                               px     |
+ *                               em     |
+ *                               %;
+ *
+ * @see http: //www.w3.org/TR/css3-3d-transforms/#transform-origin-property
+ *
+************************************************************/
+
+.transform-origin(...) {
+    -webkit-transform-origin: @arguments;
+       -moz-transform-origin: @arguments;
+        -ms-transform-origin: @arguments;
+         -o-transform-origin: @arguments;
+            transform-origin: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * transform-style
+ *
+ * @param value               :  preserve-3d | flat
+ *
+ * @see http: //www.w3.org/TR/css3-3d-transforms/#transform-style-property
+ *
+************************************************************/
+
+.transform-style(...) {
+    -webkit-transform-style: @arguments;
+       -moz-transform-style: @arguments;
+        -ms-transform-style: @arguments;
+         -o-transform-style: @arguments;
+            transform-style: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * perspective
+ *
+ * @param value               :  none | 0, 1, 100, 1000, etc
+ *
+ * @see http: //www.w3.org/TR/css3-3d-transforms/#perspective-property
+ *
+************************************************************/
+
+.perspective(...) {
+    -webkit-perspective: @arguments; /* Saf4+, Chrome 12+ */
+       -moz-perspective: @arguments; /* FF10+ */
+        -ms-perspective: @arguments; /* IE10+ */
+         -o-perspective: @arguments;
+            perspective: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * perspective-origin
+ *
+ * @param value               :  left   |
+ *                               center |
+ *                               right  |
+ *                               px     |
+ *                               em     |
+ *                               %
+ *
+ * @see http: //www.w3.org/TR/css3-3d-transforms/#perspective-origin-property
+ *
+************************************************************/
+
+.perspective-origin(...) {
+    -webkit-perspective-origin: @arguments;
+       -moz-perspective-origin: @arguments;
+        -ms-perspective-origin: @arguments;
+         -o-perspective-origin: @arguments;
+            perspective-origin: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * backface-visibility
+ *
+ * @param value               :  visible | hidden
+ *
+ * @see http: //www.w3.org/TR/css3-3d-transforms/#backface-visibility-property
+ *
+************************************************************/
+
+.backface-visibility(...) {
+    -webkit-backface-visibility: @arguments;
+       -moz-backface-visibility: @arguments;
+        -ms-backface-visibility: @arguments;
+         -o-backface-visibility: @arguments;
+            backface-visibility: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * matrix
+ *
+ * @param a                   :  Number
+ * @param b                   :  Number
+ * @param c                   :  Number
+ * @param d                   :  Number
+ * @param e                   :  Number
+ * @param f                   :  Number
+ *
+ * http: //www.w3.org/TR/css3-3d-transforms/#transform-functions
+ *
+************************************************************/
+
+.matrix(...) {
+    -webkit-transform: matrix(@arguments);
+       -moz-transform: matrix(@arguments);
+        -ms-transform: matrix(@arguments);
+         -o-transform: matrix(@arguments);
+            transform: matrix(@arguments);
+}
+
+
+
+/************************************************************
+ *
+ * translate
+ *
+ * @param translate-x         :  px
+ * @param translate-y         :  px
+ *
+ * http: //www.w3.org/TR/css3-3d-transforms/#transform-functions
+ *
+************************************************************/
+
+.translate(...) {
+    -webkit-transform: translate(@arguments);
+       -moz-transform: translate(@arguments);
+        -ms-transform: translate(@arguments);
+         -o-transform: translate(@arguments);
+            transform: translate(@arguments);
+}
+
+
+
+/************************************************************
+ *
+ * scale
+ *
+ * @param scale-x             :  0.5, 2, etc
+ * @param scale-y             :  0.5, 2, etc
+ *
+ * http: //www.w3.org/TR/css3-3d-transforms/#transform-functions
+ *
+************************************************************/
+
+.scale(...) {
+    -webkit-transform: scale(@arguments); /* Saf3.1+, Chrome */
+       -moz-transform: scale(@arguments); /* FF3.5+ */
+        -ms-transform: scale(@arguments); /* IE9 */
+         -o-transform: scale(@arguments); /* Opera 10.5+ */
+            transform: scale(@arguments);
+}
+
+
+/************************************************************
+ *
+ * rotate
+ *
+ * @param angle               :  0deg
+ *
+ * http: //www.w3.org/TR/css3-3d-transforms/#transform-functions
+ *
+************************************************************/
+
+.rotate(...) {
+    -webkit-transform: rotate(@arguments); /* Saf3.1+, Chrome */
+       -moz-transform: rotate(@arguments); /* FF3.5+ */
+        -ms-transform: rotate(@arguments); /* IE9 */
+         -o-transform: rotate(@arguments); /* Opera 10.5 */
+            transform: rotate(@arguments);
+}
+
+
+
+/************************************************************
+ *
+ * skew
+ *
+ * @param axis-x              :  0deg
+ * @param axis-y              :  0deg
+ *
+ * http: //www.w3.org/TR/css3-3d-transforms/#transform-functions
+ *
+************************************************************/
+
+.skew(...) {
+    -webkit-transform: skew(@arguments);
+       -moz-transform: skew(@arguments);
+        -ms-transform: skew(@arguments);
+         -o-transform: skew(@arguments);
+            transform: skew(@arguments);
+}
+
+
+
+/************************************************************
+ *
+ * transition
+ *
+ * @param properties          :  all, left, opacity, etc
+ * @param duration            :  1s, 1000ms
+ * @param easing              :  linear, ease-in-out, etc
+ * @param delay               :  1s, 1000ms
+ *
+ * @see http: //www.w3.org/TR/css3-transitions/
+ *
+************************************************************/
+
+.transition(...) {
+    -webkit-transition: @arguments;
+       -moz-transition: @arguments;
+        -ms-transition: @arguments;
+         -o-transition: @arguments;
+            transition: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * transition-property
+ *
+ * @param properties          :  all, left, opacity, etc
+ *
+ * @see http://www.w3.org/TR/css3-transitions/#transition-property-property
+ *
+************************************************************/
+
+.transition-property(...) {
+    -webkit-transition-property: @arguments;
+       -moz-transition-property: @arguments;
+        -ms-transition-property: @arguments;
+         -o-transition-property: @arguments;
+            transition-property: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * transition-duration
+ *
+ * @param duration            :  1s, 1000ms
+ *
+ * @see http://www.w3.org/TR/css3-transitions/#transition-duration-property
+ *
+************************************************************/
+
+.transition-duration(...) {
+    -webkit-transition-duration: @arguments;
+       -moz-transition-duration: @arguments;
+        -ms-transition-duration: @arguments;
+         -o-transition-property: @arguments;
+            transition-duration: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * transition-timing-function
+ *
+ * @param easing              :  linear, ease-in-out, etc
+ *
+ * @see http://www.w3.org/TR/css3-transitions/#transition-timing-function-property
+ *
+************************************************************/
+
+.transition-timing-function(...) {
+    -webkit-transition-timing-function: @arguments;
+       -moz-transition-timing-function: @arguments;
+        -ms-transition-timing-function: @arguments;
+         -o-transition-timing-function: @arguments;
+            transition-timing-function: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * transition-delay
+ *
+ * @param delay            :  1s, 1000ms
+ *
+ * @see http://www.w3.org/TR/css3-transitions/#transition-duration-property
+ *
+************************************************************/
+
+.transition-delay(...) {
+    -webkit-transition-delay: @arguments;
+       -moz-transition-delay: @arguments;
+        -ms-transition-delay: @arguments;
+         -o-transition-delay: @arguments;
+            transition-delay: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * animation
+ *
+ * @param animation-name            :  none | <identifier>
+ * @param animation-duration        :  1s, 1000ms
+ * @param animation-timing-function :  linear                     |
+ *                                     ease                       |
+ *                                     ease-in                    |
+ *                                     ease-out                   |
+ *                                     ease-in-out                |
+ *                                     cubic-bezier(0, 0, 10, 10)
+ * @param animation-delay           :  1s, 1000ms
+ * @param animation-iteration-count :  infinite | <number>
+ * @param animation-direction       :  normal | alternate
+ * @param animation-play-state      :  running | paused
+ * @param animation-fill-mode       :  none                       |
+ *                                     forwards                   |
+ *                                     backwards                  |
+ *                                     both [ , none | forwards | backwards | both ]*
+ *
+ * @see http://www.w3.org/TR/css3-animations/
+ *
+************************************************************/
+
+.animation(...) {
+    -webkit-animation: @arguments;
+       -moz-animation: @arguments;
+        -ms-animation: @arguments;
+         -o-animation: @arguments;
+            animation: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * animation-name
+ *
+ * @param animation-name            :  none | <identifier>
+ *
+ * @see http://www.w3.org/TR/css3-animations/#animation-name-property
+ *
+************************************************************/
+
+.animation-name(...) {
+    -webkit-animation-name: @arguments;
+       -moz-animation-name: @arguments;
+        -ms-animation-name: @arguments;
+         -o-animation-name: @arguments;
+            animation-name: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * animation-duration
+ *
+ * @param animation-duration        :  1s, 1000ms
+ *
+ * @see http://www.w3.org/TR/css3-animations/#animation-duration-property
+ *
+************************************************************/
+
+.animation-duration (...) {
+    -webkit-animation-duration : @arguments;
+       -moz-animation-duration : @arguments;
+        -ms-animation-duration : @arguments;
+         -o-animation-duration : @arguments;
+            animation-duration : @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * animation-timing-function
+ *
+ * @param animation-timing-function :  linear                     |
+ *                                     ease                       |
+ *                                     ease-in                    |
+ *                                     ease-out                   |
+ *                                     ease-in-out                |
+ *                                     cubic-bezier(0, 0, 10, 10)
+ *
+ * @see http://www.w3.org/TR/css3-animations/#animation-timing-function-property
+ *
+************************************************************/
+
+.animation-timing-function(...) {
+    -webkit-animation-timing-function: @arguments;
+       -moz-animation-timing-function: @arguments;
+        -ms-animation-timing-function: @arguments;
+         -o-animation-timing-function: @arguments;
+            animation-timing-function: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * animation-delay
+ *
+ * @param animation-delay           :  1s, 1000ms
+ *
+ * @see http://www.w3.org/TR/css3-animations/#animation-delay-property
+ *
+************************************************************/
+
+.animation-delay (...) {
+    -webkit-animation-delay : @arguments;
+       -moz-animation-delay : @arguments;
+        -ms-animation-delay : @arguments;
+         -o-animation-delay : @arguments;
+            animation-delay : @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * animation-iteration-count
+ *
+ * @param animation-iteration-count :  infinite | <number>
+ *
+ * @see http://www.w3.org/TR/css3-animations/#animation-iteration-count-property
+ *
+************************************************************/
+
+.animation-iteration-count(...) {
+    -webkit-animation-iteration-count: @arguments;
+       -moz-animation-iteration-count: @arguments;
+        -ms-animation-iteration-count: @arguments;
+         -o-animation-iteration-count: @arguments;
+            animation-iteration-count: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * animation-direction
+ *
+ * @param animation-direction       :  normal | alternate
+ *
+ * @see http://www.w3.org/TR/css3-animations/#animation-direction-property
+ *
+************************************************************/
+
+.animation-direction(...) {
+    -webkit-animation-direction: @arguments;
+       -moz-animation-direction: @arguments;
+        -ms-animation-direction: @arguments;
+         -o-animation-direction: @arguments;
+            animation-direction: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * animation-play-state
+ *
+ * @param animation-play-state      :  running | paused
+ *
+ * @see http://www.w3.org/TR/css3-animations/#animation-play-state-property
+ *
+************************************************************/
+
+.animation-play-state(...) {
+    -webkit-animation-play-state: @arguments;
+       -moz-animation-play-state: @arguments;
+        -ms-animation-play-state: @arguments;
+         -o-animation-play-state: @arguments;
+            animation-play-state: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * animation-fill-mode
+ *
+ * @param animation-fill-mode       :  none                       |
+ *                                     forwards                   |
+ *                                     backwards                  |
+ *                                     both [ , none | forwards | backwards | both ]*
+ *
+ * @see http://www.w3.org/TR/css3-animations/#animation-fill-mode-property
+ *
+************************************************************/
+
+.animation-fill-mode(...) {
+    -webkit-animation-fill-mode: @arguments;
+       -moz-animation-fill-mode: @arguments;
+        -ms-animation-fill-mode: @arguments;
+         -o-animation-fill-mode: @arguments;
+            animation-fill-mode: @arguments;
+}
+
+
+
+/************************************************************
+ *
+ * keyframes interface
+ *
+************************************************************/
+
+.keyframes-0() {}
+
+.keyframes-10() {}
+
+.keyframes-20() {}
+
+.keyframes-30() {}
+
+.keyframes-40() {}
+
+.keyframes-50() {}
+
+.keyframes-60() {}
+
+.keyframes-70() {}
+
+.keyframes-80() {}
+
+.keyframes-90() {}
+
+.keyframes-100() {}
+
+/************************************************************
+ *
+ * animation-func
+ *
+ * @param selector               : ~'#id'    |  ~'.class'
+ * @param animation-name         : <animationname>
+ * @param animation-other        : ~' .1s .1s ease-in ...'
+ *
+ * @example .animation-func(~'#test', testanimation, ~' .5s ease-in .5s');
+ *
+ * @see http://www.w3.org/TR/css3-animations/#animation-fill-mode-property
+ *
+************************************************************/
+
+@newline: `"\n"`;
+.animation-func(@selector, @animation-name, @animation-other) {
+    .Keyframe(@pre, @post, @vendor) {
+        (~"@{pre}@@{vendor}keyframes @{animation-name} {@{newline}0%") {
+            .keyframes-0();
+        }
+        10%  {
+            .keyframes-10();
+        }
+        20%  {
+            .keyframes-20();
+        }
+        30%  {
+            .keyframes-30();
+        }
+        40%  {
+            .keyframes-40();
+        }
+        50%  {
+            .keyframes-50();
+        }
+        60%  {
+            .keyframes-60();
+        }
+        70%  {
+            .keyframes-70();
+        }
+        80%  {
+            .keyframes-80();
+        }
+        90%  {
+            .keyframes-90();
+        }
+        100%  {
+            .keyframes-100();
+        }
+        .Local(){}
+        .Local() when (@post=1) {
+            (~"}@{newline}@{selector}") {
+                -webkit-animation : @animation-name @animation-other;
+                   -moz-animation : @animation-name @animation-other;
+                    -ms-animation : @animation-name @animation-other;
+                     -o-animation : @animation-name @animation-other;
+                        animation : @animation-name @animation-other;
+            }
+        }
+        .Local;
+    }
+    .Keyframe(""            , 0,    "-moz-");
+    .Keyframe(~"}@{newline}", 0, "-webkit-");
+    .Keyframe(~"}@{newline}", 0,      "-o-");
+    .Keyframe(~"}@{newline}", 0,     "-ms-");
+    .Keyframe(~"}@{newline}", 1,         "");
+}
