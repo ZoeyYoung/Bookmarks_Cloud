@@ -4,16 +4,12 @@ __author__ = "Zoey Young (ydingmiao@gmail.com)"
 import tornado.web
 from .base import BaseHandler
 import tornado.auth
-# from .config import config
-import tornado.gen
+from tornado import gen
 
-class AuthLoginHandler(BaseHandler, tornado.auth.GoogleMixin):
+class AuthHandler(BaseHandler, tornado.auth.GoogleMixin):
     @tornado.web.asynchronous
-    @tornado.gen.coroutine
+    @gen.coroutine
     def get(self):
-        if self.get_current_user():
-            self.redirect('/')
-        # self.render('login.html', count='-', user=None)
         if self.get_argument("openid.mode", None):
             user = yield self.get_authenticated_user()
             self.set_secure_cookie("auth_user", tornado.escape.json_encode(user))
@@ -32,7 +28,7 @@ class AuthLoginHandler(BaseHandler, tornado.auth.GoogleMixin):
     #         self.redirect(self.get_argument('next', '/'))
 
 
-class AuthLogoutHandler(BaseHandler):
+class LogoutHandler(BaseHandler):
     def get(self):
-        self.clear_all_cookies()
-        self.redirect("/")
+        self.clear_cookie("auth_user")
+        self.redirect(self.get_argument("next", "/"))

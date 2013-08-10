@@ -24,25 +24,18 @@ def define_options(option_parser):
     option_parser.define(
         'autoreload', type=bool, default=False, group='Application')
 
-    option_parser.define('port', default=8888, type=int, help=(
-        "Server port"), group='Application')
-
     # Startup
     option_parser.define('ensure_indexes', default=False, type=bool, help=(
         "Ensure collection indexes before starting"), group='Startup')
-
     option_parser.define('rebuild_indexes', default=False, type=bool, help=(
         "Drop all indexes and recreate before starting"), group='Startup')
 
     # Identity
-    option_parser.define('host', default='localhost', type=str, help=(
-        "Server hostname"), group='Identity')
-    # Admin
-    option_parser.define('user', type=str, group='Admin')
-    option_parser.define('password', type=str, group='Admin')
-
-    option_parser.define(
-        'timezone', type=str, default='America/New_York',
+    option_parser.define('host', default='localhost', type=str,
+        help=("Server hostname"), group='Identity')
+    option_parser.define('port', default=8888, type=int,
+        help=("Server port"), group='Application')
+    option_parser.define('timezone', type=str, default='America/New_York',
         help="Your timezone name", group='Appearance')
     option_parser.add_parse_callback(
         functools.partial(check_required_options, option_parser))

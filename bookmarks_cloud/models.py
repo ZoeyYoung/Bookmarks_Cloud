@@ -1,74 +1,62 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 __author__ = "Zoey Young (ydingmiao@gmail.com)"
-from .config import config
+from .config import *
 from .utils import get_bookmark_info
 import random
 import cgi
 import markdown
 from bson.objectid import ObjectId
 
-page_size = config['page_size']
-
-
-# Bookmark = namedtuple('Bookmark', ['_id', 'article', 'description', 'favicon', 'note', 'note_html', 'post_time', 'tags', 'title', 'url'])
-
 
 class Page(object):
 
     def __init__(self, total, cur):
         self.cur = int(cur)
-        self.last_page = int((total+page_size-1)/page_size)
+        self.last_page = int((total+PAGE_SIZE-1)/PAGE_SIZE)
         self.has_next = (self.cur < self.last_page)
         self.has_prev = (self.cur > 1)
 
-bookmarks_collection = config['db'].bookmarks
 from .whoosh_fts import WhooshBookmarks
-fts = WhooshBookmarks()
 
 class Bookmark(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, db):
+        self.bookmarks_collection = db.bookmarks
+        self.fts = WhooshBookmarks(db)
 
-    # 获得所有标签，以及链接数
-    @staticmethod
-    def get_tags():
+    def get_tags(self):
+        """获得所有标签，以及链接数"""
         from bson.son import SON
-        tags = bookmarks_collection.aggregate([
+        tags = self.bookmarks_collection.aggregate([
             {"$unwind": "$tags"},
             {"$group": {"_id": "$tags", "count": {"$sum": 1}}},
             {"$sort": SON([("_id", 1), ("count", -1)])}
         ])
         return tags['result']
 
-    @staticmethod
-    def get_random_one():
+    def get_random_one(self):
         random.seed(a=None, version=2)
         r = random.random()
-        bookmark = bookmarks_collection.find_one({"random": {"$gt": r}})
+        bookmark = self.bookmarks_collection.find_one({"random": {"$gt": r}})
         if not bookmark:
-            bookmark = bookmarks_collection.find_one({"random": {"$lte": r}})
+            bookmark = self.bookmarks_collection.find_one({"random": {"$lte": r}})
         return bookmark
 
-    @staticmethod
-    def get_count():
-        return bookmarks_collection.count()
+    def get_count(self):
+        return self.bookmarks_collection.count()
 
-    @staticmethod
-    def get_by_url(url):
-        return bookmarks_collection.find_one({'$or': [
+    def get_by_url(self, url):
+        return self.bookmarks_collection.find_one({'$or': [
             {"url": url},
             {"url": cgi.escape(url)}
         ]})
 
-    @staticmethod
-    def get_by_tag(tag, page):
-        return bookmarks_collection.find({"tags": tag}).skip((page-1)*page_size).limit(page_size).sort([("post_time", -1)])
+    def get_by_tag(self, tag, page):
+        return self.bookmarks_collection.find({"tags": tag}).skip((page-1)*PAGE_SIZE).limit(PAGE_SIZE).sort([("post_time", -1)])
 
     # TODO(Zoey) 这样搜索会比较慢, 需改进
-    @staticmethod
-    def get_by_keywords(keywords):
+    def get_by_keywords(self, keywords):
         t_keywords = r".*" + keywords + r".*"
         keywords = keywords.split(' ')
         regex_keywords = r".*"
@@ -85,28 +73,22 @@ class Bookmark(object):
         regex_list.append({'note': {'$regex': regex_keywords, '$options': '-i'}})
         for key in keywords:
             regex_list.append({'tags': {'$regex': r".*"+key+r".*", '$options': '-i'}})
-        return bookmarks_collection.find({'$or': regex_list})
+        return self.bookmarks_collection.find({'$or': regex_list})
 
-
-    @staticmethod
-    def whoose_ftx(keywords, page):
-        results = fts.search(keywords, page)
+    def whoose_ftx(self, keywords, page):
+        results = self.fts.search(keywords, page)
         search_results = []
         for r in results['results']:
-            search_results.append(bookmarks_collection.find_one(ObjectId(r["nid"])))
+            search_results.append(self.bookmarks_collection.find_one(ObjectId(r["nid"])))
         return {'results': search_results, 'total': results['total'] }
 
+    def get_all(self):
+        return self.bookmarks_collection.find(timeout=False).sort([("post_time", -1)])
 
-    @staticmethod
-    def get_all():
-        return bookmarks_collection.find(timeout=False).sort([("post_time", -1)])
+    def get_page(self, page):
+        return self.bookmarks_collection.find().skip((page-1)*PAGE_SIZE).limit(PAGE_SIZE).sort([("post_time", -1)])
 
-    @staticmethod
-    def get_page(page):
-        return bookmarks_collection.find().skip((page-1)*page_size).limit(page_size).sort([("post_time", -1)])
-
-    @staticmethod
-    def get_info(url, html=''):
+    def get_info(self, url, html=None):
         bookmark = Bookmark.get_by_url(url)
         info = get_bookmark_info(url, html)
         if info:
@@ -119,8 +101,7 @@ class Bookmark(object):
         else:
             return None
 
-    @staticmethod
-    def insert_or_update(new_bookmark):
+    def insert_or_update(self, new_bookmark):
         bookmark = Bookmark.get_by_url(new_bookmark['url'])
         # 更新信息
         # print(info['article'].encode('utf-8'))
@@ -135,8 +116,8 @@ class Bookmark(object):
             bookmark['note'] = new_bookmark['note']
             bookmark['note_html'] = markdown.markdown(new_bookmark['note'], extensions=['codehilite(linenums=False)'])
             bookmark['post_time'] = new_bookmark['post_time']
-            bookmarks_collection.save(bookmark)
-            fts.update(bookmark)
+            self.bookmarks_collection.save(bookmark)
+            self.fts.update(bookmark)
             return bookmark
         else:
             info = Bookmark.get_info(new_bookmark['url'], new_bookmark['html'])
@@ -146,12 +127,11 @@ class Bookmark(object):
                 new_bookmark['article'] = info['article']
                 new_bookmark['segmentation'] = info['segmentation']
             new_bookmark['note_html'] = markdown.markdown(new_bookmark['note'], extensions=['codehilite(linenums=True)'])
-            bookmarks_collection.insert(new_bookmark)
-            fts.update(new_bookmark)
+            self.bookmarks_collection.insert(new_bookmark)
+            self.fts.update(new_bookmark)
             return new_bookmark
 
-    @staticmethod
-    def refresh(bookmark, html=''):
+    def refresh(self, bookmark, html=None):
         info = Bookmark.get_info(bookmark['url'], html)
         if info:
             bookmark['html'] = info['html']
@@ -159,25 +139,22 @@ class Bookmark(object):
             bookmark['article'] = info['article']
             bookmark['segmentation'] = info['segmentation']
             bookmark['description'] = info['description']
-            bookmarks_collection.save(bookmark)
-            fts.update(bookmark)
+            self.bookmarks_collection.save(bookmark)
+            self.fts.update(bookmark)
         return bookmark
 
-    @staticmethod
-    def delete(url):
-        bookmarks_collection.remove({'$or': [
+    def delete(self, url):
+        self.bookmarks_collection.remove({'$or': [
             {"url": url},
             {"url": cgi.escape(url)}
         ]})
-        return fts.delele_by_url(url)
+        return self.fts.delele_by_url(url)
 
-
-    @staticmethod
-    def get_random_bookmarks():
+    def get_random_bookmarks(self):
         random.seed(a=None, version=2)
         r = random.random()
         print(r)
-        bookmarks = bookmarks_collection.find({"random": {"$gt": r}}).limit(page_size)
+        bookmarks = self.bookmarks_collection.find({"random": {"$gt": r}}).limit(PAGE_SIZE)
         if not bookmarks:
-            bookmarks = bookmarks_collection.find({"random": {"$lte": r}}).limit(page_size)
+            bookmarks = self.bookmarks_collection.find({"random": {"$lte": r}}).limit(PAGE_SIZE)
         return bookmarks

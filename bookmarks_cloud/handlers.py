@@ -6,9 +6,9 @@ from .bookmarks_handlers import *
 
 handlers = [
     (r'/', IndexHandler),
-    (r'/auth/login', AuthLoginHandler),
-    (r'/auth/logout', AuthLogoutHandler),
-    (r'/bookmark/page/([0-9]+)', BookmarkHandler),
+    (r'/auth/login', AuthHandler),
+    (r'/auth/logout', LogoutHandler),
+    (r'/bookmark/page/([0-9]+)', IndexHandler),
     (r'/bookmark', AjaxBookmarkHandler),
     (r'/bookmark/get_detail', BookmarkGetDetailHandler),
     (r'/bookmark/refresh', BookmarkRefreshHandler),
@@ -20,7 +20,7 @@ handlers = [
     (r'/tags_cloud', TagsCloudHandler),
     (r'/randombookmark', RandomBookmarkHandler),
     (r'/random', RandomBookmarksHandler),
-    (r'/search', SearchHandler),
+    # (r'/search', SearchHandler),
     (r'/ftxsearch', FullTextSearchHandler),
     (r'/tags', TagsHandler),
     (r'/segmentation/(.*)', SegmentationHandler)

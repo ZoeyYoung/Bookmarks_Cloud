@@ -6,11 +6,8 @@ from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, TEXT, ID, KEYWORD
 from whoosh.analysis import Tokenizer,Token
 from whoosh import qparser
-from .config import config
+from .config import *
 import jieba
-
-page_size = config['page_size']
-bookmarks_collection = config['db'].bookmarks
 
 class ChineseTokenizer(Tokenizer):
     def __call__(self, value, positions=False, chars=False,
@@ -41,10 +38,11 @@ class WhooshBookmarks(object):
     Object utilising Whoosh (http://woosh.ca/) to create a search index of all
     crawled rss feeds, parse queries and search the index for related mentions.
     """
-    def __init__(self):
+    def __init__(self, db):
         """
         Instantiate the whoosh schema and writer and create/open the index.
         """
+        self.bookmarks_collection = db.bookmarks
         self.indexdir = "index"
         self.indexname = "bookmarks"
         self.schema = self.get_schema()
@@ -108,7 +106,7 @@ class WhooshBookmarks(object):
         """
         results = []
         with self.ix.searcher() as searcher:
-            result_page = searcher.search_page(self.parse_query(query), page, pagelen=page_size)
+            result_page = searcher.search_page(self.parse_query(query), page, pagelen=PAGE_SIZE)
             # create a results list from the search results
             for result in result_page:
             # for result in searcher.search(self.parse_query(query)):

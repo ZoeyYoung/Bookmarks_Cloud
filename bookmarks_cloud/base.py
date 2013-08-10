@@ -2,28 +2,39 @@
 # -*- coding: utf-8 -*-
 __author__ = "Zoey Young (ydingmiao@gmail.com)"
 import tornado.web
-from .config import config
 from hashlib import md5
 from .models import Bookmark
+from .utils import get_tags_cloud
 
 class BaseHandler(tornado.web.RequestHandler):
 
     @property
     def db(self):
-        return self.settings.db
+        return self.application.db
+
+    @property
+    def bm(self):
+        return Bookmark(self.db)
 
     @property
     def total(self):
-        return Bookmark.get_count()
+        return self.bm.get_count()
+
+    @property
+    def tags(self):
+        return self.bm.get_tags()
+
+    @property
+    def tags_cloud(self):
+        return get_tags_cloud(self.tags)
 
     def avatar(self, size=40):
-        return 'http://www.gravatar.com/avatar/' + md5(self.get_current_user()['email'].lower().encode('utf-8')).hexdigest() + '?d=mm&s=' + str(size)
+        if self.current_user:
+            return 'http://www.gravatar.com/avatar/' + md5(self.current_user['email'].lower().encode('utf-8')).hexdigest() + '?d=mm&s=' + str(size)
 
     def get_current_user(self):
         user_json = self.get_secure_cookie("auth_user")
-        if not user_json:
-            return  None
-        print(user_json)
+        if not user_json: return None
         return tornado.escape.json_decode(user_json)
 
     def write_error(self, status_code, **kwargs):

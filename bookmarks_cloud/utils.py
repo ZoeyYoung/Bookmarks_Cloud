@@ -9,9 +9,10 @@ import re
 import jieba
 import jieba.analyse
 import logging
+from .config import LOG
 # import urllib
 
-log = logging.getLogger('bookmarks_cloud_log')
+log = logging.getLogger(LOG)
 
 jieba.initialize()
 
@@ -60,10 +61,10 @@ def video_site(url):
 
 def get_bookmark_info(url, html=None):
     if not html:
-        # html = get_html(url)
-        # if not html:
-        print("Error: html is None", url)
-        return None
+        html = fetch_url(url)
+        if not html:
+            print("Error: html is None", url)
+            return None
     doc = Document(html, url=url, debug=True, multipage=False)
     summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
     title = summary_obj.short_title

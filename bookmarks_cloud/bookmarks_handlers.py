@@ -10,9 +10,8 @@ import random
 from .utils import fetch_url
 from .utils import get_keywords
 from .utils import format_tags
-from .utils import get_tags_cloud
-from .models import Page, Bookmark
-import tornado
+from .models import Page
+from tornado import gen
 
 class BookmarkModule(tornado.web.UIModule):
 
@@ -36,41 +35,27 @@ class IndexHandler(BaseHandler):
 
     @tornado.web.authenticated
     def get(self, page=1):
-        bookmarks = Bookmark.get_page(page)
-        page = Page(Bookmark.get_count(), page)
-        tags = Bookmark.get_tags()
-        tags_cloud = get_tags_cloud(tags)
-        self.render('index.html', tags_cloud=tags_cloud,
-                    bookmarks=bookmarks, count=Bookmark.get_count(), page=page)
-
-
-class BookmarkHandler(BaseHandler):
-
-    @tornado.web.authenticated
-    def get(self, page):
-        tags = Bookmark.get_tags()
-        bookmarks = Bookmark.get_page(int(page))
-        page = Page(Bookmark.get_count(), int(page))
-        tags_cloud = get_tags_cloud(tags)
-        self.render('index.html', tags_cloud=tags_cloud,
-                    bookmarks=bookmarks, count=Bookmark.get_count(), page=page)
+        bookmarks = self.bm.get_page(int(page))
+        page = Page(self.total, page)
+        self.render('index.html', bookmarks=bookmarks, page=page)
 
 
 class AjaxBookmarkHandler(BaseHandler):
 
+    @tornado.web.authenticated
     def post(self):
         page = self.get_argument('page')
         tag = self.get_argument('tag')
         keywords = self.get_argument('keywords')
         if tag:
-            bookmarks = Bookmark.get_by_tag(tag, int(page))
+            bookmarks = self.bm.get_by_tag(tag, int(page))
             page = Page(bookmarks.count(), int(page))
         elif keywords:
-            results = Bookmark.whoose_ftx(keywords, int(page))
+            results = self.bm.whoose_ftx(keywords, int(page))
             bookmarks = results['results']
             page = Page(results['total'], int(page))
         else:
-            bookmarks = Bookmark.get_page(int(page))
+            bookmarks = self.bm.get_page(int(page))
             page = Page(bookmarks.count(), int(page))
         self.render('list.html', bookmarks=bookmarks, page=page)
 
@@ -78,13 +63,13 @@ class AjaxBookmarkHandler(BaseHandler):
 class BookmarkGetInfoHandler(BaseHandler):
 
     @tornado.web.authenticated
-    @tornado.gen.coroutine
+    @gen.coroutine
     def get(self, *args):
         url = self.get_argument('url')
         response = yield fetch_url(url)
         print(fetch_url.cache_info())
         if response:
-            info = Bookmark.get_info(url, html=response.body)
+            info = self.bm.get_info(url, html=response.body)
             if info:
                 self.write(json.dumps({
                     'success': 'true',
@@ -103,7 +88,7 @@ class BookmarkGetDetailHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args):
         url = self.get_argument('url')
-        bookmark = Bookmark.get_by_url(url)
+        bookmark = self.bm.get_by_url(url)
         suggest_tags = get_keywords(bookmark['article'])
         if bookmark:
             self.write(json.dumps({
@@ -123,18 +108,22 @@ class BookmarkGetDetailHandler(BaseHandler):
 class BookmarkRefreshHandler(BaseHandler):
 
     @tornado.web.authenticated
-    @tornado.gen.coroutine
+    @gen.coroutine
     def get(self, *args):
         url = self.get_argument('url')
-        bookmark = Bookmark.get_by_url(url)
+        bookmark = self.bm.get_by_url(url)
         if bookmark:
             response = yield fetch_url(url)
             if response:
-                bookmark = Bookmark.refresh(bookmark, html=response.body)
+                bookmark = self.bm.refresh(bookmark, html=response.body)
                 bookmark_module = tornado.escape.to_basestring(
                     self.render_string('modules/bookmark.html', bookmark=bookmark))
-                self.write(
-                    json.dumps({'success': 'true', 'bookmark_module': bookmark_module, 'title': bookmark['title'], 'article': tornado.escape.to_basestring(bookmark['article'])}))
+                self.write(json.dumps({
+                    'success': 'true',
+                    'bookmark_module': bookmark_module,
+                    'title': bookmark['title'],
+                    'article': tornado.escape.to_basestring(bookmark['article'])
+                }))
             else:
                 self.write(json.dumps({'success': 'false'}))
         else:
@@ -146,10 +135,10 @@ class BookmarkGetArticleHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args):
         url = self.get_argument('url')
-        bookmark = Bookmark.get_by_url(url)
+        bookmark = self.bm.get_by_url(url)
         if bookmark:
             if bookmark['article'] == '':
-                bookmark = Bookmark.refresh(bookmark)
+                bookmark = self.bm.refresh(bookmark)
             self.write(json.dumps({
                 'success': 'true',
                 'title': bookmark['title'],
@@ -175,10 +164,14 @@ class BookmarkAddHandler(BaseHandler):
             random=random.random(),
             html=self.get_argument('html')
         )
-        bookmark = Bookmark.insert_or_update(bookmark)
+        bookmark = self.bm.insert_or_update(bookmark)
         bookmark_module = tornado.escape.to_basestring(
             self.render_string('modules/bookmark.html', bookmark=bookmark))
-        self.write(json.dumps({'success': 'true', 'bookmark_module': bookmark_module, 'article': tornado.escape.to_basestring(bookmark['article'])}))
+        self.write(json.dumps({
+            'success': 'true',
+            'bookmark_module': bookmark_module,
+            'article': tornado.escape.to_basestring(bookmark['article'])
+        }))
 
 
 class BookmarkDelHandler(BaseHandler):
@@ -186,7 +179,7 @@ class BookmarkDelHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self, *args):
         url = self.get_argument('url')
-        if Bookmark.delete(url) == 1:
+        if self.bm.delete(url) == 1:
             self.write(json.dumps({'success': 'true'}))
         else:
             self.write(json.dumps({'success': 'false'}))
@@ -194,36 +187,33 @@ class BookmarkDelHandler(BaseHandler):
 
 class TagBookmarksHandler(BaseHandler):
 
+    @tornado.web.authenticated
     def get(self, page, tag):
-        tags = Bookmark.get_tags()
-        tags_cloud = get_tags_cloud(tags)
-        bookmarks = Bookmark.get_by_tag(tag, int(page))
+        bookmarks = self.bm.get_by_tag(tag, int(page))
         page = Page(bookmarks.count(), int(page))
-        self.render('tags_bookmarks.html', tags_cloud=tags_cloud, bookmarks=bookmarks, count=Bookmark.get_count(), page=page, cur_tag=tag, tag_count=bookmarks.count())
+        self.render('tags_bookmarks.html', bookmarks=bookmarks, page=page, cur_tag=tag, tag_count=bookmarks.count())
 
 
 class TagsCloudHandler(BaseHandler):
 
+    @tornado.web.authenticated
     def get(self):
-        tags = Bookmark.get_tags()
-        tags_cloud = get_tags_cloud(tags)
-        self.render('tags_cloud.html', tags_cloud=tags_cloud)
+        self.render('tags_cloud.html', tags_cloud=self.tags_cloud)
 
 
 class RandomBookmarksHandler(BaseHandler):
 
+    @tornado.web.authenticated
     def get(self):
-        tags = Bookmark.get_tags()
-        tags_cloud = get_tags_cloud(tags)
-        bookmarks = Bookmark.get_random_bookmarks()
-        self.render('random_bookmarks.html', tags_cloud=tags_cloud,
-                    bookmarks=bookmarks, count=Bookmark.get_count())
+        bookmarks = self.bm.get_random_bookmarks()
+        self.render('random_bookmarks.html', bookmarks=bookmarks)
 
 
 class RandomBookmarkHandler(BaseHandler):
 
+    @tornado.web.authenticated
     def get(self):
-        bookmark = Bookmark.get_random_one()
+        bookmark = self.bm.get_random_one()
         bookmark_module = tornado.escape.to_basestring(
             self.render_string('modules/bookmark.html', bookmark=bookmark))
         self.write(json.dumps({
@@ -235,16 +225,17 @@ class RandomBookmarkHandler(BaseHandler):
         }))
 
 
-class SearchHandler(BaseHandler):
-    """搜索书签
-    """
-    def get(self):
-        tags = Bookmark.get_tags()
-        tags_cloud = get_tags_cloud(tags)
-        keywords = self.get_argument('keywords')
-        result = Bookmark.get_by_keywords(keywords)
-        count = result.count()
-        self.render('search_result.html', keywords=keywords, tags_cloud=tags_cloud, bookmarks=result, count=count)
+# class SearchHandler(BaseHandler):
+#     """搜索书签
+#     """
+#     @tornado.web.authenticated
+#     def get(self):
+#         tags = Bookmark.get_tags()
+#         tags_cloud = get_tags_cloud(tags)
+#         keywords = self.get_argument('keywords')
+#         result = Bookmark.get_by_keywords(keywords)
+#         count = result.count()
+#         self.render('search_result.html', keywords=keywords, tags_cloud=tags_cloud, bookmarks=result, count=count)
 
 
 class FullTextSearchHandler(BaseHandler):
@@ -253,21 +244,16 @@ class FullTextSearchHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         keywords = self.get_argument('keywords')
-        tags = Bookmark.get_tags()
-        tags_cloud = get_tags_cloud(tags)
-        results = Bookmark.whoose_ftx(keywords, 1)
+        results = self.bm.whoose_ftx(keywords, 1)
         page = Page(results['total'], 1)
-        self.render('search_result.html', keywords=keywords, tags_cloud=tags_cloud, bookmarks=results['results'], count=results['total'], page=page)
+        self.render('search_result.html', keywords=keywords, bookmarks=results['results'], count=results['total'], page=page)
 
 
 class TagsHandler(BaseHandler):
 
+    @tornado.web.authenticated
     def get(self):
-        tags = Bookmark.get_tags()
-        tagslist = []
-        for tag in tags:
-            tagslist.append(tag['_id'])
-        tagsstr = ','.join(tagslist)
+        tagsstr = ','.join([tag['_id'] for tag in self.tags])
         self.write(json.dumps({
             'tags': tagsstr
         }))
@@ -277,5 +263,5 @@ class SegmentationHandler(BaseHandler):
 
     @tornado.web.authenticated
     def get(self, url):
-        bookmark = Bookmark.get_by_url(url)
+        bookmark = self.bm.get_by_url(url)
         self.render('segmentation.html', bookmark=bookmark)
