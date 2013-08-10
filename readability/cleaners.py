@@ -29,6 +29,8 @@ def clean_attributes(html_str):
     变成: <div id="main" class="content">content</div>
     考虑连id和class一起移除
     """
+    empty_tag = re.compile(r"<\w+[^>]*>[\s|&nbsp;]*</\w+>", re.I)
+    html_str = re.sub(empty_tag, '', html_str)
     while htmlstrip.search(html_str):
         html_str = htmlstrip.sub(r'<\1\2>', html_str)
     return html_str
