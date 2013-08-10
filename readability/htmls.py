@@ -16,7 +16,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 utf8_parser = HTMLParser(encoding='utf-8')
 
 
-LOG = logging.getLogger()
+LOG = logging.getLogger("bc_log")
 
 
 def build_doc(page):
@@ -28,6 +28,8 @@ def build_doc(page):
     if page is None:
         LOG.error("Page content is None, can't build_doc")
         return ''
+    if not isinstance(page, (str, bytes)):
+        page = str(page)
     html5doc = html5parser.document_fromstring(decode_html(page))
     doc = fragment_fromstring(tostring(html5doc))
     # doc = document_fromstring(decode_html(page))
