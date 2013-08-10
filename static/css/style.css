@@ -1,7 +1,8 @@
 body{font-family:'Alegreya SC','Garamond','Georgia','\5fae\8f6f\96c5\9ed1',tahoma,arial,'\5b8b\4f53';overflow:hidden;background:#ffffff url(../img/light-paper.png) repeat 0 0;}
+.img-responsive{display:block;}
 .container{max-width:95%;}
 ::selection{background:#fe57a1;color:#fff;text-shadow:none;}
-blockquote{clear:both;border:0;word-wrap:break-word;overflow:hidden;margin:0;padding:0 0 5px 20px;min-height:20px;}blockquote p{position:relative;color:#7a7a7a;font-size:14px;font-style:italic;}blockquote p:before{position:absolute;font-family:FontAwesome;content:"\f10d";display:block;top:0;left:-20px;}
+blockquote{clear:both;border:0;word-wrap:break-word;overflow:hidden;margin:0;padding:0 0 5px 20px;min-height:20px;}blockquote p{position:relative;font-size:14px;font-style:italic;}blockquote p:before{position:absolute;font-family:FontAwesome;content:"\f10d";display:block;top:0;left:-20px;}
 aside{min-height:20px;padding:19px;margin-bottom:20px;background-color:#f5f5f5;border:1px solid #e3e3e3;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;-webkit-background-clip:padding-box;-moz-background-clip:padding;background-clip:padding-box;-webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);-moz-box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);}
 mark{font-weight:bold;display:inline-block;width:100%;background:#ff8;}
 pre ins{background:#99ff99;}
@@ -11,7 +12,7 @@ pre ins,pre del{line-height:2.154;text-decoration:none;font-style:normal;display
 .btn-ttc{background-repeat:repeat-x;background-image:linear-gradient(top, #009ed2 0%, #007da7 100%);}
 .btn-ttc:hover{background-position:0 -15px;}
 .profile{position:absolute;right:20px;top:20px;z-index:9999;}
-.avatar{opacity:0.8;-webkit-transition:0.4s all ease-in-out;-moz-transition:0.4s all ease-in-out;-ms-transition:0.4s all ease-in-out;-o-transition:0.4s all ease-in-out;transition:0.4s all ease-in-out;border:1px solid;}.avatar:hover{-webkit-transform:rotate(360deg);-moz-transform:rotate(360deg);-ms-transform:rotate(360deg);-o-transform:rotate(360deg);transform:rotate(360deg);}
+.avatar{opacity:0.6;-webkit-transition:0.4s all ease-in-out;-moz-transition:0.4s all ease-in-out;-ms-transition:0.4s all ease-in-out;-o-transition:0.4s all ease-in-out;transition:0.4s all ease-in-out;border:1px solid;}.avatar:hover{opacity:1;-webkit-transform:rotate(360deg);-moz-transform:rotate(360deg);-ms-transform:rotate(360deg);-o-transform:rotate(360deg);transform:rotate(360deg);}
 #navigationMenu{position:fixed;z-index:99999;top:100px;left:-65px;font-size:18px;font-weight:bold;letter-spacing:0.6px;white-space:nowrap;line-height:40px;text-shadow:rgba(255, 255, 255, 0.5) 0 1px 1px;}#navigationMenu li{list-style:none;height:40px;opacity:0.8;}#navigationMenu li a{height:40px;width:40px;display:block;position:relative;}#navigationMenu li a span{width:0;overflow:hidden;position:absolute;left:10px;-webkit-transition:0.25s;-moz-transition:0.25s;-ms-transition:0.25s;-o-transition:0.25s;transition:0.25s;}
 #navigationMenu li a:hover{text-decoration:none;}#navigationMenu li a:hover span{width:auto;padding:0 20px;overflow:visible;}
 #navigationMenu form{display:inline;}
@@ -23,11 +24,11 @@ pre ins,pre del{line-height:2.154;text-decoration:none;font-style:normal;display
 #navigationMenu .n-search span,#navigationMenu .n-search{background-color:#4BB1DC;color:#460f35;}
 #navigationMenu .n-add span,#navigationMenu .n-add{background-color:#AA41D4;color:#3d4f0c;}
 #navigationMenu .n-logout span,#navigationMenu .n-logout{background-color:#FF7665;color:#223a44;}
-#article-panel{padding:0 20px 0 0;height:600px;}
-#bookmarks-panel{padding:0 20px 0 0;height:600px;border-right:3px solid rgba(244, 13, 13, 0.25);}
-#bookmarkForm{padding:0 20px 0 0;height:600px;}
+#article-panel{padding:0 20px 0 0;height:650px;}
+#bookmarks-panel{padding:0 20px 0 0;height:650px;border-right:3px solid rgba(244, 13, 13, 0.25);}
+#bookmarkForm{padding:0 20px 0 0;height:650px;}
 .form-horizontal .control-label{padding:0;}
-.tab-pane{margin:0 20px 0 0;}.tab-pane h3{margin:0 0 10px 24px;}
+.tab-pane{margin:0 20px 0 0;}.tab-pane h3{margin:20px 0 10px 24px;}
 .tags{padding:0;}.tags li{line-height:20px;margin:0 2px 0 0;}
 .tags a{color:#ff7665;}
 #bookmarkList{margin-left:30px;}

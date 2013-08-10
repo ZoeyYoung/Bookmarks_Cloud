@@ -5,6 +5,9 @@ body {
     overflow: hidden;
     background: #fff url(../img/light-paper.png) repeat 0 0;
 }
+.img-responsive {
+    display: block;
+}
 .container { max-width: 95% }
 ::selection {
     background: #fe57a1;
@@ -21,7 +24,6 @@ blockquote {
     min-height: 20px;
     p {
         position: relative;
-        color: #7a7a7a;
         font-size: 14px;
         font-style: italic;
         &:before {
@@ -77,10 +79,11 @@ pre {
     z-index: 9999;
 }
 .avatar {
-    opacity: 0.8;
+    opacity: 0.6;
     .transition(.4s all ease-in-out);
     border: 1px solid;
     &:hover {
+        opacity: 1;
         .transform(rotate(360deg));
     }
 }
@@ -160,7 +163,7 @@ pre {
 }
 .panel (@top: 20px) {
     padding: 0 @top 0 0;
-    height: 600px;
+    height: 650px;
 }
 #article-panel {
     .panel;
@@ -176,7 +179,7 @@ pre {
 .tab-pane {
     margin: 0 20px 0 0;
     h3 {
-        margin: 0 0 10px 24px;
+        margin: 20px 0 10px 24px;
     }
 }
 .tags {

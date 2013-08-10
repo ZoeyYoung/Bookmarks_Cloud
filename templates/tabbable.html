@@ -8,7 +8,7 @@
     <div class="tab-pane fade" id="2">
         {% block tags_pane %}
         <div id="tagCloud" class="well">
-        {% for tag in tags_cloud %}
+        {% for tag in handler.tags_cloud %}
             <a style="font-size:{{tag['font_size']}}pt" href="/tag/1/{{tag['tag']['_id']}}">{{tag['tag']['_id']}}({{tag['tag']['count']}})</a>
         {% end %}
         </div>

@@ -182,6 +182,7 @@
                         }
                     });
                 });
+                $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height() - 50);
                 $(window).resize(function() {
                     $("#bookmarks-panel, #article-panel").css('max-height', jQuery(window).height() - 50);
                 });

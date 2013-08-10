@@ -19,7 +19,7 @@
 <body id="top">
     {% set user=handler.get_current_user() %}
     <div id="vcard" class="profile" data-title="{{user['name']}} - {{user['email']}}" data-content="共收藏了{{handler.total}}个书签">
-        <img src="{{handler.avatar(100)}}" class="img-circle avatar" alt="当前用户" />
+        <img src="{{handler.avatar(64)}}" class="img-circle avatar" alt="当前用户" />
     </div>
     <header id="header">
         <ul id="navigationMenu">
@@ -49,7 +49,7 @@
         <div class="row">
             <div class="col-lg-6 quickflip-wrapper" style="margin-top: 20px;">
                 <div id="bookmarks-panel" class="nano">
-                {% block content %}{% end %}
+                    {% block content %}{% end %}
                 </div>
                 <div>
                     {% block header %}
