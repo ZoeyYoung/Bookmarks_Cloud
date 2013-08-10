@@ -11,7 +11,7 @@ pre ins,pre del{line-height:2.154;text-decoration:none;font-style:normal;display
 .btn-ttc,.btn-ttc:hover,.btn-ttc:active{color:white;text-shadow:0 -1px 0 rgba(0, 0, 0, 0.25);background-color:#007da7;}
 .btn-ttc{background-repeat:repeat-x;background-image:linear-gradient(top, #009ed2 0%, #007da7 100%);}
 .btn-ttc:hover{background-position:0 -15px;}
-.profile{position:absolute;right:20px;top:20px;z-index:9999;}
+.profile{position:absolute;right:20px;bottom:20px;z-index:9999;}
 .avatar{opacity:0.6;-webkit-transition:0.4s all ease-in-out;-moz-transition:0.4s all ease-in-out;-ms-transition:0.4s all ease-in-out;-o-transition:0.4s all ease-in-out;transition:0.4s all ease-in-out;border:1px solid;}.avatar:hover{opacity:1;-webkit-transform:rotate(360deg);-moz-transform:rotate(360deg);-ms-transform:rotate(360deg);-o-transform:rotate(360deg);transform:rotate(360deg);}
 #navigationMenu{position:fixed;z-index:99999;top:100px;left:-65px;font-size:18px;font-weight:bold;letter-spacing:0.6px;white-space:nowrap;line-height:40px;text-shadow:rgba(255, 255, 255, 0.5) 0 1px 1px;}#navigationMenu li{list-style:none;height:40px;opacity:0.8;}#navigationMenu li a{height:40px;width:40px;display:block;position:relative;}#navigationMenu li a span{width:0;overflow:hidden;position:absolute;left:10px;-webkit-transition:0.25s;-moz-transition:0.25s;-ms-transition:0.25s;-o-transition:0.25s;transition:0.25s;}
 #navigationMenu li a:hover{text-decoration:none;}#navigationMenu li a:hover span{width:auto;padding:0 20px;overflow:visible;}

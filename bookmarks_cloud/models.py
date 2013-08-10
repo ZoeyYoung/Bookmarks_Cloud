@@ -89,7 +89,7 @@ class Bookmark(object):
         return self.bookmarks_collection.find().skip((page-1)*PAGE_SIZE).limit(PAGE_SIZE).sort([("post_time", -1)])
 
     def get_info(self, url, html=None):
-        bookmark = Bookmark.get_by_url(url)
+        bookmark = self.get_by_url(url)
         info = get_bookmark_info(url, html)
         if info:
             if bookmark:
@@ -102,7 +102,7 @@ class Bookmark(object):
             return None
 
     def insert_or_update(self, new_bookmark):
-        bookmark = Bookmark.get_by_url(new_bookmark['url'])
+        bookmark = self.get_by_url(new_bookmark['url'])
         # 更新信息
         # print(info['article'].encode('utf-8'))
         # 如果书签已存在, 则更新信息
@@ -120,7 +120,7 @@ class Bookmark(object):
             self.fts.update(bookmark)
             return bookmark
         else:
-            info = Bookmark.get_info(new_bookmark['url'], new_bookmark['html'])
+            info = self.get_info(new_bookmark['url'], new_bookmark['html'])
             if info:
                 new_bookmark['title'] = info['title']
                 new_bookmark['description'] = info['description']
@@ -132,7 +132,7 @@ class Bookmark(object):
             return new_bookmark
 
     def refresh(self, bookmark, html=None):
-        info = Bookmark.get_info(bookmark['url'], html)
+        info = self.get_info(bookmark['url'], html)
         if info:
             bookmark['html'] = info['html']
             bookmark['title'] = info['title']
