@@ -11,6 +11,21 @@ def save_to_file(text, filename):
     f.close()
 
 
+# def describe(node, depth=1):
+#     if not hasattr(node, 'tag'):
+#         return "[%s]" % type(node)
+#     name = node.tag
+#     if node.get('id', ''):
+#         name += '#' + node.get('id')
+#     if node.get('class', ''):
+#         name += '.' + node.get('class').replace(' ', '.')
+#     if name[:4] in ['div#', 'div.']:
+#         name = name[3:]
+#     if depth and node.getparent() is not None:
+#         return name + ' - ' + describe(node.getparent(), depth - 1)
+#     return name
+
+
 def describe(node, depth=2):
     if not hasattr(node, 'tag'):
         return "[%s]" % type(node)

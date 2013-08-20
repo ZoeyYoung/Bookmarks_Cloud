@@ -1,9 +1,8 @@
 import logging
 import re
-import chardet
 from bs4 import UnicodeDammit
 
-LOG = logging.getLogger()
+LOG = logging.getLogger("bc_log")
 
 
 BROTHER_ENCODINGS = [
@@ -56,21 +55,9 @@ def get_encoding(page):
                 return i
         return None
 
-    res = chardet.detect(text)
-    enc = res['encoding']
-
-    if enc == 'MacCyrillic':
-        enc = 'cp1251'
-
-    # print '->', enc, "%.2f" % res['confidence']
-
-    if res['confidence'] < 0.7:
-        possible_encodings = get_brothers(enc) or ('GBK', enc)
-        for p_enc in possible_encodings:
-            if is_enc(p_enc):
-                # print '->', p_enc
-                return p_enc
-    else:
-        return enc
+    possible_encodings = get_brothers(enc) or ('GBK', enc)
+    for p_enc in possible_encodings:
+        if is_enc(p_enc):
+            return p_enc
 
     raise UnicodeDecodeError("Failed to detect encoding, tried [%s]", 'raw result from chardet: %s' % res)

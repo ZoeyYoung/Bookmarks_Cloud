@@ -4,9 +4,9 @@ import logging
 import re
 import sys
 import urllib.parse
-
+import math
 from . import urlfetch
-
+from .debug import describe
 from collections import namedtuple
 from lxml.etree import tostring
 from lxml.etree import tounicode
@@ -24,17 +24,15 @@ from .htmls import get_keywords
 
 
 logging.basicConfig(level=logging.INFO)
-log = logging.getLogger('bookmarks_cloud_log')
+log = logging.getLogger('bc_log')
 
-# 'unlikelyCandidatesRe'中不能有的元素
-# header: 部分网站直接将header作为主内容的class, 例如: http://www.mopiaoyao.com/
 PAGE_CLASS = 'article-page'
 BLOCK_CONTENT_TAG = ['div', 'header', 'article', 'section']
 REGEXES = {
-    'unlikelyCandidatesRe': re.compile('avatar|banner|bread|biaoqing|blurb|combx|comment|community|db-usr-profile|disqus|dialog|extra|feedback|foot|form|login|menu|nav|notify|notice|remark|rss|shoutbox|side|sponsor|skip|ad-break|agegate|pagination|pager|popup|tweet|twitter|footer|dig|rat|tool|share|submit|score|vote|bottom|uyan_frame|ujian|google_ads|user|sign', re.I),
+    'unlikelyCandidatesRe': re.compile('ad-break|avatar|agegate|banner|bottom|bread|biaoqing|blurb|bury|combx|crumbs|comment|community|db-usr-profile|disqus|discuss|dialog|dig|extra|feedback|foot|google_ads|login|menu|nav|notify|notice|remark|rss|rat|shoutbox|sponsor|skip|pagination|pager|popup|seccode|sign|share|submit|score|tool|tweet|twitter|uyan_frame|ujian|user|vote', re.I),
     'okMaybeItsACandidateRe': re.compile('and|article|brush|body|brand|column|main|shadow|post|topic|document|news|highlight|accept|section', re.I),
     'positiveRe': re.compile('article|body|content|detail|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news|highlight|code', re.I),
-    'negativeRe': re.compile('combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|outbrain|promo|related|scroll|shoutbox|sidebar|sponsor|shopping|tags|tool|widget', re.I),
+    'negativeRe': re.compile('combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|outbrain|promo|relate|scroll|shoutbox|sidebar|sponsor|shopping|tags|tool|widget', re.I),
     'extraneous': re.compile(r'print|archive|comment|discuss|e[\-]?mail|share|reply|all|login|sign|single', re.I),
     # Block-level elements
     # https://developer.mozilla.org/en-US/docs/HTML/Block-level_elements
@@ -44,8 +42,8 @@ REGEXES = {
     'prevLink': re.compile(r'(prev|earl|old|new|<)', re.I),
     'page': re.compile(r'pag(e|ing|inat)', re.I),
     'firstLast': re.compile(r'(first|last)', re.I)
-    #'replaceBrsRe': re.compile('(<br[^>]*>[ \n\r\t]*){2,}',re.I),
-    #'replaceFontsRe': re.compile('<(\/?)font[^>]*>',re.I),
+    # 'replaceBrsRe': re.compile('(<br[^>]*>[ \n\r\t]*){2,}',re.I),
+    # 'replaceFontsRe': re.compile('<(\/?)font[^>]*>',re.I),
     #'trimRe': re.compile('^\s+|\s+$/'),
     #'normalizeRe': re.compile('\s{2,}/'),
     #'killBreaksRe': re.compile('(<br\s*\/?>(\s|&nbsp;?)*){1,}/'),
@@ -64,21 +62,6 @@ class Unparseable(ValueError):
 Summary = namedtuple('Summary', ['html', 'confidence', 'title', 'short_title', 'description', 'keywords'])
 
 
-def describe(node, depth=1):
-    if not hasattr(node, 'tag'):
-        return "[%s]" % type(node)
-    name = node.tag
-    if node.get('id', ''):
-        name += '#' + node.get('id')
-    if node.get('class', ''):
-        name += '.' + node.get('class').replace(' ', '.')
-    if name[:4] in ['div#', 'div.']:
-        name = name[3:]
-    if depth and node.getparent() is not None:
-        return name + ' - ' + describe(node.getparent(), depth - 1)
-    return name
-
-
 def get_clean_html(doc):
     for tag in doc.xpath('//*[@class]'):
     # For each element with a class attribute, remove that class attribute
@@ -88,7 +71,7 @@ def get_clean_html(doc):
     for el in tags(doc, 'img'):
         el.set('class', 'img-responsive')
     for el in tags(doc, 'table'):
-        el.set('class', 'table table-bordered')
+        el.set('class', 'table')
     doc = clean_attributes(tounicode(doc))
     return doc
 
@@ -155,7 +138,7 @@ def score_node(elem):
         content_score += 5
     elif name in ["article", "section"]:
         content_score += 50
-    elif name in ["pre", "td", "blockquote", "aside", "code", "table"]:
+    elif name in ["pre", "td", "blockquote", "code", "table"]:
         content_score += 3
     elif name in ["ol", "ul", "li", "dd", "dt"]:
         content_score += 1
@@ -211,7 +194,7 @@ def transform_misused_divs_into_paragraphs(doc):
 
 def remove_unlikely_candidates(doc):
     """移除可能不会作为正文的元素
-    注意: 可能会误删
+    注意: 可能会误删, 错误经常出现在这
     """
     allelem = doc.iter()
     for elem in allelem:
@@ -219,10 +202,13 @@ def remove_unlikely_candidates(doc):
         # log.debug(s)
         # output = open('elem.txt', 'a')
         # print("_tree %s class-id %s" % (describe(elem), s), file=output)
-        if REGEXES['unlikelyCandidatesRe'].search(s) and (not REGEXES['okMaybeItsACandidateRe'].search(s)) and elem.tag != 'body' and elem.getparent() is not None:
+        if REGEXES['unlikelyCandidatesRe'].search(s) and \
+            not REGEXES['okMaybeItsACandidateRe'].search(s) and \
+            elem.tag != 'body' and elem.getparent() is not None:
             # print("_drop_tree %s" % (describe(elem)), file=output)
             for i in range(len(elem.findall('.//*'))):
                 allelem.__next__()
+            log.debug("remove %s %s" % (describe(elem), s))
             elem.getparent().remove(elem)
 
 
@@ -237,13 +223,15 @@ def get_link_density(elem):
     #    link_length = link_length
     total_length = text_length(elem)
     # print(describe(elem), "link_density", float(link_length), max(total_length, 1))
-    return float(link_length) / max(total_length, 1)
+    if total_length == 0:
+        return 0
+    return float(link_length) / total_length
 
 
 def score_paragraphs(doc, options):
     # output = open('elem.txt', 'a')
     candidates = {}
-    log.debug(str([describe(node) for node in tags(doc, "div")]))
+    # log.debug(str([describe(node) for node in tags(doc, "div")]))
 
     ordered = []
     for elem in tags(doc, "p", "pre", "td", "div"):
@@ -265,14 +253,15 @@ def score_paragraphs(doc, options):
             # print("parent_node", describe(parent_node), candidates[parent_node]['content_score'], file=output)
             ordered.append(parent_node)
 
-        if grand_parent_node is not None and grand_parent_node not in candidates:
+        if grand_parent_node is not None and \
+            grand_parent_node not in candidates:
             candidates[grand_parent_node] = score_node(grand_parent_node)
             # print("grand_parent_node", describe(grand_parent_node), candidates[grand_parent_node]['content_score'], file=output)
             ordered.append(grand_parent_node)
 
         content_score = 1
-        content_score += len(re.split('[,，.。]', inner_text))
-        content_score += min((inner_text_len / 100), 3)
+        content_score += len(re.findall('[,，.。]', inner_text))
+        content_score += min(math.floor(inner_text_len / 100), 3)
         # print("content_score", content_score, len(re.split('[,，.。]', inner_text)), min((inner_text_len / 100), 3), file=output)
         # if elem not in candidates:
         #    candidates[elem] = score_node(elem)
@@ -280,7 +269,7 @@ def score_paragraphs(doc, options):
         # WTF? candidates[elem]['content_score'] += content_score
         candidates[parent_node]['content_score'] += content_score
         if grand_parent_node is not None:
-            candidates[grand_parent_node]['content_score'] += content_score / 2.0
+            candidates[grand_parent_node]['content_score'] += content_score / 2
 
     # Scale the final candidates score based on link density. Good content
     # should have a relatively small link density (5% or less) and be mostly
@@ -296,7 +285,6 @@ def score_paragraphs(doc, options):
             # score * (1 - ld)))
         candidate['content_score'] *= (1 - ld)
 
-    log.debug("len candidates %d" % (len(candidates)))
     return candidates
 
 
@@ -304,14 +292,14 @@ def select_best_candidate(candidates):
     sorted_candidates = sorted(candidates.values(),
                                key=lambda x: x['content_score'],
                                reverse=True)
+    if len(sorted_candidates) == 0:
+        return None
+
     for candidate in sorted_candidates[:5]:
         elem = candidate['elem']
         log.debug("Top 5 : %6.3f %s" % (
             candidate['content_score'],
             describe(elem)))
-
-    if len(sorted_candidates) == 0:
-        return None
 
     best_candidate = sorted_candidates[0]
     return best_candidate
@@ -324,32 +312,32 @@ def reverse_tags(node, *tag_names):
 
 
 def sanitize(node, candidates, options):
-    # 不过滤标题
+    # 不过滤标题, 部分博客乱使用小标题
     # for header in tags(node, "h1", "h2", "h3", "h4", "h5", "h6"):
     #     if class_weight(header) < 0 or get_link_density(header) > 0.33:
     #         header.drop_tree()
 
     for elem in tags(node, "form", "iframe", "textarea"):
         elem.drop_tree()
-    allowed = {}
+    # allowed = {}
     # Conditionally clean <table>s, <ul>s, and <div>s
-    for el in reverse_tags(node, "div"):
     # for el in reverse_tags(node, "table", "ul", "div"):
-        if el in allowed:
-            continue
+    # <ul> <table>也经常作为正文存在, 不作处理.
+    for el in reverse_tags(node, "div"):
+        # if el in allowed:
+        #     continue
         weight = class_weight(el)
         if el in candidates:
             content_score = candidates[el]['content_score']
-            # print '!',el, '-> %6.3f' % content_score
+            # print('!',el, '-> %6.3f' % content_score)
         else:
             content_score = 0
         tag = el.tag
 
         if weight + content_score < 0:
-            # log.debug("Cleaned %s with score %6.3f and weight %-3s" %
-                # (describe(el), content_score, weight, ))
+            log.debug("Cleaned %s with score %6.3f and weight %-3s" % (describe(el), content_score, weight))
             el.drop_tree()
-        elif el.text_content().count(",") < 10:
+        elif len(re.findall('[,，.。]', el.text_content())) < 5:  # 10:
             counts = {}
             for kind in ['p', 'img', 'li', 'a', 'embed', 'input']:
                 counts[kind] = len(el.findall('.//%s' % kind))
@@ -358,12 +346,12 @@ def sanitize(node, candidates, options):
             # Count the text length excluding any surrounding whitespace
             content_length = text_length(el)
             link_density = get_link_density(el)
-            parent_node = el.getparent()
-            if parent_node is not None:
-                if parent_node in candidates:
-                    content_score = candidates[parent_node]['content_score']
-                else:
-                    content_score = 0
+            # parent_node = el.getparent()
+            # if parent_node is not None:
+            #     if parent_node in candidates:
+            #         content_score = candidates[parent_node]['content_score']
+            #     else:
+            #         content_score = 0
             # if parent_node is not None:
                 # pweight = class_weight(parent_node) + content_score
                 # pname = describe(parent_node)
@@ -381,20 +369,22 @@ def sanitize(node, candidates, options):
             elif counts["li"] > counts["p"] and tag != "ul" and tag != "ol":
                 reason = "more <li>s than <p>s"
                 to_remove = True
-            elif counts["input"] > (counts["p"] / 3):
+            elif counts["input"] > math.floor(counts["p"] / 3):
                 reason = "less than 3x <p>s than <input>s"
                 to_remove = True
-            elif content_length < options['min_text_length'] and (counts["img"] == 0 or counts["img"] > 2):
+            elif content_length < options['min_text_length'] and \
+                (counts["img"] == 0 or counts["img"] > 2):
                 reason = "too short content length %s without a single image" % content_length
                 to_remove = True
             elif weight < 25 and link_density > 0.2:
                 reason = "too many links %.3f for its weight %s" % (link_density, weight)
                 to_remove = True
+            # 参考文档类的经常链接密度非常大, 所有不考虑删除.
             # elif weight >= 25 and link_density > 0.8:
             #     reason = "too many links %.3f for its weight %s" % (
             #         link_density, weight)
             #     to_remove = True
-            elif (counts["embed"] == 1 and content_length < 75) or counts["embed"] > 1:
+            elif (counts["embed"] == 1 and content_length < 35) or counts["embed"] > 1:
                 reason = "<embed>s with too short content length, or too many <embed>s"
                 to_remove = True
 
@@ -436,7 +426,6 @@ def sanitize(node, candidates, options):
 
             if to_remove:
                 log.debug("Cleaned %6.3f %s with weight %s cause it has %s." % (content_score, describe(el), weight, reason))
-                # print tounicode(el)
                 # log.debug("pname %s pweight %.3f" %(pname, pweight))
                 el.drop_tree()
 
@@ -510,6 +499,9 @@ def get_raw_article(candidates, best_candidate, enclose_with_html_tag=True):
 
 
 def get_article(doc, options, enclose_with_html_tag=True):
+    import copy
+    output = copy.deepcopy(doc)
+    t_output = copy.deepcopy(doc)
     try:
         ruthless = True
         while True:
@@ -520,8 +512,8 @@ def get_article(doc, options, enclose_with_html_tag=True):
             if ruthless:
                 remove_unlikely_candidates(doc)
             transform_misused_divs_into_paragraphs(doc)
-            output = open('output.txt', 'w')
-            print(tostring(doc), file=output)
+            # output = open('output.txt', 'w')
+            # print(tostring(doc), file=output)
             for i in tags(doc, 'body'):
                 div = fragment_fromstring("<div/>")
                 for e in i.iterchildren():
@@ -538,14 +530,21 @@ def get_article(doc, options, enclose_with_html_tag=True):
                 if ruthless:
                     log.debug("ruthless removal did not work. ")
                     ruthless = False
-                    log.debug(
-                        "ended up stripping too much - going for a safer parse")
+                    log.debug("ended up stripping too much - going for a safer parse")
                     # try again
                     continue
                 else:
-                    log.debug(
-                        "Ruthless and lenient parsing did not work. Returning raw html")
-                    return Summary('[something-wrong]', 0, '[something-wrong]', '[something-wrong]', '[something-wrong]', '[something-wrong]')
+                    log.debug("Ruthless and lenient parsing did not work. Returning raw html")
+                    remove_unlikely_candidates(output)
+                    clean_html = get_clean_html(output)
+                    if len(clean_html) < 500:
+                        clean_html = get_clean_html(t_output)
+                    return Summary(clean_html,
+                           0,
+                           short_title=shorten_title(output),
+                           title=get_title(output),
+                           description=get_description(output),
+                           keywords=get_keywords(output))
 
             cleaned_article = sanitize(article, candidates, options)
 
@@ -978,7 +977,7 @@ def parse(input, url):
 class Document:
 
     """Class to build a etree document out of html."""
-    TEXT_LENGTH_THRESHOLD = 10  # 25
+    TEXT_LENGTH_THRESHOLD = 25  # 25
     RETRY_LENGTH = 250
 
     def __init__(self, input_doc, **options):
@@ -1109,18 +1108,4 @@ class Document:
                            description=get_description(output),
                            keywords=get_keywords(output))
 
-        summary = get_article(doc, self.options, enclose_with_html_tag=enclose_with_html_tag)
-        print(len(summary.html), "============================")
-        if summary.title == "[something-wrong]" or len(summary.html) < 500:
-            output = parse(self.input_doc, self.options.get('url'))
-            remove_unlikely_candidates(output)
-            o = open('something-wrong.txt', 'w')
-            print("[something-wrong]", tostring(output), file=o)
-            return Summary(get_clean_html(output),
-                           0,
-                           short_title=shorten_title(output),
-                           title=get_title(output),
-                           description=get_description(output),
-                           keywords=get_keywords(output))
-        else:
-            return summary
+        return get_article(doc, self.options, enclose_with_html_tag=enclose_with_html_tag)
