@@ -7,31 +7,9 @@ from whoosh.fields import Schema, TEXT, ID, KEYWORD
 from whoosh.analysis import Tokenizer,Token
 from whoosh import qparser
 from .config import *
-import jieba
+from jieba.analyse import ChineseAnalyzer
 
-class ChineseTokenizer(Tokenizer):
-    def __call__(self, value, positions=False, chars=False,
-                 keeporiginal=False, removestops=True,
-                 start_pos=0, start_char=0, mode='', **kwargs):
-        # assert isinstance(value, text_type), "%r is not unicode" % value
-        t = Token(positions, chars, removestops=removestops, mode=mode,
-            **kwargs)
-        seglist=jieba.cut_for_search(value)
-        # 使用结巴分词库进行分词
-        for w in seglist:
-            t.original = t.text = w
-            t.boost = 1.0
-            if positions:
-                t.pos=start_pos+value.find(w)
-            if chars:
-                t.startchar=start_char+value.find(w)
-                t.endchar=start_char+value.find(w)+len(w)
-            yield t  #通过生成器返回每个分词的结果token
-
-
-def ChineseAnalyzer():
-    return ChineseTokenizer()
-
+analyzer = ChineseAnalyzer()
 
 class WhooshBookmarks(object):
     """
@@ -55,7 +33,7 @@ class WhooshBookmarks(object):
     def rebuild_index(self):
         ix = create_in(self.indexdir, self.schema, indexname=self.indexname)
         writer = ix.writer()
-        for bookmark in bookmarks_collection.find(timeout=False):
+        for bookmark in self.bookmarks_collection.find(timeout=False):
             writer.update_document(
                 nid=str(bookmark['_id']),
                 url=bookmark['url'],
@@ -72,8 +50,8 @@ class WhooshBookmarks(object):
             url=ID(unique=True, stored=True),
             title=TEXT(phrase=False),
             tags=KEYWORD(lowercase=True, commas=True, scorable=True),
-            note=TEXT(analyzer=ChineseAnalyzer()),
-            article=TEXT(stored=True, analyzer=ChineseAnalyzer())
+            note=TEXT(analyzer=analyzer),
+            article=TEXT(stored=True, analyzer=analyzer)
         )
 
     def commit(self, writer):
