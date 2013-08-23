@@ -25,7 +25,7 @@ pre ins,pre del{line-height:2.154;text-decoration:none;font-style:normal;display
 #bookmarks-panel{padding:0 20px 0 0;height:650px;border-right:3px solid rgba(244, 13, 13, 0.25);}
 #bookmarkForm{padding:0 20px 0 0;height:650px;}
 .form-horizontal .control-label{padding:0;}
-.tab-pane{margin:0 20px 0 0;}.tab-pane h3{margin:20px 0 10px 24px;}
+.tab-pane{margin:0 20px 0 0;}.tab-pane h3{margin:0 0 10px 24px;}
 .tags{padding:0;}.tags li{line-height:20px;margin:0 2px 0 0;}
 .tags a{color:#ff7665;}
 #bookmarkList{margin-left:30px;}
