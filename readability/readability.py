@@ -29,7 +29,8 @@ log = logging.getLogger('bc_log')
 PAGE_CLASS = 'article-page'
 BLOCK_CONTENT_TAG = ['div', 'header', 'article', 'section']
 REGEXES = {
-    'unlikelyCandidatesRe': re.compile('ad-break|avatar|agegate|banner|bottom|bread|biaoqing|blurb|bury|combx|crumbs|comment|community|db-usr-profile|disqus|discuss|dialog|dig|extra|feedback|foot|google_ads|login|menu|nav|notify|notice|remark|rss|rat|shoutbox|sponsor|skip|pagination|pager|popup|seccode|sign|share|submit|score|tool|tweet|twitter|uyan_frame|ujian|user|vote', re.I),
+    'cannotBeCandidatesRe': re.compile('adpack|comment|copyright|disqus|foot|google_ads|uyan_frame|ujian', re.I),
+    'unlikelyCandidatesRe': re.compile('ad-break|avatar|agegate|banner|bottom|bread|biaoqing|blurb|bury|combx|crumbs|community|db-usr-profile|discuss|dialog|dig|extra|feedback|login|menu|nav|notify|notice|owner|popup|remark|rss|rat|shoutbox|sponsor|skip|stat|seccode|sign|share|submit|score|tool|tweet|twitter|user|vote|widget', re.I),
     'okMaybeItsACandidateRe': re.compile('and|article|brush|body|brand|column|main|shadow|post|topic|document|news|highlight|accept|section', re.I),
     'positiveRe': re.compile('article|body|content|detail|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news|highlight|code', re.I),
     'negativeRe': re.compile('combx|comment|com-|contact|foot|footer|footnote|masthead|media|meta|outbrain|promo|relate|scroll|shoutbox|sidebar|sponsor|shopping|tags|tool|widget', re.I),
@@ -202,8 +203,9 @@ def remove_unlikely_candidates(doc):
         # log.debug(s)
         # output = open('elem.txt', 'a')
         # print("_tree %s class-id %s" % (describe(elem), s), file=output)
-        if REGEXES['unlikelyCandidatesRe'].search(s) and \
-            not REGEXES['okMaybeItsACandidateRe'].search(s) and \
+        if (REGEXES['cannotBeCandidatesRe'].search(s) or \
+            (REGEXES['unlikelyCandidatesRe'].search(s) and \
+            not REGEXES['okMaybeItsACandidateRe'].search(s))) and \
             elem.tag != 'body' and elem.getparent() is not None:
             # print("_drop_tree %s" % (describe(elem)), file=output)
             for i in range(len(elem.findall('.//*'))):
@@ -319,13 +321,13 @@ def sanitize(node, candidates, options):
 
     for elem in tags(node, "form", "iframe", "textarea"):
         elem.drop_tree()
-    # allowed = {}
+    allowed = {}
     # Conditionally clean <table>s, <ul>s, and <div>s
     # for el in reverse_tags(node, "table", "ul", "div"):
     # <ul> <table>也经常作为正文存在, 不作处理.
     for el in reverse_tags(node, "div"):
-        # if el in allowed:
-        #     continue
+        if el in allowed:
+            continue
         weight = class_weight(el)
         if el in candidates:
             content_score = candidates[el]['content_score']
@@ -376,9 +378,9 @@ def sanitize(node, candidates, options):
                 (counts["img"] == 0 or counts["img"] > 2):
                 reason = "too short content length %s without a single image" % content_length
                 to_remove = True
-            elif weight < 25 and link_density > 0.2:
-                reason = "too many links %.3f for its weight %s" % (link_density, weight)
-                to_remove = True
+            # elif weight < 25 and link_density > 0.2:
+            #     reason = "too many links %.3f for its weight %s" % (link_density, weight)
+            #     to_remove = True
             # 参考文档类的经常链接密度非常大, 所有不考虑删除.
             # elif weight >= 25 and link_density > 0.8:
             #     reason = "too many links %.3f for its weight %s" % (
@@ -433,7 +435,6 @@ def sanitize(node, candidates, options):
         # if not (options['attributes']):
             # el.attrib = {}  # FIXME:Checkout the effects of disabling this
             # pass
-    # return clean_attributes(tounicode(node))
     return get_clean_html(node)
 
 
@@ -537,6 +538,7 @@ def get_article(doc, options, enclose_with_html_tag=True):
                     log.debug("Ruthless and lenient parsing did not work. Returning raw html")
                     remove_unlikely_candidates(output)
                     clean_html = get_clean_html(output)
+                    print(len(clean_html))
                     if len(clean_html) < 500:
                         clean_html = get_clean_html(t_output)
                     return Summary(clean_html,
@@ -964,6 +966,17 @@ def parse(input, url):
     # 含有样式和JS的lxml.html.HtmlElement对象
     raw_doc = build_doc(input)
     # 去除样式和JS的lxml.html.HtmlElement对象
+    allelem = raw_doc.iter()
+    for elem in allelem:
+        s = elem.get('style', '')
+        # output = open('elem.txt', 'a')
+        # print("_tree %s class-id %s" % (describe(elem), s), file=output)
+        if s and re.compile('display:\s*none', re.I).search(s):
+            # print("_drop_tree %s" % (describe(elem)), file=output)
+            for i in range(len(elem.findall('.//*'))):
+                allelem.__next__()
+            log.debug("remove %s %s" % (describe(elem), s))
+            elem.getparent().remove(elem)
     doc = html_cleaner.clean_html(raw_doc)
     log.debug('parse url: %s', url)
     if url:
