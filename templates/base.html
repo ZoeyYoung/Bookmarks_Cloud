@@ -23,7 +23,7 @@
 </head>
 <body id="top">
     {% set user=handler.get_current_user() %}
-    <div id="vcard" class="profile" data-title="{{user['name']}} - {{user['email']}}" data-content="共收藏了{{handler.total}}个书签">
+    <div id="vcard" class="profile" data-title="{{user}}" data-content="共收藏了{{handler.total}}个书签">
         <img src="{{handler.avatar(64)}}" class="img-circle avatar" alt="当前用户" />
     </div>
     <header id="header">
@@ -64,7 +64,7 @@
                         <div class="form-group">
                             <label class="control-label col-lg-1" for="url"></label>
                             <div class="col-lg-11 input-group">
-                                <span class="input-group-addon"><i class="icon-bookmark"></i>
+                                <span class="input-group-addon"><i class="fa fa-bookmark fa-fw"></i>
                                 </span>
                                 <input type="url" name="url" id="url" class="form-control" placeholder="http://www.website.com" autofocus required/>
                                 <span class="input-group-btn">

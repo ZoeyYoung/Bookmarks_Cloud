@@ -14,7 +14,8 @@ from .models import Page
 from tornado import gen
 
 class BookmarkModule(tornado.web.UIModule):
-
+    """书签UI模块
+    """
     def render(self, bookmark):
         try:
             return self.render_string('modules/bookmark.html', bookmark=bookmark)
@@ -23,7 +24,8 @@ class BookmarkModule(tornado.web.UIModule):
 
 
 class PagerModule(tornado.web.UIModule):
-
+    """分页UI模块
+    """
     def render(self, page):
         try:
             return self.render_string('modules/pager.html', page=page)
@@ -32,31 +34,33 @@ class PagerModule(tornado.web.UIModule):
 
 
 class IndexHandler(BaseHandler):
-
+    """登录后主页，显示当前用户保存的书签，默认显示第一页
+    """
     @tornado.web.authenticated
     def get(self, page=1):
-        bookmarks = self.bm.get_page(int(page))
+        bookmarks = self.bm.get_page(page)
         page = Page(self.total, page)
         self.render('index.html', bookmarks=bookmarks, page=page)
 
 
 class AjaxBookmarkHandler(BaseHandler):
-
+    """翻页处理, 不刷新页面, 而是通过Ajax获取
+    """
     @tornado.web.authenticated
     def post(self):
         page = self.get_argument('page')
         tag = self.get_argument('tag')
         keywords = self.get_argument('keywords')
         if tag:
-            bookmarks = self.bm.get_by_tag(tag, int(page))
-            page = Page(bookmarks.count(), int(page))
+            bookmarks = self.bm.get_by_tag_page(tag, page)
+            page = Page(bookmarks.count(), page)
         elif keywords:
-            results = self.bm.whoose_ftx(keywords, int(page))
+            results = self.bm.whoose_ftx(keywords, page)
             bookmarks = results['results']
-            page = Page(results['total'], int(page))
+            page = Page(results['total'], page)
         else:
-            bookmarks = self.bm.get_page(int(page))
-            page = Page(bookmarks.count(), int(page))
+            bookmarks = self.bm.get_page(page)
+            page = Page(bookmarks.count(), page)
         self.render('list.html', bookmarks=bookmarks, page=page)
 
 
@@ -186,12 +190,12 @@ class BookmarkDelHandler(BaseHandler):
 
 
 class TagBookmarksHandler(BaseHandler):
-
+    """获得当前用户指定标签下的书签"""
     @tornado.web.authenticated
     def get(self, page, tag):
-        bookmarks = self.bm.get_by_tag(tag, int(page))
-        page = Page(bookmarks.count(), int(page))
-        self.render('tags_bookmarks.html', bookmarks=bookmarks, page=page, cur_tag=tag, tag_count=bookmarks.count())
+        bookmarks = self.bm.get_by_tag_page(tag, page)
+        page = Page(bookmarks.count(), page)
+        self.render('tag_bookmarks.html', bookmarks=bookmarks, page=page, cur_tag=tag, tag_count=bookmarks.count())
 
 
 class TagsCloudHandler(BaseHandler):

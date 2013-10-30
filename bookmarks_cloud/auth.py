@@ -2,30 +2,25 @@
 # -*- coding: utf-8 -*-
 __author__ = "Zoey Young (ydingmiao@gmail.com)"
 import tornado.web
-from .base import BaseHandler
 import tornado.auth
-from tornado import gen
+from .base import BaseHandler
 
-class AuthHandler(BaseHandler, tornado.auth.GoogleMixin):
-    @tornado.web.asynchronous
-    @gen.coroutine
+class AuthHandler(BaseHandler):
+
     def get(self):
-        if self.get_argument("openid.mode", None):
-            user = yield self.get_authenticated_user()
-            self.set_secure_cookie("auth_user", tornado.escape.json_encode(user))
-            self.redirect("/")
-            return
-        self.authenticate_redirect()
+        self.render('login.html')
 
-    # @tornado.web.asynchronous
-    # def post(self):
-    #     if self.get_current_user():
-    #         raise tornado.web.HTTPError(403)
-    #     email = self.get_argument("email")
-    #     password = self.get_argument("password")
-    #     if email == config['email'] and password == config['password']:
-    #         self.set_secure_cookie('user', config['username'])
-    #         self.redirect(self.get_argument('next', '/'))
+    @tornado.web.asynchronous
+    def post(self):
+        if self.get_current_user():
+            raise tornado.web.HTTPError(403)
+        name = self.get_argument("name")
+        password = self.get_argument("password")
+        user = self.us.get_user_by_name_and_pwd(name, password)
+        if user:
+            self.set_secure_cookie('username', user['name'])
+            self.set_secure_cookie('email', user['email'])
+            self.redirect(self.get_argument('next', '/'))
 
 
 class LogoutHandler(BaseHandler):

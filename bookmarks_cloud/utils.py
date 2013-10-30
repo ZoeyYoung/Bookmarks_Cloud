@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 __author__ = "Zoey Young (ydingmiao@gmail.com)"
+__about__ = """
+应用中的一些功能函数
+"""
 from tornado import httpclient
 from functools import lru_cache
-from readability.readability import Document
+from readability import htmls
+from readability.readability import Document, Summary, get_clean_html
 import math
 import re
 import jieba
@@ -11,19 +15,35 @@ import jieba.analyse
 import logging
 from .config import LOG
 # import urllib
-
 log = logging.getLogger(LOG)
 
 jieba.initialize()
 
+URL_CONTENT = [
+    {'url': 'movie.douban.com/subject', 'content': 'related_info'},
+    {'url': '52youji.net', 'content': 'main-content'},
+    {'url': 'diary.jiayuan.com/famousblog', 'content': 'txt'},
+    {'url': 'http://www.qwolf.com/', 'content': 'entry-content'}
+]
 # 格式化标签
 def format_tags(str):
     tags = re.split('[,，|]', str)
     tags = [tag.strip() for tag in tags]
     tags = [tag for tag in tags if len(tag) > 0]
-    tags = list(set(tags))
+    tags = list(set([tag.upper() for tag in tags]))
     return tags
 
+def readability_parser(url):
+    request = httpclient.HTTPRequest(
+        "https://readability.com/api/content/v1/parser?token=7f579fc61973e200632c9e43ff2639234817fbb3&url=" + url,
+        method='GET',
+        headers={"content-type": 'application/json', 'Referer': 'http://www.google.com', "Accept": "*/*"},
+        request_timeout=10,
+        follow_redirects=True,
+        user_agent='Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1485.0 Safari/537.36',
+        allow_ipv6=True
+    )
+    return httpclient.AsyncHTTPClient().fetch(request)
 
 @lru_cache(maxsize=32)
 def fetch_url(url):
@@ -37,6 +57,25 @@ def fetch_url(url):
         allow_ipv6=True
     )
     return httpclient.AsyncHTTPClient().fetch(request)
+
+
+def predefined_site(url, html):
+    for uc in URL_CONTENT:
+        if re.compile(uc['url'], re.I).search(url) is not None:
+            doc = htmls.build_doc(html)
+            for tag in doc.iter():
+                allelem = doc.iter()
+                for elem in allelem:
+                    s = "%s %s" % (elem.get('class', ''), elem.get('id', ''))
+                    if re.compile(uc['content']).search(s) is not None:
+                        print(url, "=====================predefined_site")
+                        return Summary(get_clean_html(elem),
+                           '',
+                           short_title=htmls.shorten_title(doc),
+                           title=htmls.get_title(doc),
+                           description=htmls.get_description(doc),
+                           keywords=htmls.get_keywords(doc))
+    return None
 
 
 def video_site(url):
@@ -60,15 +99,17 @@ def video_site(url):
 
 
 def get_bookmark_info(url, html=None):
+    article = video_site(url)
     if not html:
         html = fetch_url(url)
         if not html:
             print("Error: html is None", url)
             return None
-    doc = Document(html, url=url, debug=True, multipage=False)
-    summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
+    summary_obj = predefined_site(url, html)
+    if summary_obj is None:
+        doc = Document(html, url=url, debug=True, multipage=False)
+        summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
     title = summary_obj.short_title
-    article = video_site(url)
     if article is None:
         article = summary_obj.html
     description = summary_obj.description

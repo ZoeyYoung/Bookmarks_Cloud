@@ -1,22 +1,25 @@
+<!-- 每条书签的样式 -->
 {% if bookmark['favicon'] is '' %}
     {% set bookmark['favicon'] = "http://ico.ylsnuha.com/" + bookmark['url'] + "?defaulticon=" + handler.avatar() %}
 {% end %}
 <div class="bookmark-item" data-name="{{bookmark['title']}}">
-    <a class="bookmark-favicon" target="_blank" title="{{bookmark['title']}}" href="{{bookmark['url']}}"><img class="lazy" data-src="{{bookmark['favicon']}}" src="" alt="{{bookmark['title']}}"/></a>
+    <a class="bookmark-favicon" target="_blank" title="{{bookmark['title']}}" href="{{bookmark['url']}}">
+        <img class="lazy" data-src="{{bookmark['favicon']}}" src="" alt="{{bookmark['title']}}"/>
+    </a>
     <div class="bookmark-title">
-        <a target="_blank" title="{{bookmark['url']}}" href="{{bookmark['url']}}"> {{bookmark['title']}} </a>
-        <time><i class="icon-time"></i> {{locale.format_date(bookmark['post_time'], -480, relative=False)}}</time>
+        <a target="_blank" title="{{bookmark['url']}}" href="{{bookmark['url']}}">{{bookmark['title']}}</a>
+        <time><i class="fa fa-clock-o"></i> {{locale.format_date(bookmark['post_time'], -480, relative=False)}}</time>
     </div>
     <div class="pull-right">
         <div class="btn-group">
-            <button type="button" class="btn btn-info bookmark-read-btn"><i class="icon-file-text"></i></button>
+            <button type="button" class="btn btn-info bookmark-read-btn"><i class="fa fa-file-text-o fa-fw"></i></button>
             <div class="btn-group">
-                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"><i class="icon-chevron-sign-down"></i>
+                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"><i class="fa fa-chevron-down fa-fw"></i>
                 </button>
                 <ul class="dropdown-menu">
-                    <li class="bookmark-edit-btn"><a href="javascript:;" title="编辑"><i class="icon-edit"></i></a></li>
-                    <li class="bookmark-refresh-btn"><a href="javascript:;" title="更新"><i class="icon-refresh"></i></a></li>
-                    <li class="bookmark-del-btn" ><a href="javascript:;" title="删除"><i class="icon-trash"></i></a></li>
+                    <li class="bookmark-edit-btn"><a href="javascript:;" title="编辑"><i class="fa fa-pencil fa-fw"></i></a></li>
+                    <li class="bookmark-refresh-btn"><a href="javascript:;" title="更新"><i class="fa fa-refresh fa-fw"></i></a></li>
+                    <li class="bookmark-del-btn" ><a href="javascript:;" title="删除"><i class="fa fa-trash-o fa-fw"></i></a></li>
                 </ul>
             </div>
         </div>

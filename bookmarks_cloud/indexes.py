@@ -15,4 +15,4 @@ def ensure_indexes(sync_db, drop=False):
     sync_db.bookmarks.ensure_index([("note", ASCENDING)])
     sync_db.bookmarks.ensure_index([("url", ASCENDING)])
     sync_db.bookmarks.ensure_index([("tags", ASCENDING)])
-    sync_db.bookmarks.ensure_index([("random", ASCENDING)])
+    sync_db.bookmarks.ensure_index([("owner", ASCENDING), ("random", ASCENDING)])
