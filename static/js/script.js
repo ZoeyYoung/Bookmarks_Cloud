@@ -6,7 +6,12 @@
                 $('#article-title')[0].innerHTML = title;
                 $('#article-content')[0].innerHTML = '<p><a target="_blank" href="' + url + '">查看原网页</a> <a target="_blank" href="/segmentation/' + url + '">查看分词结果</a></p>' + article;
                 // FIXME 应该跳到文章顶部才对...也许该考虑换个插件了...
-                $('#article-panel').nanoScroller({ scroll: 'top' });
+                $('#article-panel').nanoScroller({
+                    contentClass: 'nanocontent',
+                    iOSNativeScrolling: true,
+                    preventPageScrolling: true,
+                    scroll: 'top'
+                });
             },
             initAddBookmarkForm = function(url, response) {
                 $('#url').val(url).prop('disabled', true);
@@ -22,6 +27,7 @@
                 var note = (note_t === '') ? response.note : response.note + '\n' + note_t;
                 $('#note').val(note);
                 showArticle(url, response.title, response.article);
+                console.log(response);
             },
             resetAddBookmarkForm = function() {
                 $('#url').val('').prop('disabled', false);
@@ -47,7 +53,11 @@
                     placement: "left"
                 });
                 $("img.lazy").lazy();
-                $("div.nano").nanoScroller();
+                $("div.nano").nanoScroller({
+                    contentClass: 'nanocontent',
+                    iOSNativeScrolling: true,
+                    preventPageScrolling: true
+                });
                 $('div.quickflip-wrapper').quickFlip({
                     closeSpeed : 200,
                     openSpeed : 150
@@ -108,7 +118,7 @@
                 $(document).on('click', '.bookmark-refresh-btn', function() {
                     var bookmark_item = $(this).closest('.bookmark-item');
                     var url = bookmark_item.find('.bookmark-favicon').attr('href');
-                    var animateClass = "icon-spin";
+                    var animateClass = "fa-spin";
                     $(this).addClass(animateClass);
                     that = $(this);
                     jQuery.getJSON('/bookmark/refresh', {
