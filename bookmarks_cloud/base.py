@@ -15,7 +15,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
     @property
     def bm(self):
-        return Bookmark(self.db, self.current_user.decode('utf-8'))
+        return Bookmark(self.db, self.current_user)
 
     @property
     def us(self):
@@ -35,13 +35,13 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def avatar(self, size=40):
         if self.current_user:
-            return 'http://www.gravatar.com/avatar/' + md5(self.get_secure_cookie('email').lower()).hexdigest() + '?d=mm&s=' + str(size)
+            return 'http://www.gravatar.com/avatar/' + md5(self.current_user['email'].encode('utf-8').lower()).hexdigest() + '?d=mm&s=' + str(size)
 
     def get_current_user(self):
-        return self.get_secure_cookie("username")
-        # user_json = self.get_secure_cookie("auth_user")
-        # if not user_json: return None
-        # return tornado.escape.json_decode(user_json)
+        user_json = self.get_secure_cookie("auth_user")
+        if not user_json:
+            return None
+        return tornado.escape.json_decode(user_json)
 
     def write_error(self, status_code, **kwargs):
         if status_code == 404:

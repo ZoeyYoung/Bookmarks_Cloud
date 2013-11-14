@@ -4,23 +4,27 @@ __author__ = "Zoey Young (ydingmiao@gmail.com)"
 import os
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, TEXT, ID, KEYWORD
-from whoosh.analysis import Tokenizer,Token
+from whoosh.analysis import Tokenizer, Token
 from whoosh import qparser
 from .config import *
 from jieba.analyse import ChineseAnalyzer
 
 analyzer = ChineseAnalyzer()
 
+
 class WhooshBookmarks(object):
+
     """
     Object utilising Whoosh (http://woosh.ca/) to create a search index of all
     crawled rss feeds, parse queries and search the index for related mentions.
     """
+
     def __init__(self, db):
         """
         Instantiate the whoosh schema and writer and create/open the index.
         """
-        self.bookmarks_collection = db.bookmarks
+        self.bookmarks_collection = db.bookmarks_col
+        self.webpages_collection = db.webpages_col
         self.indexdir = "index"
         self.indexname = "bookmarks"
         self.schema = self.get_schema()
@@ -30,20 +34,6 @@ class WhooshBookmarks(object):
         # create an index obj and buffered writer
         self.ix = open_dir(self.indexdir, indexname=self.indexname)
 
-    def rebuild_index(self):
-        ix = create_in(self.indexdir, self.schema, indexname=self.indexname)
-        writer = ix.writer()
-        for bookmark in self.bookmarks_collection.find(timeout=False):
-            writer.update_document(
-                nid=str(bookmark['_id']),
-                url=bookmark['url'],
-                title=bookmark['title'],
-                tags=bookmark['tags'],
-                note=bookmark['note'],
-                article=bookmark['article']
-            )
-        writer.commit()
-
     def get_schema(self):
         return Schema(
             nid=ID(unique=True, stored=True),
@@ -51,8 +41,24 @@ class WhooshBookmarks(object):
             title=TEXT(phrase=False),
             tags=KEYWORD(lowercase=True, commas=True, scorable=True),
             note=TEXT(analyzer=analyzer),
-            article=TEXT(stored=True, analyzer=analyzer)
+            content=TEXT(stored=True, analyzer=analyzer)
         )
+
+    def rebuild_index(self):
+        ix = create_in(self.indexdir, self.schema, indexname=self.indexname)
+        writer = ix.writer()
+        for bookmark in self.bookmarks_collection.find(timeout=False):
+            webpage = self.webpages_collection.find_one({'_id': bookmark['webpage']})
+            if webpage:
+                writer.update_document(
+                    nid=str(bookmark['_id']),
+                    url=bookmark['url'],
+                    title=bookmark['title'],
+                    tags=bookmark['tags'],
+                    note=bookmark['note'],
+                    content=webpage['content']
+                )
+        writer.commit()
 
     def commit(self, writer):
         """
@@ -61,7 +67,7 @@ class WhooshBookmarks(object):
         writer.commit()
         return True
 
-    def update(self, bookmark, writer=None):
+    def update(self, bookmark, webpage, writer=None):
         if writer is None:
             writer = self.ix.writer()
         writer.update_document(
@@ -70,12 +76,13 @@ class WhooshBookmarks(object):
             title=bookmark['title'],
             tags=bookmark['tags'],
             note=bookmark['note'],
-            article=bookmark['article']
+            content=webpage['content']
         )
         writer.commit()
 
     def parse_query(self, query):
-        parser = qparser.MultifieldParser(["url", "title", "tags", "note", "article"], self.ix.schema)
+        parser = qparser.MultifieldParser(
+            ["url", "title", "tags", "note", "content"], self.ix.schema)
         return parser.parse(query)
 
     def search(self, query, page):
@@ -84,20 +91,19 @@ class WhooshBookmarks(object):
         """
         results = []
         with self.ix.searcher() as searcher:
-            result_page = searcher.search_page(self.parse_query(query), page, pagelen=PAGE_SIZE)
+            result_page = searcher.search_page(
+                self.parse_query(query), page, pagelen=PAGE_SIZE)
             # create a results list from the search results
             for result in result_page:
             # for result in searcher.search(self.parse_query(query)):
                 results.append(dict(result))
-        return { 'results': results, 'total': result_page.total }
-
+        return {'results': results, 'total': result_page.total}
 
     def delele_by_url(self, url):
         writer = self.ix.writer()
         result = writer.delete_by_term('url', url)
         writer.commit()
         return result
-
 
     def close(self):
         """

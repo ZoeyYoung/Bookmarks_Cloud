@@ -1022,57 +1022,57 @@
  *
 ************************************************************/
 
-@newline: `"\n"`;
-.animation-func(@selector, @animation-name, @animation-other) {
-    .Keyframe(@pre, @post, @vendor) {
-        (~"@{pre}@@{vendor}keyframes @{animation-name} {@{newline}0%") {
-            .keyframes-0();
-        }
-        10%  {
-            .keyframes-10();
-        }
-        20%  {
-            .keyframes-20();
-        }
-        30%  {
-            .keyframes-30();
-        }
-        40%  {
-            .keyframes-40();
-        }
-        50%  {
-            .keyframes-50();
-        }
-        60%  {
-            .keyframes-60();
-        }
-        70%  {
-            .keyframes-70();
-        }
-        80%  {
-            .keyframes-80();
-        }
-        90%  {
-            .keyframes-90();
-        }
-        100%  {
-            .keyframes-100();
-        }
-        .Local(){}
-        .Local() when (@post=1) {
-            (~"}@{newline}@{selector}") {
-                -webkit-animation : @animation-name @animation-other;
-                   -moz-animation : @animation-name @animation-other;
-                    -ms-animation : @animation-name @animation-other;
-                     -o-animation : @animation-name @animation-other;
-                        animation : @animation-name @animation-other;
-            }
-        }
-        .Local;
-    }
-    .Keyframe(""            , 0,    "-moz-");
-    .Keyframe(~"}@{newline}", 0, "-webkit-");
-    .Keyframe(~"}@{newline}", 0,      "-o-");
-    .Keyframe(~"}@{newline}", 0,     "-ms-");
-    .Keyframe(~"}@{newline}", 1,         "");
-}
+// @newline: `"\n"`;
+// .animation-func(@selector, @animation-name, @animation-other) {
+//     .Keyframe(@pre, @post, @vendor) {
+//         (~"@{pre}@@{vendor}keyframes @{animation-name} {@{newline}0%") {
+//             .keyframes-0();
+//         }
+//         10%  {
+//             .keyframes-10();
+//         }
+//         20%  {
+//             .keyframes-20();
+//         }
+//         30%  {
+//             .keyframes-30();
+//         }
+//         40%  {
+//             .keyframes-40();
+//         }
+//         50%  {
+//             .keyframes-50();
+//         }
+//         60%  {
+//             .keyframes-60();
+//         }
+//         70%  {
+//             .keyframes-70();
+//         }
+//         80%  {
+//             .keyframes-80();
+//         }
+//         90%  {
+//             .keyframes-90();
+//         }
+//         100%  {
+//             .keyframes-100();
+//         }
+//         .Local(){}
+//         .Local() when (@post=1) {
+//             (~"}@{newline}@{selector}") {
+//                 -webkit-animation : @animation-name @animation-other;
+//                    -moz-animation : @animation-name @animation-other;
+//                     -ms-animation : @animation-name @animation-other;
+//                      -o-animation : @animation-name @animation-other;
+//                         animation : @animation-name @animation-other;
+//             }
+//         }
+//         .Local;
+//     }
+//     .Keyframe(""            , 0,    "-moz-");
+//     .Keyframe(~"}@{newline}", 0, "-webkit-");
+//     .Keyframe(~"}@{newline}", 0,      "-o-");
+//     .Keyframe(~"}@{newline}", 0,     "-ms-");
+//     .Keyframe(~"}@{newline}", 1,         "");
+// }

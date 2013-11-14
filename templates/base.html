@@ -1,123 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8" />
-    <!-- saved from url=(0014)about:internet -->
-    <title>{{ handler.settings['title'] }}</title>
-    <meta name="keywords" content="{{ handler.settings['keywords'] }}">
-    <meta name="description" content="{{ handler.settings['desc'] }}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ handler.settings['desc'] }}">
+    <meta name="keywords" content="{{ handler.settings['keywords'] }}">
+    <title>{{ handler.settings['title'] }}</title>
     <!-- Bootstrap -->
-    <link href="{{static_url('css/bootstrap.min.css')}}" rel="stylesheet" media="screen">
-    <link href="{{static_url('css/font-awesome.min.css')}}" rel="stylesheet" media="screen">
-    <!-- font-awesome如果需要IE7支持要添加额外的CSS -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Font Awesome 4.0.1 doesn't support IE7, but an older version does.  -->
     <link href="{{static_url('css/pygments.css')}}" rel="stylesheet" media="screen">
     <link href="{{static_url('css/nanoscroller.css')}}" rel="stylesheet" media="screen">
     <link href="{{static_url('css/style.css') }}" rel="stylesheet" />
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-        <script src="{{static_url('js/html5shiv.js')}}"></script>
-        <script src="{{static_url('js/respond.min.js')}}"></script>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
 </head>
 <body id="top">
-    {% set user=handler.get_current_user() %}
-    <div id="vcard" class="profile" data-title="{{user}}" data-content="共收藏了{{handler.total}}个书签">
-        <img src="{{handler.avatar(64)}}" class="img-circle avatar" alt="当前用户" />
-    </div>
-    <header id="header">
-        <ul id="navigationMenu">
-            <li class="active"><a class="n-cloud" href="/"><span><i class="icon-cloud"></i> 首页</span></a>
-            </li>
-            <li><a class="n-list" href="#1" data-toggle="tab"><span><i class="icon-list"></i> 列表</span></a>
-            </li>
-            <li><a class="n-tags" href="#2" data-toggle="tab"><span><i class="icon-tags"></i> 标签</span></a>
-            </li>
-            <li id="randomBookmarksBtn">
-                <a class="n-random" href="#3" data-toggle="tab"><span><i class="icon-random"></i> 随机</span></a>
-            </li>
-            <li>
-                <a id="searchBtn" class="n-search" href="javascript:;">
-                    <span><i class="icon-search"></i>
-                        <form id="searchForm" action="/ftxsearch" method="get">
-                            <input type="search" id="keywords" name="keywords" class="input-medium" placeholder="标题 网址 标签" />
-                        </form>
-                    </span>
-                </a>
-            </li>
-            <li><a id="showBookmarkFormBtn" class="n-add" href="#"><span><i class="icon-plus"></i> 添加</span></a></li>
-            <li><a class="n-logout" href="/auth/logout"><span><i class="icon-off"></i> 登出</span></a></li>
+    {% set user=handler.current_user %}
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand n-cloud" href="/"><i class="fa fa-cloud fa-fw"></i> 书签云</a>
+      </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+            <li><a class="n-list" href="#1" data-toggle="tab"><i class="fa fa-list fa-fw"></i> 列表</a></li>
+            <li><a class="n-tags" href="#2" data-toggle="tab"><i class="fa fa-tags fa-fw"></i> 标签</a></li>
+            <li id="randomBookmarksBtn"><a class="n-random" href="#3" data-toggle="tab"><i class="fa fa-random fa-fw"></i> 随机</a></li>
         </ul>
-    </header>
+        <form id="searchForm" action="/ftxsearch" method="get" class="navbar-form navbar-left" role="search">
+          <div class="form-group">
+            <input type="text" id="keywords" name="keywords" class="form-control" placeholder="标题 网址 标签">
+          </div>
+          <button id="searchBtn" type="submit" class="btn btn-default"><i class="fa fa-search fa-fw"></i></button>
+        </form>
+        <ul class="nav navbar-nav navbar-right">
+          <li id="vcard" data-title="{{user['email']}}" data-content="共收藏了{{handler.total}}个书签"><img src="{{handler.avatar(40)}}" class="img-circle avatar" alt="当前用户" />
+          <li><a id="showBookmarkFormBtn" class="n-add" href="#"><i class="fa fa-plus-square fa-fw"></i> 添加</a></li>
+          <li><a class="n-logout" href="/auth/logout"><i class="fa fa-power-off fa-fw"></i> 登出</a></li>
+          </li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </nav>
     <div class="container">
-        <div class="row">
-            <div class="col-lg-6 quickflip-wrapper" style="margin-top: 20px;">
-                <div id="bookmarks-panel" class="nano">
+        <div class="row" style="padding: 0 15px;">
+            <div class="col-md-12 quickflip-wrapper">
+                <div id="bookmarks-panel">
                     {% block content %}{% end %}
                 </div>
-                <div>
+                <div class="row" style="padding: 0 15px;">
+                    <!-- 添加链接表单 Begin -->
                     {% block header %}
-                    {% if not handler.get_current_user() is None %}
-                    <form id="bookmarkForm" class="form-horizontal" action="#" role="form">
+                    <!-- 判断是否为已登录用户 -->
+                    {% if not handler.current_user is None %}
+                    <div class="col-md-6">
+                    <form id="bookmarkForm" class="form-horizontal" role="form" action="#">
                         {% module xsrf_form_html() %}
                         <div class="form-group">
-                            <label class="control-label col-lg-1" for="url"></label>
-                            <div class="col-lg-11 input-group">
+                            <label for="url" class="control-label"></label>
+                            <div class="col-md-12 input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark fa-fw"></i>
                                 </span>
-                                <input type="url" name="url" id="url" class="form-control" placeholder="http://www.website.com" autofocus required/>
+                                <input type="url" class="form-control" name="url" id="url" placeholder="http://www.website.com" autofocus required/>
                                 <span class="input-group-btn">
                                     <button class="btn btn-info" type="button" id="getBookmarkInfoBtn" data-loading-text="载入中...">获取信息</button>
                                 </span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-lg-1" for="title" >标题</label>
-                            <div class="col-lg-11">
-                                <input type="text" name="title" id="title" placeholder="书签标题" class="form-control" required disabled>
+                            <label for="title" class="control-label visible-print">标题</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" name="title" id="title" placeholder="书签标题" required disabled>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-lg-1" for="description">摘要</label>
-                            <div class="col-lg-11">
-                                <textarea name="description" id="description" rows="3" placeholder="书签摘要" class="form-control" disabled></textarea>
+                            <label for="description" class="control-label visible-print">摘要</label>
+                            <div class="col-md-12">
+                                <textarea class="form-control" name="description" id="description" rows="3" placeholder="书签摘要" disabled></textarea>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-lg-1" for="tags">标签</label>
-                            <div class="col-lg-11">
-                                <input type="text" name="tags" id="tags" class="form-control" placeholder="标签1,标签2,标签3..." required/>
-                                <ul id="suggestTags" class="tags"></ul>
+                            <label for="tags" class="control-label visible-print">标签</label>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" name="tags" id="tags" placeholder="标签1,标签2,标签3..." required/>
+                                <ul id="suggestTags" class="list-inline"></ul>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label col-lg-1" for="note">笔记</label>
-                            <div class="col-lg-11">
+                            <label for="note" class="control-label visible-print">笔记</label>
+                            <div class="col-md-12">
                                 <textarea class="form-control" id="note" rows="10" placeholder="还神马都没有记."></textarea>
                                 <span class="help-block">使用Markdown语法</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
                                 <button type="button" id="addBookmarkBtn" class="btn btn-primary quickFlipCta">提交</button>
                                 <button type="button" id="cancelAddBookmarkBtn" class="btn quickFlipCta">取消</button>
                             </div>
                         </div>
                     </form>
-                    {% end %}
-                    {% end %}
-                </div>
-            </div>
-            <div id="article-panel" class="col-lg-6 nano">
-                <article id="article" class="content nanocontent">
-                    <h3 id="article-title"></h3>
-                    <div id="article-content">
                     </div>
-                </article>
+                    {% end %}
+                    {% end %}
+                    <!-- 添加链接表单 End -->
+                    <div id="article-panel" class="col-md-6">
+                        <article id="article" class="content">
+                            <h3 id="article-title"></h3>
+                            <div id="article-content">
+                            </div>
+                        </article>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <footer id="footer">
     </footer>
-    <script src="{{static_url('js/jquery.min.js')}}"></script>
-    <script src="{{static_url('js/bootstrap.min.js')}}"></script>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <script src="{{static_url('js/jquery.lazy.min.js')}}"></script>
     <script src="{{static_url('js/jquery.quickflip.min.js')}}"></script>
     <script src="{{static_url('js/jquery.nanoscroller.min.js')}}"></script>

@@ -29,7 +29,7 @@ log = logging.getLogger('bc_log')
 PAGE_CLASS = 'article-page'
 BLOCK_CONTENT_TAG = ['div', 'header', 'article', 'section']
 REGEXES = {
-    'cannotBeCandidatesRe': re.compile('adpack|comment|copyright|disqus|foot|google_ads|uyan_frame|ujian', re.I),
+    'cannotBeCandidatesRe': re.compile('adpack|comment|copyright|disqus|foot|google_ads|navigation|uyan_frame|ujian', re.I),
     'unlikelyCandidatesRe': re.compile('ad-break|avatar|agegate|banner|bottom|bread|biaoqing|blurb|bury|combx|crumbs|community|db-usr-profile|discuss|dialog|dig|extra|feedback|login|menu|nav|notify|notice|owner|popup|remark|rss|rat|shoutbox|sponsor|skip|stat|seccode|sign|share|submit|score|tool|tweet|twitter|user|vote|widget', re.I),
     'okMaybeItsACandidateRe': re.compile('and|article|brush|body|brand|column|main|shadow|post|topic|document|news|highlight|accept|section', re.I),
     'positiveRe': re.compile('article|body|content|detail|entry|hentry|main|page|pagination|post|text|blog|story|topic|document|section|news|highlight|code', re.I),

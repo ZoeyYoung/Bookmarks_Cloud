@@ -13,20 +13,19 @@ import re
 import jieba
 import jieba.analyse
 import logging
-from .config import LOG
+import json
+import html.parser
+html_parser = html.parser.HTMLParser()
+from .config import LOG, DB
 # import urllib
 log = logging.getLogger(LOG)
-
+predefine_sites_collection = DB.predefine_sites
 jieba.initialize()
 
-URL_CONTENT = [
-    {'url': 'movie.douban.com/subject', 'content': 'related_info'},
-    {'url': '52youji.net', 'content': 'main-content'},
-    {'url': 'diary.jiayuan.com/famousblog', 'content': 'txt'},
-    {'url': 'http://www.qwolf.com/', 'content': 'entry-content'}
-]
 # 格式化标签
-def format_tags(str):
+def format_tags(str=None):
+    if str is None:
+        str = ''
     tags = re.split('[,，|]', str)
     tags = [tag.strip() for tag in tags]
     tags = [tag for tag in tags if len(tag) > 0]
@@ -34,19 +33,24 @@ def format_tags(str):
     return tags
 
 def readability_parser(url):
+    """使用readability的API
+    教程: http://www.readability.com/developers/api/parser
+    """
     request = httpclient.HTTPRequest(
         "https://readability.com/api/content/v1/parser?token=7f579fc61973e200632c9e43ff2639234817fbb3&url=" + url,
         method='GET',
-        headers={"content-type": 'application/json', 'Referer': 'http://www.google.com', "Accept": "*/*"},
-        request_timeout=10,
-        follow_redirects=True,
-        user_agent='Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1485.0 Safari/537.36',
-        allow_ipv6=True
+        user_agent='Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.6 Safari/537.36'
     )
     return httpclient.AsyncHTTPClient().fetch(request)
 
 @lru_cache(maxsize=32)
-def fetch_url(url):
+def fetch_webpage(url):
+    """抓取网页
+    Args:
+        url: 网址
+    Returns:
+        HTTPResponse
+    """
     request = httpclient.HTTPRequest(
         url,
         method='GET',
@@ -59,22 +63,35 @@ def fetch_url(url):
     return httpclient.AsyncHTTPClient().fetch(request)
 
 
+def get_html_str(url, html=None):
+    if not html:
+        response = fetch_webpage(url)
+        response = response.result()
+        html = response.body
+        if not html:
+            print("Error: html is None", url)
+            return "<html><head><title>Ooops, 抓取网页失败.</title></head><body>Ooops, 抓取网页失败.</body></html>"
+    return html
+
 def predefined_site(url, html):
-    for uc in URL_CONTENT:
-        if re.compile(uc['url'], re.I).search(url) is not None:
+    print(url, "=====================predefined_site？")
+    pds = predefine_sites_collection.find()
+    for pd in pds:
+        if re.compile(pd['url_pattern'], re.I).search(url) is not None:
+            print(url, "=====================predefined_site")
             doc = htmls.build_doc(html)
             for tag in doc.iter():
                 allelem = doc.iter()
                 for elem in allelem:
                     s = "%s %s" % (elem.get('class', ''), elem.get('id', ''))
-                    if re.compile(uc['content']).search(s) is not None:
-                        print(url, "=====================predefined_site")
+                    if re.compile(pd['content_css']).search(s) is not None:
+                        print(url, "=====================predefined_site", htmls.get_keywords(doc)+','+','.join(pd['tags']))
                         return Summary(get_clean_html(elem),
                            '',
                            short_title=htmls.shorten_title(doc),
                            title=htmls.get_title(doc),
                            description=htmls.get_description(doc),
-                           keywords=htmls.get_keywords(doc))
+                           keywords=htmls.get_keywords(doc)+','+','.join(pd['tags']))
     return None
 
 
@@ -98,40 +115,73 @@ def video_site(url):
             return None
 
 
-def get_bookmark_info(url, html=None):
-    article = video_site(url)
-    if not html:
-        html = fetch_url(url)
-        if not html:
-            print("Error: html is None", url)
-            return None
+def get_webpage_by_readability(url, readability):
+    if readability:
+        webpage = json.loads(readability.decode("utf-8"))
+        webpage["favicon"] = ""
+        webpage["tags"] = get_suggest_tags(webpage['title'], webpage['content'])
+        webpage["segmentation"] = get_segmentation(webpage['title'], webpage['content'])
+        webpage['excerpt'] = html_parser.unescape(webpage['excerpt'])
+        return webpage
+    else:
+        print("Error: In get_bookmark_info_by_readability")
+
+
+def get_webpage_by_html(url, html=None):
+    html = get_html_str(url, html)
     summary_obj = predefined_site(url, html)
+    article = video_site(url)
     if summary_obj is None:
         doc = Document(html, url=url, debug=True, multipage=False)
         summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
     title = summary_obj.short_title
     if article is None:
         article = summary_obj.html
-    description = summary_obj.description
-    keywords_t = []
-    keywords_a = []
-    segmentation = ''
-    segmentation_t = ''
-    segmentation_a = ''
-    if title:
-        keywords_t = get_keywords(title)
-        segmentation_t = text_segmentation(title)
-    if article:
-        keywords_a = get_keywords(article)
-        segmentation_a = text_segmentation(article)
-    keywords = keywords_t + keywords_a
-    segmentation = segmentation_t + segmentation_a
-    if summary_obj.keywords:
-        keywords = keywords + format_tags(summary_obj.keywords)
-    if keywords:
-        keywords = ",".join(set(keywords))
-    bookmark = dict(html=html, title=title, favicon="", article=article, segmentation=segmentation, description=description, tags=keywords)
-    return bookmark
+    return {
+        "url": url,
+        "short_url": url,
+        "domain": url, # 这个应该可以根据URL生成
+        "favicon": "",
+        "title": title,
+        "author" : None,
+        "lead_image_url" : None,
+        "excerpt" : summary_obj.description,
+        "content": article,
+        "segmentation" : get_segmentation(title, article),
+        "tags": get_suggest_tags(title, article, summary_obj.keywords),
+        "next_page_id": None,
+        "direction" : "ltr",
+        "dek" : None,
+        "word_count": None,
+        "total_pages" : 0,
+        "date_published": None,
+        "rendered_pages": 1,
+    }
+
+
+def get_suggest_tags(title, content, keywords_meta=None):
+    """根据标题和内容获取推荐标签"""
+    if keywords_meta is None:
+        keywords_meta = ''
+    if title is None:
+        title = ''
+    if content is None:
+        content = ''
+    # 关键字获取
+    keywords_title = jieba.analyse.extract_tags(text_content(title), 10)
+    keywords_content = jieba.analyse.extract_tags(text_content(content), 10)
+    keywords = keywords_title + keywords_content + format_tags(keywords_meta)
+    keywords = ",".join(set(keywords))
+    # TODO: 还需要进行一系列处理
+    return keywords
+
+
+def get_segmentation(title, content):
+    if title is None:
+        title = ''
+    if content is None:
+        content = ''
+    return text_segmentation(title + content)
 
 
 def text_content(s):

@@ -9,7 +9,8 @@ from .bookmarks_handlers import *
 
 handlers = [
     (r'/', IndexHandler),
-    (r'/auth/login', AuthHandler),
+    (r'/auth/signin', SignInHandler),
+    (r'/auth/signup', SignUpHandler),
     (r'/auth/logout', LogoutHandler),
     (r'/bookmark/page/([0-9]+)', IndexHandler),
     (r'/bookmark', AjaxBookmarkHandler),
@@ -19,7 +20,8 @@ handlers = [
     (r'/bookmark/get_info', BookmarkGetInfoHandler),
     (r'/bookmark/add', BookmarkAddHandler),
     (r'/bookmark/del', BookmarkDelHandler),
-    (r'/tag/([0-9]+)/(.*)', TagBookmarksHandler),
+    (r'/bookmark/set_star', BookmarkSetStarHandler),
+    (r'/tag/([^/]+)/([0-9]+)', TagBookmarksHandler),
     (r'/tags_cloud', TagsCloudHandler),
     (r'/randombookmark', RandomBookmarkHandler),
     (r'/random', RandomBookmarksHandler),
@@ -27,4 +29,5 @@ handlers = [
     (r'/ftxsearch', FullTextSearchHandler),
     (r'/tags', TagsHandler),
     (r'/segmentation/(.*)', SegmentationHandler)
+    # (r'/readability/(.*)', ReadabilityHandler)
 ]

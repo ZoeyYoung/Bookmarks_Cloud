@@ -32,7 +32,7 @@ class Application(tornado.web.Application):
             ui_modules={'Bookmark': BookmarkModule, 'Pager': PagerModule},
             xsrf_cookies=False,
             cookie_secret=COOKIE_SECRET,
-            login_url="/auth/login",
+            login_url="/auth/signin",
             gzip=True,
             # autoescape=None,
             **{k: v.value() for k, v in options._options.items()}
@@ -50,7 +50,7 @@ def main():
             print('Logging to', handler.baseFilename)
             break
     if options.rebuild_indexes or options.ensure_indexes:
-        indexes.ensure_indexes(DB, drop=options.rebuild_indexes)
+        indexes.ensure_indexes(pymongo.MongoClient()[DB_NAME], drop=options.rebuild_indexes)
     http_server = httpserver.HTTPServer(Application(options), xheaders=True)
     http_server.listen(options.port)
     log.info('Listening on port %s' % options.port)

@@ -2,36 +2,48 @@
 {% if bookmark['favicon'] is '' %}
     {% set bookmark['favicon'] = "http://ico.ylsnuha.com/" + bookmark['url'] + "?defaulticon=" + handler.avatar() %}
 {% end %}
-<div class="bookmark-item" data-name="{{bookmark['title']}}">
-    <a class="bookmark-favicon" target="_blank" title="{{bookmark['title']}}" href="{{bookmark['url']}}">
-        <img class="lazy" data-src="{{bookmark['favicon']}}" src="" alt="{{bookmark['title']}}"/>
-    </a>
-    <div class="bookmark-title">
-        <a target="_blank" title="{{bookmark['url']}}" href="{{bookmark['url']}}">{{bookmark['title']}}</a>
-        <time><i class="fa fa-clock-o"></i> {{locale.format_date(bookmark['post_time'], -480, relative=False)}}</time>
-    </div>
-    <div class="pull-right">
-        <div class="btn-group">
-            <button type="button" class="btn btn-info bookmark-read-btn"><i class="fa fa-file-text-o fa-fw"></i></button>
+{% if bookmark['is_star'] is 0 %}
+    {% set is_star_css = "fa-star-o" %}
+{% else %}
+    {% set is_star_css = "fa-star" %}
+{% end %}
+<div class="bookmark-item thumbnail" data-name="{{bookmark['title']}}">
+    <div class="caption">
+        <div class="bookmark-title">
+            <a class="bookmark-favicon" target="_blank" title="{{bookmark['title']}}" href="{{bookmark['url']}}">
+                <img class="lazy" data-src="{{bookmark['favicon']}}" src="" alt="{{bookmark['title']}}"/>
+            </a>
+            <a target="_blank" title="{{bookmark['url']}}" href="{{bookmark['url']}}">{{bookmark['title']}}</a>
+            <time><i class="fa fa-clock-o"></i> {{locale.format_date(bookmark['added_time'], -480, relative=False)}}</time>
+        </div>
+        <div class="pull-right">
             <div class="btn-group">
-                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"><i class="fa fa-chevron-down fa-fw"></i>
-                </button>
-                <ul class="dropdown-menu">
-                    <li class="bookmark-edit-btn"><a href="javascript:;" title="编辑"><i class="fa fa-pencil fa-fw"></i></a></li>
-                    <li class="bookmark-refresh-btn"><a href="javascript:;" title="更新"><i class="fa fa-refresh fa-fw"></i></a></li>
-                    <li class="bookmark-del-btn" ><a href="javascript:;" title="删除"><i class="fa fa-trash-o fa-fw"></i></a></li>
-                </ul>
+                <button type="button" class="btn btn-info bookmark-read-btn"><i class="fa fa-file-text-o fa-fw"></i></button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"><i class="fa fa-chevron-down fa-fw"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="bookmark-star-btn"><a href="javascript:;" title="加星"><i class="fa {{is_star_css}} fa-fw"></i> 加星</a></li>
+                        <li class="bookmark-edit-btn"><a href="javascript:;" title="编辑"><i class="fa fa-pencil fa-fw"></i> 编辑</a></li>
+                        <li class="bookmark-refresh-btn"><a href="javascript:;" title="更新"><i class="fa fa-refresh fa-fw"></i> 更新</a></li>
+                        <li class="bookmark-del-btn" ><a href="javascript:;" title="删除"><i class="fa fa-trash-o fa-fw"></i> 删除</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
-    <blockquote><p class="text-muted">{{bookmark['description']}}</p></blockquote>
-    <div class="bookmark-note">{% raw bookmark['note_html'] %}</div>
-    {% if len(bookmark['tags']) > 0 %}
-    <ul class="list-inline tags">
-        <li><i class="icon-tags"></i></li>
-        {% for tag in bookmark['tags'] %}
-            <li><a href="/tag/1/{{tag}}">{{tag}}</a></li>
+        <blockquote><p class="text-muted">{{bookmark['excerpt']}}</p></blockquote>
+        <div class="bookmark-note">
+            {% raw bookmark['note_html'] %}
+        </div>
+        {% if len(bookmark['tags']) > 0 %}
+        <ul class="list-inline tags">
+            <li><i class="icon-tags"></i></li>
+            {% for tag in bookmark['tags'] %}
+                <li><a href="/tag/{{tag}}/1">{{tag}}</a></li>
+            {% end %}
+        </ul>
         {% end %}
-    </ul>
-    {% end %}
+    </div>
+    <div class="bookmark-article" style="display:none;">
+    </div>
 </div>

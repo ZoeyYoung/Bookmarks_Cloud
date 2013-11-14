@@ -5,25 +5,52 @@ import tornado.web
 import tornado.auth
 from .base import BaseHandler
 
-class AuthHandler(BaseHandler):
-
+class SignInHandler(BaseHandler):
+    """登录"""
     def get(self):
-        self.render('login.html')
+        self.render('auth.html')
 
     @tornado.web.asynchronous
     def post(self):
+        # 是否重复登录
         if self.get_current_user():
             raise tornado.web.HTTPError(403)
-        name = self.get_argument("name")
+        email = self.get_argument("email")
         password = self.get_argument("password")
-        user = self.us.get_user_by_name_and_pwd(name, password)
+        user = self.us.get_user_by_email_and_pwd(email, password)
         if user:
-            self.set_secure_cookie('username', user['name'])
-            self.set_secure_cookie('email', user['email'])
+            user['_id'] = str(user['_id'])
+            self.set_secure_cookie('auth_user', tornado.escape.json_encode(user))
             self.redirect(self.get_argument('next', '/'))
+        else:
+            # 登录不成功前台应该有提示
+            print("登录失败")
+
+
+class SignUpHandler(BaseHandler):
+
+    def get(self):
+        self.render('auth.html')
+
+    """注册"""
+    @tornado.web.asynchronous
+    def post(self):
+        # 是否重复登录
+        if self.get_current_user():
+            raise tornado.web.HTTPError(403)
+        email = self.get_argument("email")
+        password = self.get_argument("password")
+        user = self.us.insert(email, password)
+        if user:
+            self.set_secure_cookie('auth_user', tornado.escape.json_encode(user))
+            self.redirect(self.get_argument('next', '/'))
+        else:
+            # 注册不成功前台应该有提示
+            print("注册失败")
 
 
 class LogoutHandler(BaseHandler):
+
     def get(self):
         self.clear_cookie("auth_user")
         self.redirect(self.get_argument("next", "/"))

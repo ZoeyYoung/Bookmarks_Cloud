@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="tab-content content nanocontent">
+<div class="tab-content content">
     <div class="tab-pane active" id="1">
         {% block bookmarks_pane %}
         {% end %}
@@ -9,7 +9,7 @@
         {% block tags_pane %}
         <div id="tagCloud" class="well">
         {% for tag in handler.tags_cloud %}
-            <a style="font-size:{{tag['font_size']}}pt" href="/tag/1/{{tag['tag']['_id']}}">{{tag['tag']['_id']}}({{tag['tag']['count']}})</a>
+            <a style="font-size:{{tag['font_size']}}pt" href="/tag/{{tag['tag']['_id']}}/1">{{tag['tag']['_id']}}({{tag['tag']['count']}})</a>
         {% end %}
         </div>
         {% end %}
