@@ -1,8 +1,8 @@
 {% extends 'tabbable.html' %}
 {% block bookmarks_pane %}
-<h3>搜索 "{{keywords}}" 共搜到 {{count}} 个书签:</h3>
 <div id="pageBookmarkList" tag="" keywords="{{keywords}}">
-    <div id="bookmarkList">
+    <div id="bookmarkList" class="list-group">
+        <div class="list-group-item"><h3>搜索 "{{keywords}}" 共搜到 {{count}} 个书签:</h3></div>
         {% for bookmark in bookmarks %}
             {% module Bookmark(bookmark) %}
         {% end %}

@@ -5,10 +5,10 @@ import tornado.web
 import tornado.template
 from .base import BaseHandler
 from .utils import fetch_webpage
-from .utils import get_keywords
 from .models import Page
 from tornado import gen
-from tornado.escape import json_encode, json_decode
+from tornado.escape import json_encode
+from .db import json_dumps_docs, json_dumps_doc
 
 class BookmarkModule(tornado.web.UIModule):
     """书签UI模块
@@ -28,12 +28,97 @@ class PagerModule(tornado.web.UIModule):
         except KeyError:
             print('KeyError ->', page)
 
+class RecentBookmarksAPIHandler(BaseHandler):
+
+    def get(self, limit=10):
+        tag = self.get_argument("tag", default=None)
+        bookmarks = self.bm.get_recent_bms(tag, limit)
+        self.set_header("Content-Type", "application/json")
+        self.write(json_dumps_docs(bookmarks))
+
+
+class UserAPIHandler(BaseHandler):
+
+    def get(self, username=None):
+        if username is not None:
+            user = self.us.get_user_by_name(username)
+        else:
+            email = self.get_argument("email", default="")
+            user = self.us.get_user_by_email(email)
+        self.set_header("Content-Type", "application/json")
+        if user is not None:
+            self.write(json_dumps_doc(user))
+        else:
+            self.write(json_encode({"error": "用户不存在"}))
+
+
+class WebpageAPIHandler(BaseHandler):
+
+    def get(self, oid=None):
+        if oid is None:
+            url = self.get_argument('url', default=None)
+            webpage = self.wp.get_webpage_by_url(url)
+        else:
+            webpage = self.wp.get_webpage_by_oid(oid)
+        self.set_header("Content-Type", "application/json")
+        self.write(json_dumps_doc(webpage))
+
+
+class WebpageUsersAPIHandler(BaseHandler):
+
+    def get(self, oid=None):
+        if oid is None:
+            url = self.get_argument('url', default=None)
+            webpage = self.wp.get_webpage_by_url(url)
+            oid = webpage['_id']
+        users = self.bm.get_users_by_webpage(oid)
+        self.set_header("Content-Type", "application/json")
+        self.write(json_dumps_docs(users))
+
+
+class UserTagsAPIHandler(BaseHandler):
+
+    def get(self, username, limit=None):
+        print(limit)
+        tags = self.bm.get_tags_by_username(username, limit)
+        self.write(json_dumps_docs(tags))
+
+
+class UserBookmarkAPIHandler(BaseHandler):
+
+    def get(self, username):
+        url = self.get_argument("url", default="")
+        bookmark = self.bm.get_bm_by_username_url(username, url)
+        self.write(json_dumps_doc(bookmark))
+
+
+class UserBookmarksAPIHandler(BaseHandler):
+
+    def get(self, username, page=1):
+        bookmarks = self.bm.get_bms_by_username_page(username, page)
+        self.set_header("Content-Type", "application/json")
+        self.write(json_dumps_docs(bookmarks))
+
+class UserTagBookmarksAPIHandler(BaseHandler):
+
+    def get(self, username, tag, page=1):
+        bookmarks = self.bm.get_bms_by_username_tag_page(username, tag, page)
+        self.set_header("Content-Type", "application/json")
+        self.write(json_dumps_docs(bookmarks))
+
+class TagBookmarksAPIHandler(BaseHandler):
+
+    def get(self, tag, page=1):
+        bookmarks = self.bm.get_bms_by_tag_page(tag, page)
+        self.set_header("Content-Type", "application/json")
+        self.write(json_dumps_docs(bookmarks))
+
 class IndexHandler(BaseHandler):
     """登录后主页，显示当前用户保存的书签，默认显示第一页
     """
     @tornado.web.authenticated
     def get(self, page=1):
-        bookmarks = self.bm.get_by_page(page)
+        bookmarks = self.bm.get_bms_by_currentuser_page(page)
         page = Page(self.total, page)
         self.render('index.html', bookmarks=bookmarks, page=page)
 
@@ -46,14 +131,14 @@ class AjaxBookmarkHandler(BaseHandler):
         tag = self.get_argument('tag')
         keywords = self.get_argument('keywords')
         if tag:
-            bookmarks = self.bm.get_by_tag_page(tag, page)
+            bookmarks = self.bm.get_bms_by_currentuser_tag_page(tag, page)
             page = Page(bookmarks.count(), page)
         elif keywords:
             results = self.bm.whoose_ftx(keywords, page)
             bookmarks = results['results']
             page = Page(results['total'], page)
         else:
-            bookmarks = self.bm.get_by_page(page)
+            bookmarks = self.bm.get_bms_by_currentuser_page(page)
             page = Page(bookmarks.count(), page)
         self.render('list.html', bookmarks=bookmarks, page=page)
 
@@ -67,29 +152,34 @@ class BookmarkGetInfoHandler(BaseHandler):
         url = self.get_argument('url')
         # 首先判断用户是否已收藏过该书签，或已解析过该页面
         (bookmark, webpage) = self.bm.get_bookmark_webpage_by_url(url)
-
         if webpage is None:  # 如果未解析过该页面
+            response = yield fetch_webpage(url)
+            if response.body:
+                webpage = self.wp.get_webpage_by_goose(url, html=response.body)
+            else:
+                print("Error:", response.error)
+                self.write(json_encode({'success': 'false'}))
             # 默认使用readability的parser API
             # 教程: http://www.readability.com/developers/api/parser
-            try:
-                http_client = tornado.httpclient.AsyncHTTPClient()
-                response = yield http_client.fetch("https://readability.com/api/content/v1/parser?token=7f579fc61973e200632c9e43ff2639234817fbb3&url=" + tornado.escape.url_escape(url))
-                if response.body:
-                    webpage = self.bm.get_webpage_by_readability(url, readability=response.body)
-            except tornado.httpclient.HTTPError:
-                # print("Error:", response.error)
-                # 备用，处理readability无法识别的网页
-                response = yield fetch_webpage(url)
-                if response.body:
-                    webpage = self.bm.get_webpage_by_html(url, html=response.body)
-                else:
-                    print("Error:", response.error)
-                    self.write(json_encode({'success': 'false'}))
+            # try:
+                # http_client = tornado.httpclient.AsyncHTTPClient()
+                # response = yield http_client.fetch("https://readability.com/api/content/v1/parser?token=7f579fc61973e200632c9e43ff2639234817fbb3&url=" + tornado.escape.url_escape(url))
+                # if response.body:
+                #     webpage = self.wp.get_webpage_by_readability(url, readability=response.body)
+            # except tornado.httpclient.HTTPError:
+            #     # print("Error:", response.error)
+            #     # 备用，处理readability无法识别的网页
+            #     response = yield fetch_webpage(url)
+            #     if response.body:
+            #         webpage = self.wp.get_webpage_by_html(url, html=response.body)
+            #     else:
+            #         print("Error:", response.error)
+            #         self.write(json_encode({'success': 'false'}))
 
         if bookmark is None:  # 如果用户未收藏过该书签，则新建书签对象
             bookmark_info = {
                 'success': 'true',
-                'favicon': webpage['favicon'], # 需要吗?
+                'favicon': webpage.get('favicon', ''), # 需要吗?
                 'title': webpage['title'],
                 'description': webpage['excerpt'],
                 'suggest_tags': webpage['tags'],
@@ -101,7 +191,7 @@ class BookmarkGetInfoHandler(BaseHandler):
         elif bookmark is not None:  # 如果用户收藏过该书签，则更新信息
             bookmark_info = {
                 'success': 'true',
-                'favicon': webpage['favicon'], # 需要吗?
+                'favicon': webpage.get('favicon', ''), # 需要吗?
                 'title': webpage['title'],
                 'description': webpage['excerpt'],
                 'suggest_tags': webpage['tags'],
@@ -140,22 +230,28 @@ class BookmarkRefreshHandler(BaseHandler):
     @gen.coroutine
     def get(self, *args):
         url = self.get_argument('url')
+        response = yield fetch_webpage(url)
+        if response.body:
+            (bookmark, webpage) = self.bm.refresh_by_goose(url, html=response.body)
+        else:
+            print("Error:", response.error)
+            self.write(json_encode({'success': 'false'}))
         # 默认使用readability的parser API
         # 教程: http://www.readability.com/developers/api/parser
-        try:
-            http_client = tornado.httpclient.AsyncHTTPClient()
-            response = yield http_client.fetch("https://readability.com/api/content/v1/parser?token=7f579fc61973e200632c9e43ff2639234817fbb3&url=" + tornado.escape.url_escape(url))
-            if response.body:
-                (bookmark, webpage) = self.bm.refresh_by_readability(url, readability=response.body)
-        except tornado.httpclient.HTTPError:
-            # print("Error:", response.error)
-            # 备用，处理readability无法识别的网页
-            response = yield fetch_webpage(url)
-            if response.body:
-                (bookmark, webpage) = self.bm.refresh_by_html(url, html=response.body)
-            else:
-                print("Error:", response.error)
-                self.write(json_encode({'success': 'false'}))
+        # try:
+        #     http_client = tornado.httpclient.AsyncHTTPClient()
+        #     response = yield http_client.fetch("https://readability.com/api/content/v1/parser?token=7f579fc61973e200632c9e43ff2639234817fbb3&url=" + tornado.escape.url_escape(url))
+        #     if response.body:
+        #         (bookmark, webpage) = self.bm.refresh_by_readability(url, readability=response.body)
+        # except tornado.httpclient.HTTPError:
+        #     # print("Error:", response.error)
+        #     # 备用，处理readability无法识别的网页
+        #     response = yield fetch_webpage(url)
+        #     if response.body:
+        #         (bookmark, webpage) = self.bm.refresh_by_html(url, html=response.body)
+        #     else:
+        #         print("Error:", response.error)
+        #         self.write(json_encode({'success': 'false'}))
         if bookmark:
             bookmark_module = tornado.escape.to_basestring(
                     self.render_string('modules/bookmark.html', bookmark=bookmark))
@@ -174,12 +270,17 @@ class BookmarkGetArticleHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args):
         url = self.get_argument('url')
-        webpage = self.bm.get_webpage_by_url(url)
+        webpage = self.wp.get_webpage_by_url(url)
         if webpage:
             if webpage['content'] == '':
                 # TODO: 如果正文为空
                 # webpage = self.bm.refresh(bookmark)
                 print("TODO: 如果正文为空")
+                self.write(json_encode({
+                    'success': 'true',
+                    'title': webpage['title'],
+                    'article': "正文为空"
+                }))
             else:
                 self.write(json_encode({
                     'success': 'true',
@@ -214,7 +315,7 @@ class BookmarkDelHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self, *args):
         url = self.get_argument('url')
-        if self.bm.delete(url) == 1:
+        if self.bm.delete(url):
             self.write(json_encode({'success': 'true'}))
         else:
             self.write(json_encode({'success': 'false'}))
@@ -225,7 +326,7 @@ class BookmarkSetStarHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args):
         url = self.get_argument('url')
-        bookmark = self.bm.get_by_url(url)
+        bookmark = self.bm.get_bm_by_url(url)
         if bookmark:
             if bookmark['is_star'] == 0:
                 bookmark['is_star'] = 1
@@ -240,11 +341,11 @@ class BookmarkSetStarHandler(BaseHandler):
             self.write(json_encode({'success': 'false'}))
 
 
-class TagBookmarksHandler(BaseHandler):
+class AuthTagBookmarksHandler(BaseHandler):
     """获得当前用户指定标签下的书签"""
     @tornado.web.authenticated
     def get(self, tag, page):
-        bookmarks = self.bm.get_by_tag_page(tag, page)
+        bookmarks = self.bm.get_bms_by_currentuser_tag_page(tag, page)
         page = Page(bookmarks.count(), page)
         self.render('tag_bookmarks.html', bookmarks=bookmarks, page=page, cur_tag=tag, tag_count=bookmarks.count())
 
@@ -280,19 +381,6 @@ class RandomBookmarkHandler(BaseHandler):
         }))
 
 
-# class SearchHandler(BaseHandler):
-#     """搜索书签
-#     """
-#     @tornado.web.authenticated
-#     def get(self):
-#         tags = Bookmark.get_tags()
-#         tags_cloud = get_tags_cloud(tags)
-#         keywords = self.get_argument('keywords')
-#         result = Bookmark.get_by_keywords(keywords)
-#         count = result.count()
-#         self.render('search_result.html', keywords=keywords, tags_cloud=tags_cloud, bookmarks=result, count=count)
-
-
 class FullTextSearchHandler(BaseHandler):
     """搜索书签
     """
@@ -301,6 +389,9 @@ class FullTextSearchHandler(BaseHandler):
         keywords = self.get_argument('keywords')
         results = self.bm.whoose_ftx(keywords, 1)
         page = Page(results['total'], 1)
+        # TODO
+        # if results['total'] is 0 and keyword is a url
+        # Add Bookmark
         self.render('search_result.html', keywords=keywords, bookmarks=results['results'], count=results['total'], page=page)
 
 
@@ -317,8 +408,8 @@ class TagsHandler(BaseHandler):
 class SegmentationHandler(BaseHandler):
 
     def get(self, url):
-        bookmark = self.bm.get_by_url(url)
-        self.render('segmentation.html', bookmark=bookmark)
+        webpage = self.wp.get_webpage_by_url(url)
+        self.render('segmentation.html', webpage=webpage)
 
 # class ReadabilityHandler(BaseHandler):
 

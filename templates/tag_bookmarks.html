@@ -1,11 +1,11 @@
 {% extends 'tabbable.html' %}
 {% block bookmarks_pane %}
-<h3>{{cur_tag}} ({{tag_count}} 个书签):</h3>
 <div id="pageBookmarkList" tag="{{cur_tag}}" keywords="">
-    <div id="bookmarkList">
-    {% for bookmark in bookmarks %}
-        {% module Bookmark(bookmark) %}
-    {% end %}
+    <div id="bookmarkList" class="list-group">
+        <div class="list-group-item"><h3>{{cur_tag}} ({{tag_count}} 个书签):</h3></div>
+        {% for bookmark in bookmarks %}
+            {% module Bookmark(bookmark) %}
+        {% end %}
     </div>
     {% module Pager(page) %}
 </div>

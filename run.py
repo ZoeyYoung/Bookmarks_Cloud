@@ -6,6 +6,7 @@ import logging
 # from mongolog.handlers import MongoHandler
 import tornado.ioloop
 import tornado.web
+import tornado.httpclient
 from tornado.options import options
 from tornado import httpserver
 from bookmarks_cloud import indexes
@@ -37,7 +38,7 @@ class Application(tornado.web.Application):
             # autoescape=None,
             **{k: v.value() for k, v in options._options.items()}
         )
-        self.db=pymongo.MongoClient()[DB_NAME]
+        self.db = pymongo.MongoClient()[DB_NAME]
         tornado.web.Application.__init__(self, handlers, **settings)
 
 
@@ -50,12 +51,14 @@ def main():
             print('Logging to', handler.baseFilename)
             break
     if options.rebuild_indexes or options.ensure_indexes:
-        indexes.ensure_indexes(pymongo.MongoClient()[DB_NAME], drop=options.rebuild_indexes)
+        indexes.ensure_indexes(
+            pymongo.MongoClient()[DB_NAME], drop=options.rebuild_indexes)
     http_server = httpserver.HTTPServer(Application(options), xheaders=True)
     http_server.listen(options.port)
     log.info('Listening on port %s' % options.port)
-    # TODO: Can't Work In Windows
-    # httpclient.AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+    # TODO: Not Working in Python3
+    tornado.httpclient.AsyncHTTPClient.configure(
+        "tornado.curl_httpclient.CurlAsyncHTTPClient")
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":

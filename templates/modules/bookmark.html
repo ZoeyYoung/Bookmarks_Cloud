@@ -7,43 +7,48 @@
 {% else %}
     {% set is_star_css = "fa-star" %}
 {% end %}
-<div class="bookmark-item thumbnail" data-name="{{bookmark['title']}}">
-    <div class="caption">
-        <div class="bookmark-title">
+<div class="bookmark-item list-group-item" data-name="{{bookmark['title']}}">
+    <div class="bookmark-meta">
+        <p class="bookmark-title">
             <a class="bookmark-favicon" target="_blank" title="{{bookmark['title']}}" href="{{bookmark['url']}}">
                 <img class="lazy" data-src="{{bookmark['favicon']}}" src="" alt="{{bookmark['title']}}"/>
             </a>
             <a target="_blank" title="{{bookmark['url']}}" href="{{bookmark['url']}}">{{bookmark['title']}}</a>
             <time><i class="fa fa-clock-o"></i> {{locale.format_date(bookmark['added_time'], -480, relative=False)}}</time>
+        </p>
+        <p class="text-muted">{{bookmark['excerpt']}}</p>
+    </div>
+    <div class="pull-right">
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary bookmark-edit-btn"><i class="fa fa-file-text-o fa-fw"></i></button>
+            <button type="button" class="btn btn-primary bookmark-star-btn hidden-xs"><i class="fa {{is_star_css}} fa-fw"></i></button>
+            <button type="button" class="btn btn-primary bookmark-refresh-btn hidden-xs"><i class="fa fa-refresh fa-fw"></i></button>
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+                <!-- <i class="fa fa-chevron-down fa-fw"></i> -->
+            </button>
+            <ul class="dropdown-menu">
+                <li class="bookmark-star-btn visible-xs"><a href="javascript:;" title="加星"><i class="fa {{is_star_css}} fa-fw"></i> 加星</a></li><!--
+                <li class="bookmark-edit-btn"><a href="javascript:;" title="编辑"><i class="fa fa-pencil fa-fw"></i> 编辑</a></li> -->
+                <li class="bookmark-refresh-btn visible-xs"><a href="javascript:;" title="更新"><i class="fa fa-refresh fa-fw"></i> 更新</a></li>
+                <li class="bookmark-del-btn" ><a href="javascript:;" title="删除"><i class="fa fa-trash-o fa-fw"></i> 删除</a></li>
+            </ul>
         </div>
-        <div class="pull-right">
-            <div class="btn-group">
-                <button type="button" class="btn btn-info bookmark-read-btn"><i class="fa fa-file-text-o fa-fw"></i></button>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"><i class="fa fa-chevron-down fa-fw"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li class="bookmark-star-btn"><a href="javascript:;" title="加星"><i class="fa {{is_star_css}} fa-fw"></i> 加星</a></li>
-                        <li class="bookmark-edit-btn"><a href="javascript:;" title="编辑"><i class="fa fa-pencil fa-fw"></i> 编辑</a></li>
-                        <li class="bookmark-refresh-btn"><a href="javascript:;" title="更新"><i class="fa fa-refresh fa-fw"></i> 更新</a></li>
-                        <li class="bookmark-del-btn" ><a href="javascript:;" title="删除"><i class="fa fa-trash-o fa-fw"></i> 删除</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <blockquote><p class="text-muted">{{bookmark['excerpt']}}</p></blockquote>
-        <div class="bookmark-note">
-            {% raw bookmark['note_html'] %}
-        </div>
-        {% if len(bookmark['tags']) > 0 %}
-        <ul class="list-inline tags">
-            <li><i class="icon-tags"></i></li>
-            {% for tag in bookmark['tags'] %}
-                <li><a href="/tag/{{tag}}/1">{{tag}}</a></li>
-            {% end %}
-        </ul>
+    </div>
+    <div class="clearfix"></div>
+    <div class="bookmark-note">
+        {% raw bookmark['note_html'] %}
+    </div>
+    <div class="clearfix"></div>
+    <ul class="list-inline tags">
+        <li><i class="fa fa-tags fa-fw"></i></li>
+    {% if len(bookmark['tags']) > 0 %}
+        {% for tag in bookmark['tags'] %}
+        <li><a href="/tag/{{tag}}/1">{{tag}}</a></li>
         {% end %}
-    </div>
-    <div class="bookmark-article" style="display:none;">
-    </div>
+    {% else %}
+        <li>无标签</li>
+    {% end %}
+    </ul>
 </div>

@@ -3,6 +3,8 @@
         var lastEditor = null,
             $getBookmarkInfoBtn = $('#getBookmarkInfoBtn'),
             showArticle = function(url, title, article) {
+                var max_height = $('#bookmarkFormPanel form').height();
+                $('#article-panel').css("max_height", max_height);
                 $('#article-title')[0].innerHTML = title;
                 $('#article-content')[0].innerHTML = '<p><a target="_blank" href="' + url + '">查看原网页</a> <a target="_blank" href="/segmentation/' + url + '">查看分词结果</a></p>' + article;
             },
@@ -15,6 +17,7 @@
                 var tags_t = $('#tags').val();
                 var tags = (tags_t === '') ? response.tags : response.tags + ',' + tags_t;
                 $('#tags').val(tags);
+                $('#tags').tagsinput();
                 // 推荐标签
                 var s_tags_arr = response.suggest_tags.split(',');
                 var s_tags_html = (s_tags_arr && s_tags_arr.length) ? '<li class="stag">' + s_tags_arr.join('</li><li class="stag">') + '</li>' : '';
@@ -30,41 +33,60 @@
                 $('#url').val('').prop('disabled', false);
                 $('#title').val('');
                 $('#description').val('');
+                // $('#tags').tagsinput('removeAll');
+                $('#tags').tagsinput('destroy');
                 $('#tags').val('');
                 $('#suggestTags').empty();
                 $('#note').val('');
                 $('#article-title')[0].innerHTML = '';
                 $('#article-content')[0].innerHTML = '';
                 $('#getBookmarkInfoBtn').button('reset');
+                $('#bookmarkFormPanel').slideUp();
+                $('#bookmarksPanel').show();
             },
-            empty_article_btn_html = '<button type="button" class="bookmark-article-empty-btn btn btn-default btn-lg btn-block" data-toggle="button"><i class="fa fa-arrow-up" data-toggle="tooltip" title="收起正文"></i>收起正文</button>';
-            // getRandomBookmark = function() {
-            //     jQuery.getJSON('/randombookmark', function(response) {
-            //         if (response.success === 'true') {
-            //             $('#bookmarkList').prepend(response.bookmark_module);
-            //             $("img.lazy").lazy();
-            //             showArticle(response.url, response.title, response.article);
-            //         } else {
-            //             alert('数据库返回错误');
-            //         }
-            //     });
-            // },
             init = function() {
                 $("#vcard").popover({
                     trigger: "hover",
                     placement: "bottom"
                 });
+                $("#searchForm").focusin(function() {
+                    $('.navbar-form .form-control').animate({
+                      width: '300px'
+                    }, 500);
+                }).focusout(function() {
+                    $('.navbar-form .form-control').animate({
+                      width: '127px'
+                    }, 500);
+                })
                 $("img.lazy").lazy();
-                $('div.quickflip-wrapper').quickFlip({
-                    closeSpeed: 200,
-                    openSpeed: 150
-                });
-                $(document).on('mouseenter mouseleave', 'div.bookmark-item', function() {
+                $(document).on('mouseenter mouseleave', '.bookmark-item', function() {
                     $(this).find('.bookmark-note').stop(true, true).slideToggle();
                 });
                 // 点击"添加"，显示添加书签表单
                 $(document).on('click', '#showBookmarkFormBtn', function() {
-                    $('div.quickflip-wrapper').quickFlipper();
+                    $('#bookmarkFormPanel').slideToggle("fast", function() {
+                        $('#bookmarksPanel').toggle();
+                    });
+                });
+                // 取消添加书签
+                $(document).on('click', '#delBookmarkBtn', function() {
+                    var url = $('#url').val();
+                    resetBookmarkForm();
+                    $.ajax({
+                        url: '/bookmark/del',
+                        data: {
+                            url: url
+                        },
+                        dataType: 'json',
+                        type: "POST"
+                    }).done(function(response) {
+                        if (response.success === 'true') {
+                            lastEditor.remove();
+                            lastEditor = null;
+                        } else {
+                            alert('数据库返回错误');
+                        }
+                    });
                 });
                 // 取消添加书签
                 $(document).on('click', '#cancelAddBookmarkBtn', function() {
@@ -73,7 +95,8 @@
                 // stag为推荐的标签，当点击时添加到标签后面
                 $(document).on('click', '.stag', function() {
                     // TODO: 应该判断是否重复，这个标签输入做得不好
-                    $('#tags').val($('#tags').val() + ',' + $(this).text());
+                    $('#tags').tagsinput('add', $(this).text());
+                    // $('#tags').val($('#tags').val() + ',' + $(this).text());
                 });
                 // 在添加书签时，点击“获取信息”按钮，获取书签的信息，填入表单
                 $(document).on('click', '#getBookmarkInfoBtn', function() {
@@ -82,12 +105,13 @@
                     jQuery.getJSON('/bookmark/get_info', {
                         url: $("#url").val()
                     }).done(function(response) {
-                        $getBookmarkInfoBtn.button('reset');
                         if (response.success === 'true') {
                             initBookmarkForm($("#url").val(), response);
                         } else {
                             alert('数据库返回错误');
                         }
+                    }).always(function() {
+                        $getBookmarkInfoBtn.button('reset');
                     });
                 });
                 // 点击提交按钮，添加书签
@@ -163,7 +187,8 @@
                 });
                 // 编辑书签
                 $(document).on('click', '.bookmark-edit-btn', function() {
-                    $('div.quickflip-wrapper').quickFlipper();
+                    $('#bookmarkFormPanel').show();
+                    $('#bookmarksPanel').hide();
                     lastEditor = $(this).closest('.bookmark-item');
                     var url = lastEditor.find('.bookmark-favicon').attr('href');
                     jQuery.getJSON('/bookmark/get_detail', {
@@ -212,26 +237,38 @@
                             bind: "event",
                             delay: 0
                         });
+                        $('body').animate({scrollTop:0});
+                        // $('.bookmark-item:first').scrollTop(0);//回到顶端
                     });
                 });
-                $(document).on('click', '.bookmark-read-btn', function() {
-                    var $bookmark_item = $(this).closest('.bookmark-item');
-                    var url = $bookmark_item.find('.bookmark-favicon').attr('href');
-                    var $bookmark_article = $bookmark_item.find('.bookmark-article');
-                    // 隐藏所有
-                    $('.bookmark-article').hide();
-                    jQuery.getJSON('/bookmark/get_article', {
-                        url: url
-                    }, function(response) {
-                        if (response.success === 'true') {
-                            $bookmark_article.html(response.article).append(empty_article_btn_html).slideDown("slow");
-                        } else {
-                            alert('数据库返回错误');
-                        }
-                    });
-                });
-                $(document).on('click', '.bookmark-article-empty-btn', function() {
-                    $('.bookmark-article').slideUp("fast");
+                // $(document).on('click', '.bookmark-read-btn', function() {
+                //     var $bookmark_item = $(this).closest('.bookmark-item');
+                //     var url = $bookmark_item.find('.bookmark-favicon').attr('href');
+                //     // 隐藏所有
+                //     // $('.bookmark-article').hide();
+                //     jQuery.getJSON('/bookmark/get_detail', {
+                //         url: url
+                //     }).done(function(response) {
+                //         if (response.success === 'true') {
+                //             initBookmarkForm(url, response);
+                //         } else {
+                //             alert('数据库返回错误');
+                //         }
+                //     });
+                //     // jQuery.getJSON('/bookmark/get_article', {
+                //     //     url: url
+                //     // }, function(response) {
+                //     //     if (response.success === 'true') {
+                //     //         $('.bookmarks-list').hide();
+                //     //         $bookmark_article_content.html(response.article);
+                //     //         $bookmark_article.slideDown("slow");
+                //     //     } else {
+                //     //         alert('数据库返回错误');
+                //     //     }
+                //     // });
+                // });
+                $(document).on('click', '#showBookmarkList', function() {
+                    resetBookmarkForm();
                 });
                 // getRandomBookmark();
             };

@@ -9,12 +9,12 @@
     <title>{{ handler.settings['title'] }}</title>
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/3.0.2/yeti/bootstrap.min.css">
     <!-- Font Awesome -->
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
     <!-- Font Awesome 4.0.1 doesn't support IE7, but an older version does.  -->
     <link href="{{static_url('css/pygments.css')}}" rel="stylesheet" media="screen">
-    <link href="{{static_url('css/nanoscroller.css')}}" rel="stylesheet" media="screen">
+    <link href="{{static_url('css/bootstrap-tagsinput.css')}}" rel="stylesheet" media="screen">
     <link href="{{static_url('css/style.css') }}" rel="stylesheet" />
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -25,7 +25,7 @@
 </head>
 <body id="top">
     {% set user=handler.current_user %}
-    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -45,34 +45,36 @@
         </ul>
         <form id="searchForm" action="/ftxsearch" method="get" class="navbar-form navbar-left" role="search">
           <div class="form-group">
-            <input type="text" id="keywords" name="keywords" class="form-control" placeholder="标题 网址 标签">
+            <input type="text" id="keywords" name="keywords" class="form-control" placeholder="搜索...">
           </div>
-          <button id="searchBtn" type="submit" class="btn btn-default"><i class="fa fa-search fa-fw"></i></button>
+            <!-- <button id="searchBtn" type="submit" class="btn btn-default"><i class="fa fa-search fa-fw"></i></button> -->
         </form>
         <ul class="nav navbar-nav navbar-right">
-          <li id="vcard" data-title="{{user['email']}}" data-content="共收藏了{{handler.total}}个书签"><img src="{{handler.avatar(40)}}" class="img-circle avatar" alt="当前用户" />
-          <li><a id="showBookmarkFormBtn" class="n-add" href="#"><i class="fa fa-plus-square fa-fw"></i> 添加</a></li>
+          <li id="vcard" data-title="{{user['email']}}" data-content="共收藏了{{handler.total}}个书签" class="hidden-xs"><img src="{{handler.avatar(33)}}" class="img-circle avatar" alt="当前用户" />
+          <li class="visible-lg"><a id="showBookmarkFormBtn" class="n-add" href="#"><i class="fa fa-plus-square fa-fw"></i> 添加</a></li>
           <li><a class="n-logout" href="/auth/logout"><i class="fa fa-power-off fa-fw"></i> 登出</a></li>
           </li>
         </ul>
       </div><!-- /.navbar-collapse -->
     </nav>
-    <div class="container">
-        <div class="row" style="padding: 0 15px;">
-            <div class="col-md-12 quickflip-wrapper">
-                <div id="bookmarks-panel">
-                    {% block content %}{% end %}
-                </div>
-                <div class="row" style="padding: 0 15px;">
+    <div class="container" role="main">
+        <div class="row">
+            <div id="bookmarkFormPanel" class="col-md-12">
+                <button type="button" id="showBookmarkList" class="btn btn-info" data-toggle="button"><i class="fa fa-chevron-left" data-toggle="tooltip" title="收起正文"></i></button>
+                <div class="row">
+                    <article id="article" class="content col-md-8">
+                        <h3 id="article-title"></h3>
+                        <div id="article-content">
+                        </div>
+                    </article>
                     <!-- 添加链接表单 Begin -->
                     {% block header %}
                     <!-- 判断是否为已登录用户 -->
                     {% if not handler.current_user is None %}
-                    <div class="col-md-6">
-                    <form id="bookmarkForm" class="form-horizontal" role="form" action="#">
+                    <form class="form-horizontal col-md-4 visible-lg" role="form" action="#">
                         {% module xsrf_form_html() %}
                         <div class="form-group">
-                            <label for="url" class="control-label"></label>
+                            <label for="url" class="control-label sr-only">URL</label>
                             <div class="col-md-12 input-group">
                                 <span class="input-group-addon"><i class="fa fa-bookmark fa-fw"></i>
                                 </span>
@@ -83,26 +85,26 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="title" class="control-label visible-print">标题</label>
+                            <label for="title" class="control-label sr-only">标题</label>
                             <div class="col-md-12">
                                 <input type="text" class="form-control" name="title" id="title" placeholder="书签标题" required disabled>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="description" class="control-label visible-print">摘要</label>
+                            <label for="description" class="control-label sr-only">摘要</label>
                             <div class="col-md-12">
                                 <textarea class="form-control" name="description" id="description" rows="3" placeholder="书签摘要" disabled></textarea>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="tags" class="control-label visible-print">标签</label>
+                            <label for="tags" class="control-label sr-only">标签</label>
                             <div class="col-md-12">
-                                <input type="text" class="form-control" name="tags" id="tags" placeholder="标签1,标签2,标签3..." required/>
+                                <input type="text" class="form-control" name="tags" id="tags" required/>
                                 <ul id="suggestTags" class="list-inline"></ul>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="note" class="control-label visible-print">笔记</label>
+                            <label for="note" class="control-label sr-only">笔记</label>
                             <div class="col-md-12">
                                 <textarea class="form-control" id="note" rows="10" placeholder="还神马都没有记."></textarea>
                                 <span class="help-block">使用Markdown语法</span>
@@ -110,34 +112,34 @@
                         </div>
                         <div class="form-group">
                             <div class="col-md-12">
-                                <button type="button" id="addBookmarkBtn" class="btn btn-primary quickFlipCta">提交</button>
-                                <button type="button" id="cancelAddBookmarkBtn" class="btn quickFlipCta">取消</button>
+                                <div class="pull-right">
+                                    <button type="button" id="addBookmarkBtn" class="btn btn-primary">提交</button>
+                                    <button type="button" id="cancelAddBookmarkBtn" class="btn btn-default">取消</button>
+                                </div>
+                                <button type="button" id="delBookmarkBtn" class="btn btn-danger">删除</button>
                             </div>
                         </div>
                     </form>
-                    </div>
                     {% end %}
                     {% end %}
                     <!-- 添加链接表单 End -->
-                    <div id="article-panel" class="col-md-6">
-                        <article id="article" class="content">
-                            <h3 id="article-title"></h3>
-                            <div id="article-content">
-                            </div>
-                        </article>
-                    </div>
                 </div>
+            </div>
+            <div id="bookmarksPanel" class="col-md-12">
+                {% block content %}{% end %}
             </div>
         </div>
     </div>
     <footer id="footer">
+        <div class="container">
+            <p>Copyright © 2013 <a href="http://zoeyyoung.github.io/">ZoeyYoung</a></p>
+        </div>
     </footer>
     <script src="https://code.jquery.com/jquery.js"></script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <script src="{{static_url('js/jquery.lazy.min.js')}}"></script>
-    <script src="{{static_url('js/jquery.quickflip.min.js')}}"></script>
-    <script src="{{static_url('js/jquery.nanoscroller.min.js')}}"></script>
+    <script src="{{static_url('js/bootstrap-tagsinput.min.js')}}"></script>
     <script src="{{static_url('js/script.js')}}"></script>
 </body>
 </html>

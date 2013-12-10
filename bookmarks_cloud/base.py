@@ -3,23 +3,29 @@
 __author__ = "Zoey Young (ydingmiao@gmail.com)"
 import tornado.web
 from hashlib import md5
-from .models import Bookmark
-from .models import User
-from .utils import get_tags_cloud
+from .db import BookmarksDB
+from .db import UsersDB
+from .db import WebpagesDB
+import math
 
 class BaseHandler(tornado.web.RequestHandler):
 
     @property
     def db(self):
+        """使用的数据库"""
         return self.application.db
 
     @property
     def bm(self):
-        return Bookmark(self.db, self.current_user)
+        return BookmarksDB(self.db, self.current_user)
 
     @property
     def us(self):
-        return User(self.db)
+        return UsersDB(self.db)
+
+    @property
+    def wp(self):
+        return WebpagesDB(self.db)
 
     @property
     def total(self):
@@ -27,11 +33,21 @@ class BaseHandler(tornado.web.RequestHandler):
 
     @property
     def tags(self):
-        return self.bm.get_tags()
+        return self.bm.get_currentuser_tags()
+
+    @property
+    def top_tags(self):
+        return self.bm.get_tags_by_owner_orderby_count(self.current_user['_id'], 30)
 
     @property
     def tags_cloud(self):
-        return get_tags_cloud(self.tags)
+        """标签云"""
+        if self.tags is None or len(self.tags) == 0:
+            return []
+        max_count = max(tag['count'] for tag in self.tags)
+        if max_count < 2:
+            max_count = 2
+        return [{'tag': tag, 'font_size': round(math.log(tag['count'], max_count), 1)*14 + 8} for tag in self.tags if tag['count'] > 0]
 
     def avatar(self, size=40):
         if self.current_user:

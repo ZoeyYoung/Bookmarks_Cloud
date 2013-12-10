@@ -1,0 +1,88 @@
+except: http://www.iana.org/ Internet Assigned Numbers Authority
+except: http://www.bilibili.tv/ 嗶哩嗶哩 - ( ゜- ゜)つロ 乾杯~ - bilibili.tv
+except: http://i.youku.com/u/UMzU1NDM1Nzg0 【EMINEM中文网】的空间 优酷视频空间-聊聊影视，聊聊明星！
+except: http://www.songmeanings.net/ Song Lyrics, Song Meanings & More at SongMeanings
+except: http://www.scirus.com/ Scirus - for scientific information
+except: http://pianfang.us/home 登录偏方网
+except: http://www.theuselessweb.com/ The Useless Web
+except: http://userstyles.org/ Restyle the web with Stylish!
+except: http://jiepang.com/ 街旁 - 醒醒吧，阿宅
+except: http://nginx.com/ The High Performance Reverse Proxy, Load Balancer, Edge Cache, Origin Server
+except: http://ferret.wrc.noaa.gov/Ferret/ Data Visualization and Analysis
+except: http://forum.ubuntu.org.cn/viewtopic.php?f=70&amp;t=143830 [html is null]
+except: http://blog.binchen.org/ [html is null]
+except: http://www.slideshare.net/michael.labriola/diving-in-the-flex-data-binding-waters-presentation [html is null]
+except: http://www.zhihu.com/question/19842364 中文分词的技术是怎样实现的？ - 知乎
+except: http://www.blooberry.com/indexdot/css/propindex/all.htm All CSS Properties Listed Alphabetically
+except: http://www.c114.net/sy/hit.asp?id=7172 C114(中国通信网)|通信网站|中国第一通信门户
+except: http://think-like-a-git.net/todo.html Think Like (a) Git
+except: http://www.cs.usfca.edu/~galles/visualization/RadixSort.html Radix Sort Visualzation
+except: http://jetty.codehaus.org/jetty/ Servlet Engine and Http Server
+except: http://userscripts.org/scripts/show/84972 YoukuSS for Greasemonkey
+except: http://www1.pconline.com.cn/pcedu/specialtopic/browser-testsuite/ 测试
+except: http://livedocs.adobe.com/flex/3/html/help.html?content=deep_linking_3.html Adobe Flex 3 Help
+except: http://www.cnblogs.com/zhangziqiu/archive/2009/04/30/jQuery-Learn-1.html 从零开始学习jQuery (一) 开天辟地入门篇
+except: http://www.colorschemer.com/ ColorSchemer | Instant Color Schemes
+except: http://www.cssoptimiser.com/ Online CSS Optimiser / Optimizer
+except: http://www.nvidia.cn/page/products.html NVIDIA 产品 | NVIDIA
+except: http://www.pythonfan.org/forum-86-1.html Python爱好者 Tornado -
+except: http://think-like-a-git.net/ Think Like (a) Git
+except: http://www.php.net/ [html is null]
+except: http://free.logomaker.cn/ [html is null]
+except: http://prefixr.com/index.php Nettuts+ Prefixr
+except: http://domchristie.github.io/to-markdown/ an HTML to Markdown converter written in javascript
+except: https://github.com/bbatsov/prelude/issues/155 (error "Cannot open doc string file \"/usr/share/emacs/24.1.50/etc/DOC-24.1.50.1\"") 路 Issue #155 路 bbatsov/prelude 路 GitHub
+except: http://rubyinstaller.org/ RubyInstaller for Windows
+except: http://scriptsrc.net/ jQuery google api and other google hosted javascript libraries.
+except: http://www.aqee.net/docs/impress.js/impress.js.htm 一个令人惊异的利用纯CSS 3D动画特效功能制作的展示页面 | 外刊IT评论网 impress.js
+except: http://nltk.org/ Natural Language Toolkit - NLTK 2.0 documentation
+except: http://chenzhou123520.iteye.com/blog/1629916 REST is not enabled. use --rest to turn on.
+except: http://www.pythondoc.com/pythontutorial27/index.html python tutorial 2.7 documentation
+except: http://members.optusnet.com.au/~charles57/GTD/ Org-mode, Emacs, and Getting Things Done
+except: http://www.cflex.net/adobe_flex_help.cfm Community Flex Help
+except: http://www.ruby-lang.org/zh_cn/ Ruby 程序设计语言官方网站
+except: http://thepast.me/post/80017253 Sublime Text 2 使用 Markdown 若干折腾小记
+except: http://howsecureismypassword.net/ How Secure Is My Password?
+except: http://www.internic.net/ The Internet's Network Information Center
+except: http://www.tornadoweb.org/en/stable/ Tornado Web Server - Tornado 3.1 documentation
+except: http://www.dajie.com/home 登录_大街网_预见新自己！
+except: http://www.freemindworld.com/adchs/index.html Android Design
+except: http://csscomb.com/ The Greatest tool for sorting CSS properties in specific order
+except: http://jqfundamentals.com/ A guide to the basics of jQuery
+except: http://xheditor.com/ xhEditor - Webbased WYSWYG HtmlEditor
+except: http://www.quirksmode.org/book/links.html ppk on JavaScript
+except: http://momentjs.com/ Parse, validate, manipulate, and display dates in javascript.
+except: http://hslpicker.com/ HSL Color Picker
+except: http://twitter.github.io/bootstrap/index.html Bootstrap
+except: http://www.5uflash.com/yejiezatan/qizuibashe/5999.html flex air开发该被淘汰了（目前开发AIR真的很不成熟,建议放弃)
+except: https://code.google.com/p/google-styleguide/ google-styleguide - Style guides for Google-originated open-source projects - Google Project Hosting
+except: http://my.oschina.net/feichexia/blog/122217 如何编写可维护的JavaScript代码？ - WillJ的个人空间 - 开源中国社区
+except: http://www.hongkiat.com/blog/css3-calc-function/ CSS3 calc() Function
+except: http://www.oschina.net/question/179699_68955 10个非常不错的CSS技巧 - 开源中国社区
+except: http://www.oschina.net/question/12_52027 初学 Java Web 开发，请远离各种框架，从 Servlet 开发
+except: http://www.oschina.net/news/36728/what-languages-fix 为什么会有这么多的编程语言 - 开源中国社区
+except: http://blog.donews.com/limodou/archive/2005/01/17/244114.aspx limodou是一个程序员，他关心的焦点是Python, DocBook, Open Source …
+except: http://www.stylejar.com/archives/mongodb_the_random_attribute.html " mongodb 随机查询 c小淡のп_п_п
+except: http://www.crifan.com/how_to_use_some_language_python_csharp_to_implement_crawl_website_extract_dynamic_webpage_content_emulate_login_website/ 如何用Python，C#等语言去实现抓取静态网页+抓取动态网页+模拟登陆网站 | 在路上
+except: http://www.crifan.com/summary_about_flow_process_of_fetch_webpage_simulate_login_website_and_some_notice/ 【整理】关于抓取网页，分析网页内容，模拟登陆网站的逻辑/流程和注意事项 | 在路上
+except: http://www.crifan.com/summary_common_python_ide_pyscripter_ulipad_eclipse_pydev_eric/ 【整理】各种Python的IDE(集成开发环境)的总结和对比 | 在路上
+except: http://www.tuicool.com/te 正文抽取演示 - 推酷
+except: http://blog.csdn.net/jdcdrdim/article/details/7255083 XMPP SI FileTransfer服务传输文件过程详解
+except: http://www.cnblogs.com/lhb25/archive/2011/01/10/1932284.html JavaScript初学者应注意的七个细节 - 梦想天空（山边小溪） - 博客园
+except: https://developer.mozilla.org/en-US/docs/HTML/Block-level_elements Block-level elements - HTML
+except: http://www.css3generator.in/ Simplest CSS3 Generator
+except: http://topcoat.io/ Topcoat
+except: http://tech.techweb.com.cn/thread-615504-1-1.html 【分享】安卓推送开源方案解析 - Android开发 - TechWeb-技术社区
+except: http://developer.51cto.com/art/200909/153312.htm WEB开发中必须了解的HTML标签 - 51CTO.COM
+except: http://www.xinli001.com/ 改变从这里开始-壹心理
+except: http://zoeyyoung.gitcafe.com/mongodb.html MongoDB相关记录 - OK Computer
+except: http://www.oschina.net/news/32341/what-js-devs-seem-to-care-about 对于JavaScript，开发者更关注哪些方面 - 开源中国社区
+except: http://www.oschina.net/news/38775/legacy-coding 如何在遗留代码基础上开发 - 开源中国社区
+except: http://www.oschina.net/news/39567/wife-of-a-programmer 程序员妻子自述: 那些程序员教给我的
+except: http://www.oschina.net/news/39728/14-lessons-after-five-years-of-professional-programming 编程从业五年的十四条经验，句句朴实 - 开源中国社区
+except: http://open.chrome.360.cn/extension_dev/manifest.html#web_accessible_resources 清单文件--扩展开发文档
+except: http://pythonhosted.org/Markdown/extensions/code_hilite.html CodeHilite Extension - Python Markdown
+except: http://pythonhosted.org/Markdown/index.html Python Markdown
+except: http://alpha.gnu.org/gnu/emacs/windows/ GNU Project Archives
+except: http://docs.huihoo.com/homepage/shredderyin/emacs.html Emacs
+except: http://forum.ubuntu.org.cn/ 

@@ -8,18 +8,18 @@ from tornado import httpclient
 from functools import lru_cache
 from readability import htmls
 from readability.readability import Document, Summary, get_clean_html
-import math
 import re
 import jieba
 import jieba.analyse
 import logging
 import json
 import html.parser
+from .models import Webpage
 html_parser = html.parser.HTMLParser()
 from .config import LOG, DB
 # import urllib
 log = logging.getLogger(LOG)
-predefine_sites_collection = DB.predefine_sites
+predefine_sites_collection = DB.predefine_sites_col
 jieba.initialize()
 
 # 格式化标签
@@ -62,7 +62,6 @@ def fetch_webpage(url):
     )
     return httpclient.AsyncHTTPClient().fetch(request)
 
-
 def get_html_str(url, html=None):
     if not html:
         response = fetch_webpage(url)
@@ -94,7 +93,6 @@ def predefined_site(url, html):
                            keywords=htmls.get_keywords(doc)+','+','.join(pd['tags']))
     return None
 
-
 def video_site(url):
     players_settings = {
         r'http://v\.youku\.com/v_show/id_(\S+)\.html': '<div><iframe class="video_player" src="http://player.youku.com/embed/%s?wmode=transparent" frameborder=0 allowfullscreen wmode="transparent"></iframe></div>',
@@ -114,18 +112,58 @@ def video_site(url):
         else:
             return None
 
+def readability_adapter(url, readability):
+    webpage = Webpage()
+    webpage.url = url
+    webpage.domain = readability["domain"]
+    webpage.title = readability["title"]
+    webpage.favicon = ""
+    webpage.top_image = readability["lead_image_url"]
+    webpage.excerpt = readability["excerpt"]
+    webpage.author = readability["author"]
+    webpage.content = readability["content"]
+    webpage.tags = get_suggest_tags(readability['title'], readability['content'])
+    webpage.movies = []
+    webpage.raw_html = ""
+    webpage.publish_date = readability.date_published
+    webpage.segmentation = get_segmentation(readability['title'], readability['content'])
+    return webpage.__dict__
 
 def get_webpage_by_readability(url, readability):
     if readability:
         webpage = json.loads(readability.decode("utf-8"))
-        webpage["favicon"] = ""
-        webpage["tags"] = get_suggest_tags(webpage['title'], webpage['content'])
-        webpage["segmentation"] = get_segmentation(webpage['title'], webpage['content'])
-        webpage['excerpt'] = html_parser.unescape(webpage['excerpt'])
-        return webpage
+        for (k, v) in webpage.items():
+            try:
+                webpage[k] = html_parser.unescape(v)
+            except TypeError:
+                pass
+        return readability_adapter(url, webpage)
     else:
         print("Error: In get_bookmark_info_by_readability")
 
+def goose_adapter(url, goose_article):
+    webpage = Webpage()
+    webpage.url = url
+    webpage.domain = goose_article.domain
+    webpage.title = goose_article.title
+    webpage.favicon = goose_article.meta_favicon
+    if goose_article.top_image is not None:
+        webpage.top_image = goose_article.top_image.src
+    webpage.excerpt = goose_article.meta_description
+    webpage.author = ""
+    webpage.content = goose_article.cleaned_text
+    webpage.tags = ",".join(set(list(goose_article.tags) + format_tags(goose_article.meta_keywords)))
+    webpage.movies = goose_article.movies
+    webpage.raw_html = goose_article.raw_html
+    webpage.publish_date = goose_article.publish_date
+    webpage.segmentation = get_segmentation(goose_article.title, goose_article.cleaned_text)
+    return webpage.__dict__
+
+def get_webpage_by_goose(url, html=None):
+    from goose import Goose
+    g = Goose({'debug': True})
+    article = g.extract(url=url, raw_html=html)
+    return goose_adapter(url, article)
 
 def get_webpage_by_html(url, html=None):
     html = get_html_str(url, html)
@@ -137,27 +175,22 @@ def get_webpage_by_html(url, html=None):
     title = summary_obj.short_title
     if article is None:
         article = summary_obj.html
-    return {
-        "url": url,
-        "short_url": url,
-        "domain": url, # 这个应该可以根据URL生成
-        "favicon": "",
-        "title": title,
-        "author" : None,
-        "lead_image_url" : None,
-        "excerpt" : summary_obj.description,
-        "content": article,
-        "segmentation" : get_segmentation(title, article),
-        "tags": get_suggest_tags(title, article, summary_obj.keywords),
-        "next_page_id": None,
-        "direction" : "ltr",
-        "dek" : None,
-        "word_count": None,
-        "total_pages" : 0,
-        "date_published": None,
-        "rendered_pages": 1,
-    }
-
+    from urllib.parse import urlparse
+    webpage = Webpage()
+    webpage.url = url
+    webpage.domain = urlparse(url).hostname
+    webpage.title = title
+    webpage.favicon = ""
+    webpage.top_image = None
+    webpage.excerpt = summary_obj.description
+    webpage.author = None
+    webpage.content = article
+    webpage.tags = get_suggest_tags(title, article, summary_obj.keywords)
+    webpage.movies = []
+    webpage.raw_html = html
+    webpage.publish_date = None
+    webpage.segmentation = get_segmentation(title, article)
+    return webpage.__dict__
 
 def get_suggest_tags(title, content, keywords_meta=None):
     """根据标题和内容获取推荐标签"""
@@ -175,14 +208,12 @@ def get_suggest_tags(title, content, keywords_meta=None):
     # TODO: 还需要进行一系列处理
     return keywords
 
-
 def get_segmentation(title, content):
     if title is None:
         title = ''
     if content is None:
         content = ''
     return text_segmentation(title + content)
-
 
 def text_content(s):
     if not s:
@@ -191,22 +222,13 @@ def text_content(s):
     s = re.sub(r'</?\w+[^>]*>', '', s)
     return ' '.join(s.split())
 
-
 def text_segmentation(article):
     if not article:
         return ''
     words = "/ ".join(jieba.cut(text_content(article)))
     return words
 
-
 def get_keywords(article):
     if not article:
         return ''
     return jieba.analyse.extract_tags(text_content(article), 10)
-
-
-def get_tags_cloud(tags):
-    max_count = max(tag['count'] for tag in tags)
-    if max_count < 2:
-        max_count = 2
-    return [{'tag': tag, 'font_size': round(math.log(tag['count'], max_count), 1)*14 + 8} for tag in tags if tag['count'] > 0]

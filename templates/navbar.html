@@ -1,0 +1,24 @@
+<header id="header">
+    <ul id="navigationMenu">
+        <li class="active"><a class="n-cloud" href="/"><span><i class="fa fa-cloud fa-fw"></i> 首页</span></a>
+        </li>
+        <li><a class="n-list" href="#1" data-toggle="tab"><span><i class="fa fa-list fa-fw"></i> 列表</span></a>
+        </li>
+        <li><a class="n-tags" href="#2" data-toggle="tab"><span><i class="fa fa-tags fa-fw"></i> 标签</span></a>
+        </li>
+        <li id="randomBookmarksBtn">
+            <a class="n-random" href="#3" data-toggle="tab"><span><i class="fa fa-random fa-fw"></i> 随机</span></a>
+        </li>
+        <li>
+            <a id="searchBtn" class="n-search" href="javascript:;">
+                <span><i class="fa fa-search fa-fw"></i>
+                    <form id="searchForm" action="/ftxsearch" method="get">
+                        <input type="search" id="keywords" name="keywords" class="input-medium" placeholder="标题 网址 标签" />
+                    </form>
+                </span>
+            </a>
+        </li>
+        <li><a id="showBookmarkFormBtn" class="n-add" href="#"><span><i class="fa fa-plus-square fa-fw"></i> 添加</span></a></li>
+        <li><a class="n-logout" href="/auth/logout"><span><i class="fa fa-power-off fa-fw"></i> 登出</span></a></li>
+    </ul>
+</header>

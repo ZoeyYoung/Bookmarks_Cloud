@@ -1,7 +1,7 @@
 import logging
 import re
 
-from lxml.html import document_fromstring, fragment_fromstring
+# from lxml.html import document_fromstring, fragment_fromstring
 from lxml.html import html5parser
 from lxml.html import HTMLParser
 from lxml.html import tostring

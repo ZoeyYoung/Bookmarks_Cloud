@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="tab-content content">
+<div class="tab-content content col-md-10">
     <div class="tab-pane active" id="1">
+        <div id="bookmarksList">
         {% block bookmarks_pane %}
         {% end %}
+        </div>
+<!--         <div id="bookmark-article" style="display:none;">
+            <button type="button" id="bookmark-article-empty-btn" class="btn btn-info" data-toggle="button"><i class="fa fa-chevron-left" data-toggle="tooltip" title="收起正文"></i></button>
+            <div class="row">
+                <div id="bookmark-article-content" class="well col-md-8"></div>
+            </div>
+        </div> -->
     </div>
     <div class="tab-pane fade" id="2">
         {% block tags_pane %}
@@ -18,4 +26,11 @@
         <div id="randomBookmarks"></div>
     </div>
 </div>
+<ul id="topTagsList" class="col-md-2 list-unstyled">
+    <li><h4><i class="fa fa-tags fa-fw"></i> 常用标签</h4></li>
+{% for tag in handler.top_tags %}
+    <li><a href="/tag/{{tag['_id']}}/1">{{tag['_id']}}({{tag['count']}})</a></li>
+{% end %}
+    <li><a class="n-tags" href="#2" data-toggle="tab">所有标签</a>
+</ul>
 {% end %}

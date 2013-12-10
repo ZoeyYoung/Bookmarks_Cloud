@@ -1,7 +1,7 @@
 {% extends 'tabbable.html' %}
 {% block bookmarks_pane %}
 <div id="pageBookmarkList" tag="" keywords="">
-    <div id="bookmarkList">
+    <div id="bookmarkList" class="list-group">
         {% for bookmark in bookmarks %}
             {% module Bookmark(bookmark) %}
         {% end %}

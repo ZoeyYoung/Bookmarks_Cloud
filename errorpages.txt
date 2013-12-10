@@ -1,0 +1,80 @@
+Error: html is None http://forum.ubuntu.org.cn/viewtopic.php?f=70&amp;t=143830
+Error: html is None http://blog.binchen.org/
+Error: html is None http://www.slideshare.net/michael.labriola/diving-in-the-flex-data-binding-waters-presentation
+Error: html is None http://knb.im/css3/
+Error: html is None http://www.php.net/
+Error: html is None http://free.logomaker.cn/
+Error: html is None http://pychecker.sourceforge.net/
+Error: html is None http://www.helpinfo.net/Index.aspx
+Error: html is None http://www.laihj.net/
+Error: html is None http://cssdoc.net/
+Error: html is None http://www.ryanbay.com/
+Error: html is None https://code.google.com/p/google-styleguide/
+
+F:\Bookmarks_Cloud\lib\site-packages\html5lib\treebuilders\etree_lxml.py:311: DataLossWarning: lxml cannot represent adjacent comments beyond the root elements
+warnings.warn("lxml cannot represent adjacent comments beyond the root elements", DataLossWarning)
+
+F:\Bookmarks_Cloud\lib\site-packages\html5lib\treebuilders\etree_lxml.py:341: DataLossWarning: lxml cannot represent doctype with a different name to the root element
+  warnings.warn("lxml cannot represent doctype with a different name to the root element", DataLossWarning)
+
+F:\Bookmarks_Cloud\lib\site-packages\html5lib\ihatexml.py:254: DataLossWarning: Coercing non-XML name
+  warnings.warn("Coercing non-XML name", DataLossWarning)
+
+F:\Bookmarks_Cloud\lib\site-packages\html5lib\ihatexml.py:262: DataLossWarning: Coercing non-XML name
+  warnings.warn("Coercing non-XML name", DataLossWarning)
+
+F:\Bookmarks_Cloud\lib\site-packages\html5lib\ihatexml.py:233: DataLossWarning: Text cannot
+ contain U+000C
+  warnings.warn("Text cannot contain U+000C", DataLossWarning)
+
+ERROR:tornado.application:Uncaught exception GET /bookmark/get_info?url=http%3A%2F%2Fblog.jobbole.com%2F10279%2F (::1)
+HTTPRequest(protocol='http', host='localhost:8888', method='GET', uri='/bookmark/get_info?url=http%3A%2F%2Fblog.jobbole.com%2F10279%2F', version='HTTP/1.1', remote_ip='::1', headers={'Accept': 'application/json, text/javascript, */*; q=0.01', 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1568.2 Safari/537.36', 'Accept-Language': 'zh-CN,zh;q=0.8', 'Connection': 'keep-alive', 'Cookie': '_xsrf=4cf7a36628194a4885889b12cd123cdc; user=eW91cl9uYW1l|1375434239|f424c6c0be8e1cfabc198abd63b74af4ae69fbdc', 'Host': 'localhost:8888', 'Accept-Encoding': 'gzip,deflate,sdch'})
+Traceback (most recent call last):
+  File "F:\Bookmarks_Cloud\lib\site-packages\tornado\web.py", line 1141, in _when_complete
+    callback()
+  File "F:\Bookmarks_Cloud\lib\site-packages\tornado\web.py", line 1162, in _execute_method
+
+    self._when_complete(method(*self.path_args, **self.path_kwargs),
+  File "F:\Bookmarks_Cloud\lib\site-packages\tornado\web.py", line 2293, in wrapper
+    return method(self, *args, **kwargs)
+  File "F:\Bookmarks_Cloud\bookmarks_cloud\bookmarks_handlers.py", line 73, in get
+    info = Bookmark.get_info(url)
+  File "F:\Bookmarks_Cloud\bookmarks_cloud\models.py", line 98, in get_info
+    info = get_bookmark_info(url, html)
+  File "F:\Bookmarks_Cloud\bookmarks_cloud\utils.py", line 51, in get_bookmark_info
+    summary_obj = doc.summary_with_metadata(enclose_with_html_tag=False)
+  File "F:\Bookmarks_Cloud\readability\readability.py", line 1040, in summary_with_metadata
+
+    summary = self._summary(enclose_with_html_tag=enclose_with_html_tag)
+  File "F:\Bookmarks_Cloud\readability\readability.py", line 1057, in _summary
+    doc = self.html
+  File "F:\Bookmarks_Cloud\readability\readability.py", line 1002, in html
+    self._html = parse(self.input_doc, self.options.get('url'))
+  File "F:\Bookmarks_Cloud\readability\readability.py", line 952, in parse
+    raw_doc = build_doc(input)
+  File "F:\Bookmarks_Cloud\readability\htmls.py", line 31, in build_doc
+    html5doc = html5parser.fromstring(decode_html(page))
+  File "F:\Bookmarks_Cloud\lib\site-packages\lxml\html\html5parser.py", line 144, in fromstring
+    guess_charset=guess_charset)
+  File "F:\Bookmarks_Cloud\lib\site-packages\lxml\html\html5parser.py", line 61, in document_fromstring
+    return parser.parse(html, useChardet=guess_charset).getroot()
+  File "F:\Bookmarks_Cloud\lib\site-packages\html5lib\html5parser.py", line 224, in parse
+    parseMeta=parseMeta, useChardet=useChardet)
+  File "F:\Bookmarks_Cloud\lib\site-packages\html5lib\html5parser.py", line 93, in _parse
+    self.mainLoop()
+  File "F:\Bookmarks_Cloud\lib\site-packages\html5lib\html5parser.py", line 183, in mainLoop
+    new_token = phase.processCharacters(new_token)
+  File "F:\Bookmarks_Cloud\lib\site-packages\html5lib\html5parser.py", line 991, in processCharacters
+    self.tree.insertText(token["data"])
+  File "F:\Bookmarks_Cloud\lib\site-packages\html5lib\treebuilders\_base.py", line 320, in insertText
+    parent.insertText(data)
+  File "F:\Bookmarks_Cloud\lib\site-packages\html5lib\treebuilders\etree_lxml.py", line 240, in insertText
+    builder.Element.insertText(self, data, insertBefore)
+  File "F:\Bookmarks_Cloud\lib\site-packages\html5lib\treebuilders\etree.py", line 108, in insertText
+    self._element.text += data
+  File "lxml.etree.pyx", line 921, in lxml.etree._Element.text.__set__ (src\lxml\lxml.etree.c:41401)
+  File "apihelpers.pxi", line 650, in lxml.etree._setNodeText (src\lxml\lxml.etree.c:18889)
+
+  File "apihelpers.pxi", line 1333, in lxml.etree._utf8 (src\lxml\lxml.etree.c:24702)
+ValueError: All strings must be XML compatible: Unicode or ASCII, no NULL bytes or control characters
+ERROR:tornado.access:500 GET /bookmark/get_info?url=http%3A%2F%2Fblog.jobbole.com%2F10279%2F (::1) 135.01ms

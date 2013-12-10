@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,9 +9,9 @@
     <title>{{ handler.settings['title'] }}</title>
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/3.0.2/yeti/bootstrap.min.css">
     <!-- Font Awesome -->
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
     <!-- Font Awesome 4.0.1 doesn't support IE7, but an older version does.  -->
     <!-- font-awesome如果需要IE7支持要添加额外的CSS -->
     <link href="{{static_url('css/style.css') }}" rel="stylesheet" />
@@ -27,7 +27,15 @@
     <div class="container">
         <div class="row">
             <div class="col-md-offset-4 col-md-4">
-                <form method="POST" class="form-signin form-horizontal" role="form">
+            <!-- Nav tabs -->
+                <ul class="nav nav-tabs">
+                  <li><a href="#signin" data-toggle="tab">登录</a></li>
+                  <li><a href="#signup" data-toggle="tab">注册</a></li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                  <div class="tab-pane active" id="signin">
+                    <form method="POST" action="/auth/signin" class="form-signin form-horizontal" role="form">
                         <div class="form-group">
                             <label for="email" class="col-sm-2 control-label">邮箱</label>
                             <div class="col-sm-10">
@@ -42,11 +50,39 @@
                         </div>
                         <div class="form-actions">
                             <div class="col-sm-offset-2 col-sm-10">
-                                <button type="button" id="signInBtn" class="btn btn-primary">登录</button>
-                                <button type="button" id="signUpBtn" class="btn btn-default">注册</button>
+                                <button type="submit" id="signInBtn" class="btn btn-primary">登录</button>
                             </div>
                         </div>
-                </form>
+                    </form>
+                  </div>
+                  <div class="tab-pane" id="signup">
+                    <form method="POST" action="/auth/signup" class="form-signin form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="email" class="col-sm-2 control-label">邮箱</label>
+                            <div class="col-sm-10">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="邮箱"  required autofocus>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="username" class="col-sm-2 control-label">用户名</label>
+                            <div class="col-sm-10">
+                                <input type="username" class="form-control" id="username" name="username" placeholder=""  required autofocus>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="col-sm-2 control-label">密码</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="密码" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" id="signUpBtn" class="btn btn-default">注册</button>
+                            </div>
+                        </div>
+                    </form>
+                  </div>
+                </div>
             </div>
         </div>
     </div>
@@ -56,6 +92,5 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <script src="{{static_url('js/jquery.placeholder.js')}}"></script>
-    <script src="{{static_url('js/auth.js')}}"></script>
 </body>
 </html>
